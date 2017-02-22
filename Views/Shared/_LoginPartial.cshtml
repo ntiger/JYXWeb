@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNet.Identity;
+@using JYXWeb.Util;
+
+@if (Request.IsAuthenticated)
+{
+    var username = User.Identity.GetUserName().Split('@')[0];
+    if (User.Identity.GetFirstName() != "" || User.Identity.GetLastName() != "")
+    {
+        username = User.Identity.GetFirstName() + " " + User.Identity.GetLastName();
+    }
+
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+    @Html.AntiForgeryToken()
+
+    <ul class="nav navbar-nav navbar-right">
+        <li>
+            @Html.ActionLink(username + " 欢迎你", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "个人中心" })
+        </li>
+        <li><a href="javascript:document.getElementById('logoutForm').submit()">退出</a></li>
+    </ul>
+    }
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li>@Html.ActionLink("注册", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+        <li>@Html.ActionLink("登录", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+    </ul>
+}

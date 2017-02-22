@@ -1,0 +1,29 @@
+﻿<div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand">@ViewBag.Title</a>
+           
+            @*@Html.ActionLink("美天优递", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })*@
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="dropdown-submenu">@Html.ActionLink("我要转运", "Index", "Package")
+                    <ul class="dropdown-menu">
+                        <li role="presentation">@Html.ActionLink("原装闪运", "New", "Package")</li>
+                        <li role="presentation">@Html.ActionLink("普通转运", "New", "Package", new { holdPackage = "true"}, null)</li>
+                        <li role="presentation">@Html.ActionLink("包裹管理", "Index", "Package")</li>
+                    </ul>
+                </li>
+                <li>@Html.ActionLink("渠道说明", "Service", "Home")</li>
+                <li>@Html.ActionLink("公司简介", "About", "Home")</li>
+ @*               <li>@Html.ActionLink("联系我们", "Contact", "Home")</li>*@
+            </ul>
+            @Html.Partial("_LoginPartial")
+        </div>
+    </div>
+</div>

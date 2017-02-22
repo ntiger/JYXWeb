@@ -1,0 +1,96 @@
+﻿@using JYXWeb.Util;
+@model JYXWeb.Models.IndexViewModel
+@{
+    ViewBag.Title = "个人中心";
+    var userCode = User.Identity.GetUserCode();
+    var firstName = User.Identity.GetFirstName();
+    var lastName = User.Identity.GetLastName();
+    var isAdmin = AppUtil.IsAdmin(userCode).ToString().ToLower();
+}
+
+<p class="text-success">@ViewBag.StatusMessage</p>
+<div ng-controller="accountCtrl" data-ng-init="firstName='@firstName';lastName='@lastName';isAdmin=@isAdmin;getUsers()" ng-cloak>
+    <br />
+    <fieldset>
+        <legend>个人信息</legend>
+        用户名/邮箱: @User.Identity.Name 
+        [@Html.ActionLink("修改密码", "ChangePassword")]
+
+    </fieldset>
+    <br />
+    <br />
+
+    <fieldset>
+        <legend>我的美国收货地址</legend>
+        <table class="table table-striped" style="width:30%">
+            <tr>
+                <td>名/First Name:</td>
+                <td>
+                    <md-input-container class="md-block hide-md-error-msg" layout-fill>
+                        <input ng-model="firstName" ng-change="saveName()" ng-model-options="{ updateOn: 'blur' }" aria-label="first name"/>
+                    </md-input-container>
+                </td>
+            </tr>
+            <tr>
+                <td>姓/Last Name:</td>
+                <td>
+                    <md-input-container class="md-block hide-md-error-msg" layout-fill>
+                        <input ng-model="lastName"  ng-change="saveName()" ng-model-options="{ updateOn: 'blur' }" aria-label="last name"/>
+                    </md-input-container>
+                </td>
+            </tr>
+            <tr>
+                <td>地址1/Address1:</td>
+                <td>7J Taggart Dr</td>
+            </tr>
+            <tr>
+                <td>地址2/Address2:</td>
+                <td>@userCode</td>
+            </tr>
+            <tr>
+                <td>城市/City:</td>
+                <td>Nashua</td>
+            </tr>
+            <tr>
+                <td>州/State:</td>
+                <td>New Hampshire (NH)</td>
+            </tr>
+            <tr>
+                <td>邮编/Zip Code:</td>
+                <td>03060</td>
+            </tr>
+            <tr>
+                <td>电话/Tel:</td>
+                <td>815-556-9028</td>
+            </tr>
+        </table>
+    </fieldset>
+
+    <md-table-container>
+        <table class="table table-striped" md-table ng-model="userTable" md-progress="promise">
+            <thead md-head md-order="query.order">
+                <tr md-row>
+                    <th md-column md-order-by="UserCode" class="text-center"><span>用户编码</span></th>
+                    <th md-column md-order-by="UserName" class="text-center"><span>登录邮箱</span></th>
+                    <th md-column md-order-by="LastName" class="text-center"><span>姓</span></th>
+                    <th md-column md-order-by="FirstName" class="text-center"><span>名</span></th>
+                </tr>
+            </thead>
+
+
+            <tbody md-body>
+                <tr md-row md-auto-select="false" ng-repeat="user in users | orderBy: query.order | limitTo: query.limit : (query.page-1) * query.limit">
+                    <td md-cell>{{user.UserCode}}</td>
+                    <td md-cell>{{user.UserName}}</td>
+                    <td md-cell>{{user.LastName}}</td>
+                    <td md-cell>{{user.FirstName}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </md-table-container>
+    <md-table-pagination md-limit="query.limit" md-limit-options="[5, 10, 20, 50]" md-page="query.page" 
+                         md-total="{{users.length}}" md-on-paginate="" md-page-select></md-table-pagination>
+</div>
+@section Scripts {
+    <script src="~/src/app/controlles/accountCtrl.js"></script>
+}

@@ -1,0 +1,12 @@
+﻿@{
+    var holdPackage = Request.Params["holdPackage"] ?? "false";
+    ViewBag.Title = holdPackage=="true"? "普通转运" : "原装闪运";
+}
+
+<div data-ng-init="init();holdPackage=@holdPackage;addPackage();" ng-cloak>
+    @Html.Partial("_Package")
+    @Html.Partial("_AddressModal")
+</div>
+    @section Scripts {
+        <script src="~/src/app/controlles/packageCtrl.js"></script>
+    }

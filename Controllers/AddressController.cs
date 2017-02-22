@@ -1,0 +1,103 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using JYXWeb.DB;
+using JYXWeb.Util;
+
+namespace JYXWeb.Controllers
+{
+    [Authorize]
+    public class AddressController : Controller
+    {
+        public ActionResult GetDistricts(int? id)
+        {
+            using (var packageDataContext = new PackageDataContext())
+            {
+                var districts = packageDataContext.Districts.Where(a => a.ParentID == id || !id.HasValue && !a.ParentID.HasValue).Select(a => new
+                {
+                    a.ID,
+                    a.Name
+                }).ToList();
+                return Json(districts, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+        public ActionResult GetAddresses(int? id)
+        {
+            using (var packageDataContext = new PackageDataContext())
+            {
+                var addresses = packageDataContext.Addresses.Where(a => a.UserCode == User.Identity.GetUserCode() || a.ID == id).Select(a => new
+                {
+                    a.ID,
+                    ProvinceName = a.District1.District1.District1.Name,
+                    Province = a.District1.District1.District1.ID,
+                    CityName = a.District1.District1.Name,
+                    City = a.District1.District1.ID,
+                    DistrictName = a.District1.Name,
+                    District = a.District,
+                    Street = a.Street,
+                    a.Name,
+                    a.Phone,
+                    a.PostCode,
+                    a.IsDefault,
+                }).OrderBy(a => a.IsDefault).ToList();
+                return Json(addresses, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+        public ActionResult UpdateAddress(Address address)
+        {
+            using (var packageDataContext = new PackageDataContext())
+            {
+                var existingAddress = packageDataContext.Addresses.Where(a => a.ID == address.ID).SingleOrDefault();
+                if (existingAddress != null)
+                {
+                    existingAddress.Name = address.Name;
+                    existingAddress.District = address.District;
+                    existingAddress.Phone = address.Phone;
+                    existingAddress.PostCode = address.PostCode;
+                    existingAddress.IsDefault = address.IsDefault;
+                }
+                else
+                {
+                    address.UserCode = User.Identity.GetUserCode();
+                    packageDataContext.Addresses.InsertOnSubmit(address);
+                }
+
+                packageDataContext.SubmitChanges();
+            }
+            return null;
+        }
+
+        public ActionResult DeleteAddress(int id)
+        {
+            using (var packageDataContext = new PackageDataContext())
+            {
+                var returnStr = "";
+                var address = packageDataContext.Addresses.Where(a => a.ID == id).SingleOrDefault();
+                if (address != null)
+                {
+                    if (address.UserCode == User.Identity.GetUserCode())
+                    {
+                        packageDataContext.Addresses.DeleteOnSubmit(address);
+                        packageDataContext.SubmitChanges();
+                    }
+                    else
+                    {
+                        returnStr = "无法删除他人地址";
+                    }
+                }
+                else
+                {
+                    returnStr = "地址不存在";
+                }
+                return Json(returnStr, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+    }
+}

@@ -1,0 +1,78 @@
+﻿<div class="modal fade" id="splitPackageModal" tabindex="-1" role="dialog" aria-labelledby="splitPackageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">分箱</h4>
+            </div>
+            <div class="modal-body">
+                <div layout="row">
+                    <div flex="50">
+                        <table class="table table-bordered table-striped table-condensed">
+                            <thead>
+                                <tr>
+                                    <th colspan="5" class="text-center">原包裹</th>
+                                </tr>
+                                <tr>
+                                    <th class="text-center"><span>追踪号</span></th>
+                                    <th class="text-center"><span>名称</span></th>
+                                    <th class="text-center"><span>单价</span></th>
+                                    <th class="text-center"><span>数量</span></th>
+                                    <th class="text-center"><span>操作</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="product in package.Products track by $index">
+                                    <td>{{product.Tracking}}</td>
+                                    <td>{{product.Name}}</td>
+                                    <td class="text-center">{{product.Price}}</td>
+                                    <td class="text-center">{{product.Quantity}}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-xs btn-primary" ng-click="splitProduct($index)">
+                                            <span class="glyphicon glyphicon-arrow-right"></span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div flex="50">
+                        <table class="table table-bordered table-striped table-condensed">
+                            <thead>
+                                <tr>
+                                    <th colspan="5" class="text-center">新包裹</th>
+                                </tr>
+                                <tr>
+                                    <th class="text-center"><span>追踪号</span></th>
+                                    <th class="text-center"><span>名称</span></th>
+                                    <th class="text-center"><span>单价</span></th>
+                                    <th class="text-center"><span>数量</span></th>
+                                    <th class="text-center"><span>操作</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="product in newPackage.Products track by $index">
+                                    <td>{{product.Tracking}}</td>
+                                    <td>{{product.Name}}</td>
+                                    <td class="text-center">{{product.Price}}</td>
+                                    <td class="text-center">{{product.Quantity}}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-xs btn-primary" ng-click="cancelSplitProduct($index)">
+                                            <span class="glyphicon glyphicon-arrow-left"></span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" data-ng-click="splitPackage()">确认分箱</button>
+            </div>
+        </div>
+    </div>
+</div>

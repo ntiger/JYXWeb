@@ -1,0 +1,114 @@
+﻿@using JYXWeb.Util;
+@{
+    ViewBag.Title = "包裹管理";
+    var userCode = User.Identity.GetUserCode();
+    var isAdmin = AppUtil.IsAdmin(userCode).ToString().ToLower();
+}
+
+<div data-ng-init="isAdmin=@isAdmin;init();userCode='@userCode';" ng-cloak layout="column">
+    <div layout-gt-sm="row">
+       <md-input-container class="md-block hide-md-error-msg">
+            <md-datepicker ng-model="startDate" md-placeholder="Enter start date"></md-datepicker>
+        </md-input-container>
+       <md-input-container class="md-block hide-md-error-msg">
+            <md-datepicker ng-model="endDate" md-placeholder="Enter end date"></md-datepicker>
+        </md-input-container>
+       <md-input-container class="md-block hide-md-error-msg">
+            <label>包裹状态</label>
+            <md-select ng-model="status">
+                <md-option ng-repeat="status in statusList" value="{{status}}">
+                    {{status}}
+                </md-option>
+            </md-select>
+        </md-input-container>
+       <md-input-container class="md-block hide-md-error-msg">
+            <label>转运单号</label>
+            <input ng-model="packageCode" />
+        </md-input-container>
+       <md-input-container class="md-block hide-md-error-msg">
+            <label>追踪号</label>
+            <input ng-model="tracking" />
+        </md-input-container>
+       <md-input-container class="md-block hide-md-error-msg">
+            <label>收件人</label>
+            <input ng-model="receiver" />
+        </md-input-container>
+        
+        <md-input-container class="md-block hide-md-error-msg">
+            <md-button class="md-raised md-warn" style="margin-top:0" data-ng-click="searchPackages()">
+                查找包裹 <md-icon class="material-icons">search</md-icon>
+            </md-button>
+        </md-input-container>
+    </div>
+    <div layout="row">
+        <md-input-container ng-show="isAdmin" class="md-block hide-md-error-msg" style="margin:0">
+            <label>用户姓名</label>
+            <input ng-model="userName" />
+        </md-input-container>
+        <md-input-container ng-show="isAdmin" class="md-block hide-md-error-msg" style="margin:0">
+            <label>用户编码</label>
+            <input ng-model="userCode" ng-focus="userCode=''" />
+        </md-input-container>
+    </div>
+    <md-input-container class="md-block">
+        <md-button class="md-raised md-warn" ng-click="addPackage($event)">新增包裹</md-button>
+        <md-button class="md-raised md-warn" data-ng-disabled="selectedPackages.length<2" ng-click="combinePackages($event)">合箱</md-button>
+    </md-input-container>
+    <div layout="row">
+        <md-table-container>
+            <table class="table table table-striped" md-table md-row-select="options.rowSelection" multiple="{{options.multiSelect}}" 
+                   ng-model="selectedPackages" md-progress="promise">
+                <thead md-head md-order="packagesOrder">
+                    <tr md-row>
+                        <th md-column md-order-by="ID" class="text-center"><span>单号</span></th>
+                        <th md-column md-order-by="Tracking" class="text-center"><span>入库追踪号</span></th>
+                        <th md-column md-order-by="Receiver" class="text-center"><span>收件人</span></th>
+                        <th md-column md-order-by="Products" class="text-center"><span>货物名称</span></th>
+                        <th md-column md-order-by="Status" class="text-center"><span>状态</span></th>
+                        <th md-column md-order-by="UserCode" class="text-center" data-ng-show="isAdmin"><span>用户编码</span></th>
+                        <th md-column md-order-by="" class="text-center"><span>操作</span></th>
+                    </tr>
+                </thead>
+                <tbody md-body>
+                    <tr md-row md-select="package" md-select-id="ID" md-auto-select="false" ng-repeat="package in packages | orderBy: packagesOrder">
+                        <td md-cell class="text-center">
+                            <a href="#" ng-click="getPackage(package.ID, showPackageModal)">{{package.ID.replace('TM','MT')}}</a>
+                        </td>
+                        <td md-cell class="text-center">
+                            {{package.Tracking}}
+                        </td>
+                        <td md-cell class="text-center">
+                            {{package.Receiver}}
+                        </td>
+                        <td md-cell class="text-center">
+                            {{package.ProductNames}}
+                        </td>
+                        <td md-cell class="text-center">
+                            {{package.Status}}
+                        </td>
+                        <td md-cell class="text-center" ng-show="isAdmin">
+                            {{package.UserCode}}
+                        </td>
+                        <td md-cell class="text-center">
+                            <md-button class="md-fab md-mini md-primary" data-ng-disabled="package.Disabled" aria-label="Separate" ng-click="getPackage(package.ID, showSplitPackageModal)">
+                                分箱
+                            </md-button>
+                            <md-button class="md-fab md-mini md-warn" data-ng-disabled="package.Disabled" aria-label="Return" ng-click="returnPackage(package.ID)">
+                                退货
+                            </md-button>
+                            <md-button class="md-fab md-mini md-warn md-hue-2" aria-label="Delete" data-ng-disabled="package.Disabled" data-ng-click="deletePackage(package.ID)">
+                                删除
+                            </md-button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </md-table-container>
+    </div>
+    @Html.Partial("_PackageModal")
+    @Html.Partial("_SplitPackageModal")
+    @Html.Partial("_AddressModal")
+</div>
+    @section Scripts {
+        <script src="~/src/app/controlles/packageCtrl.js?1.0"></script>
+    }

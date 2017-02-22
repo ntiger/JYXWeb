@@ -1,0 +1,35 @@
+﻿@{
+    var angularEnabled = (ViewBag.AngularAppName != null);
+    var angularAppName = ViewBag.AngularAppName;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+
+<body class="body-normal" id="main-document-body" @if (angularEnabled) { <text> data-ng-app="@angularAppName" </text>  }>
+    <div class="container">
+        @Html.Partial("_Menu")
+        <div>
+            @RenderBody()
+        </div>
+        <hr />
+        <footer>
+            <p class="text-center">&copy; @DateTime.Now.Year 美天优递 版权所有. Powered by Xiao Wang &copy;2016&#8211;@DateTime.Today.Year.</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/angularjs")
+    @Scripts.Render("~/bundles/app")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
+

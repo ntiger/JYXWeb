@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNet.Identity;
+@using JYXWeb.Util;
+
+@if (Request.IsAuthenticated)
+{
+    var username = User.Identity.GetUserName().Split('@')[0];
+    if(User.Identity.GetFirstName()!=""|| User.Identity.GetLastName() != "")
+    {
+        username = User.Identity.GetFirstName() + " " + User.Identity.GetLastName();
+    }
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+    {
+    @Html.AntiForgeryToken()
+        <md-button aria-label="" href="/Manage">
+            @(username + " 欢迎你")
+        </md-button>
+        <a md-button aria-label="" onclick="document.getElementById('logoutForm').submit()">
+            退出
+        </a>
+    }
+}
+else
+{
+    <md-button aria-label="" href="/Account/Register">
+        注册
+    </md-button>
+    <md-button aria-label="" href="/Account/Login">
+        登录
+    </md-button>
+}

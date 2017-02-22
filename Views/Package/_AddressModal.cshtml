@@ -1,0 +1,59 @@
+﻿<div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">管理收货地址</h4>
+            </div>
+            <div class="modal-body">
+                <h4>{{ package.Address.ID===undefined?'添加新':'编辑' }}地址</h4>
+                <md-input-container class="md-block" flex-gt-xs>
+                    <label>收件人姓名</label>
+                    <input ng-model="package.Address.Name">
+                </md-input-container>
+                <div layout="row">
+                    <md-input-container style="margin-right: 10px;">
+                        <label>请选择省份</label>
+                        <md-select ng-model="package.Address.ProvinceName" md-on-open="getDistricts('provinces', '', '')" ng-change="package.Address.CityName='';package.Address.District=''">
+                            <md-option ng-repeat="(i, province) in provinces" ng-value="province.Name">{{province.Name}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-input-container>
+                        <label>请选择城市</label>
+                        <md-select ng-model="package.Address.CityName" md-on-open="getDistricts('cities', 'provinces', package.Address.ProvinceName)" ng-change="package.Address.District=''">
+                            <md-option ng-repeat="(i, city) in cities track by $index" ng-value="city.Name">{{city.Name}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-input-container>
+                        <label>请选择区县</label>
+                        <md-select ng-model="package.Address.District" md-on-open="getDistricts('districts', 'cities', package.Address.CityName)">
+                            <md-option ng-repeat="(i, district) in districts track by $index" ng-value="district.ID" ng-selected="districts.length==1&&i==0">{{district.Name}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                <div layout="row">
+                    <md-input-container class="md-block" flex="80">
+                        <label>街道地址</label>
+                        <input ng-model="package.Address.Street">
+                    </md-input-container>
+                    <md-input-container class="md-block" flex="20">
+                        <label>邮编</label>
+                        <input ng-model="package.Address.PostCode">
+                    </md-input-container>
+                </div>
+                <md-input-container class="md-block" flex-gt-xs>
+                    <label>联系电话</label>
+                    <input ng-model="package.Address.Phone">
+                </md-input-container>
+                <div layout-gt-sm="row">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="updateAddress()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>

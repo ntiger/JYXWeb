@@ -1,0 +1,123 @@
+﻿body.body-side-menu {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    position: relative;
+    overflow:hidden;
+}
+
+body.body-normal {
+    margin-top: 50px;
+    padding-bottom: 20px;
+    height:auto !important;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+.container-full {
+  margin: 0 auto;
+  width: 100%;
+}
+
+.full-width-div {
+    position: absolute;
+    width: 100%;
+    left: 0;
+}
+
+md-input-container.hide-md-error-msg .md-errors-spacer:empty {
+    display: none;
+}
+
+.md-select-menu-container {
+    z-index: 1053 !important;
+}
+
+.md-select-backdrop{
+    z-index: 1052 !important;
+}
+
+.md-datepicker-button {
+    width: 36px;
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+}
+
+.md-datepicker-input-container {
+    margin-left: 0px !important;
+}
+
+.md-datepicker-input {
+    min-width: 0px !important;
+}
+
+/*Bootstrap multiple level menu*/
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu > .dropdown-menu {
+    top: 50px;
+    left: 0;
+    -webkit-border-radius: 0 6px 6px 6px;
+    -moz-border-radius: 0 6px 6px 6px;
+    border-radius: 0 6px 6px 6px;
+}
+
+.dropdown-submenu:hover > .dropdown-menu {
+    display: block;
+}
+.dropdown-submenu > a:after {
+    display: block;
+    content: " ";
+    float: right;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 5px 5px 0px 5px;
+    border-top-color: #cccccc;
+    margin-top: 10px;
+    margin-left: 5px;
+}
+
+.dropdown-submenu.pull-left {
+    float: none;
+}
+
+.dropdown-submenu.pull-left > .dropdown-menu {
+    left: -100%;
+    margin-left: 10px;
+    -webkit-border-radius: 6px 0 6px 6px;
+    -moz-border-radius: 6px 0 6px 6px;
+    border-radius: 6px 0 6px 6px;
+}
+/*end*/
+
+.md-fab.docs-scroll-fab {
+  position: fixed !important;
+  transform: scale(0);
+  transition: transform 0.2s;
+}
+
+.docs-scroll-fab.scrolling {
+  transform: scale(1);
+}
