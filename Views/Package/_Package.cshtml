@@ -1,30 +1,44 @@
-﻿<div layout-gt-sm="row">
-    <md-input-container class="md-block" flex-gt-xs>
+﻿<div layout-gt-sm="row" style="max-width:1200px">
+    <md-input-container class="md-block" flex>
         <label>包裹追踪号 (Tracking #)</label>
         <input ng-model="package.Tracking">
     </md-input-container>
-    <md-input-container class="md-block" flex-gt-xs>
+    <md-input-container class="md-block" flex>
         <label>订单号 (Order #, 可不填)</label>
         <input ng-model="package.OrderNumber">
     </md-input-container>
-    <md-input-container class="md-block" flex-gt-xs>
+    <md-input-container class="md-block" flex>
         <label>备注 (可以添加其他要求)</label>
         <input ng-model="package.Notes">
     </md-input-container>
-    <md-input-container class="md-block" flex-gt-xs data-ng-show="newPackageStatusList.indexOf(package.Status)>-1">
+    <md-input-container class="md-block" data-ng-show="isAdmin">
         <label>包裹状态</label>
-        <md-select ng-model="package.Status">
-            <md-option ng-repeat="status in newPackageStatusList track by $index" data-ng-value="status">
+        <md-select ng-model="package.SubStatus">
+            <md-option ng-repeat="status in statusList track by $index" data-ng-value="status">
                 {{status}}
             </md-option>
         </md-select>
     </md-input-container>
-    <md-input-container class="md-block" flex-gt-xs data-ng-show="newPackageStatusList.indexOf(package.Status)===-1">
+    <md-input-container class="md-block" data-ng-show="!isAdmin">
         <label>包裹状态</label>
         <input disabled ng-model="package.Status">
     </md-input-container>
+
 </div>
-<div layout-gt-sm="row" class="text-primary">
+<div layout="row">
+    <md-input-container md-no-float class="md-block hide-md-error-msg">
+        <label>请选择发货人</label>
+        <md-select ng-model="package.Address" ng-model-options="{trackBy: '$value.ID'}">
+            <md-option ng-repeat="address in addresses track by $index" data-ng-value="address" md-on-close="updateAddressString()">
+                {{address.addressString}}
+            </md-option>
+        </md-select>
+    </md-input-container>
+    <md-button class="md-raised md-warn" ng-click="showAddressManager()">编辑当前地址</md-button>
+    <md-button class="md-raised md-warn" ng-click="showAddressManager({})">创建新地址</md-button>
+    <md-button class="md-raised md-warn" ng-click="deleteAddress(package.Address.ID)">删除当前地址</md-button>
+</div>
+<div layout="row">
     <md-input-container md-no-float class="md-block hide-md-error-msg">
         <label>请选择收货地址</label>
         <md-select ng-model="package.Address" ng-model-options="{trackBy: '$value.ID'}">
@@ -37,7 +51,6 @@
     <md-button class="md-raised md-warn" ng-click="showAddressManager({})">创建新地址</md-button>
     <md-button class="md-raised md-warn" ng-click="deleteAddress(package.Address.ID)">删除当前地址</md-button>
 </div>
-<br />
 <div layout="row">
     <md-table-container>
         <table class="table table table-striped" md-table md-row-select="options.rowSelection" multiple="{{options.multiSelect}}" ng-model="selected" md-progress="promise">
@@ -91,9 +104,12 @@
             </tbody>
         </table>
         <md-button class="md-raised md-warn pull-left" ng-click="addProduct()">添加</md-button>
+        <br />
+        <br />
+        <md-button class="md-raised md-warn pull-right" 
+                   data-ng-show="isAdmin||package.Status==='待入库'||package.Status==='已入库'" data-ng-click="updatePackage()">保存包裹</md-button>
+    
     </md-table-container>
 
-    
 </div>
-<button type="button" class="btn btn-primary pull-right" data-ng-click="updatePackage()">保存包裹</button>
 <br />

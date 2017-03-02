@@ -3,17 +3,20 @@
     ViewBag.Title = "包裹管理";
     var userCode = User.Identity.GetUserCode();
     var isAdmin = AppUtil.IsAdmin(userCode).ToString().ToLower();
+    var newPackage = Request.Params["newPackage"] ?? "false";
+    var holdPackage = Request.Params["holdPackage"] ?? "false";
+    var status = Request.Params["status"] ?? "全部";
 }
 
-<div data-ng-init="isAdmin=@isAdmin;init();userCode='@userCode';" ng-cloak layout="column">
+<div data-ng-init="isAdmin=@isAdmin;userCode='@userCode';newPackage=@newPackage;holdPackage=@holdPackage;status='@status';init(newPackage?addPackage:'');" ng-cloak layout="column">
     <div layout-gt-sm="row">
-       <md-input-container class="md-block hide-md-error-msg">
+        <md-input-container class="md-block hide-md-error-msg">
             <md-datepicker ng-model="startDate" md-placeholder="Enter start date"></md-datepicker>
         </md-input-container>
-       <md-input-container class="md-block hide-md-error-msg">
+        <md-input-container class="md-block hide-md-error-msg">
             <md-datepicker ng-model="endDate" md-placeholder="Enter end date"></md-datepicker>
         </md-input-container>
-       <md-input-container class="md-block hide-md-error-msg">
+        <md-input-container class="md-block hide-md-error-msg">
             <label>包裹状态</label>
             <md-select ng-model="status">
                 <md-option ng-repeat="status in statusList" value="{{status}}">
@@ -21,19 +24,19 @@
                 </md-option>
             </md-select>
         </md-input-container>
-       <md-input-container class="md-block hide-md-error-msg">
+        <md-input-container class="md-block hide-md-error-msg">
             <label>转运单号</label>
             <input ng-model="packageCode" />
         </md-input-container>
-       <md-input-container class="md-block hide-md-error-msg">
+        <md-input-container class="md-block hide-md-error-msg">
             <label>追踪号</label>
             <input ng-model="tracking" />
         </md-input-container>
-       <md-input-container class="md-block hide-md-error-msg">
+        <md-input-container class="md-block hide-md-error-msg">
             <label>收件人</label>
             <input ng-model="receiver" />
         </md-input-container>
-        
+
         <md-input-container class="md-block hide-md-error-msg">
             <md-button class="md-raised md-warn" style="margin-top:0" data-ng-click="searchPackages()">
                 查找包裹 <md-icon class="material-icons">search</md-icon>
@@ -65,8 +68,9 @@
                         <th md-column md-order-by="Receiver" class="text-center"><span>收件人</span></th>
                         <th md-column md-order-by="Products" class="text-center"><span>货物名称</span></th>
                         <th md-column md-order-by="Status" class="text-center"><span>状态</span></th>
+                        <th md-column md-order-by="SubStatus" class="text-center" data-ng-show="isAdmin"><span>子状态</span></th>
                         <th md-column md-order-by="UserCode" class="text-center" data-ng-show="isAdmin"><span>用户编码</span></th>
-                        <th md-column md-order-by="" class="text-center"><span>操作</span></th>
+                        <th md-column md-order-by="" class="text-center" style="text-align:center"><span>操作</span></th>
                     </tr>
                 </thead>
                 <tbody md-body>
@@ -87,16 +91,22 @@
                             {{package.Status}}
                         </td>
                         <td md-cell class="text-center" ng-show="isAdmin">
+                            {{package.SubStatus}}
+                        </td>
+                        <td md-cell class="text-center" ng-show="isAdmin">
                             {{package.UserCode}}
                         </td>
                         <td md-cell class="text-center">
-                            <md-button class="md-fab md-mini md-primary" data-ng-disabled="package.Disabled" aria-label="Separate" ng-click="getPackage(package.ID, showSplitPackageModal)">
+                            <md-button class="md-fab md-mini" style="margin:3px 3px" data-ng-disabled="package.Disabled" aria-label="Separate" ng-click="shipPackage(package.ID)">
+                                {{(package.SubStatus.indexOf('确认发货')>-1?'撤回':'发货')}}
+                            </md-button>
+                            <md-button class="md-fab md-mini md-primary" style="margin:3px 3px" data-ng-disabled="package.Disabled" aria-label="Separate" ng-click="getPackage(package.ID, showSplitPackageModal)">
                                 分箱
                             </md-button>
-                            <md-button class="md-fab md-mini md-warn" data-ng-disabled="package.Disabled" aria-label="Return" ng-click="returnPackage(package.ID)">
+                            <md-button class="md-fab md-mini md-warn" style="margin:3px 3px" data-ng-disabled="package.Disabled" aria-label="Return" ng-click="returnPackage(package.ID)">
                                 退货
                             </md-button>
-                            <md-button class="md-fab md-mini md-warn md-hue-2" aria-label="Delete" data-ng-disabled="package.Disabled" data-ng-click="deletePackage(package.ID)">
+                            <md-button class="md-fab md-mini md-warn md-hue-2" style="margin:3px 3px" aria-label="Delete" data-ng-disabled="package.Disabled" data-ng-click="deletePackage(package.ID)">
                                 删除
                             </md-button>
                         </td>
@@ -110,5 +120,5 @@
     @Html.Partial("_AddressModal")
 </div>
     @section Scripts {
-        <script src="~/src/app/controlles/packageCtrl.js?1.0"></script>
+        <script src="~/src/app/controlles/packageCtrl.js?0.1"></script>
     }

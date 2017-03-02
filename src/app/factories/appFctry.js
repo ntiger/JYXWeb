@@ -62,12 +62,12 @@
                 id: 'package-new',
                 name: '原装闪运',
                 type: 'link',
-                url: '/Package/New',
+                url: '/Package?newPackage=true',
                 icon: 'fa fa-group'
             }, {
                 id: 'package-new-hold',
                 name: '普通转运',
-                url: '/Package/New?holdPackage=true',
+                url: '/Package?newPackage=true&holdPackage=true',
                 type: 'link',
                 icon: 'fa fa-map-marker'
             },

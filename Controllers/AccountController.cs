@@ -153,7 +153,8 @@ namespace JYXWeb.Controllers
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email, PasswordPlain = model.Password };
-                while (new ApplicationDbContext().Users.Select(a => a.UserCode).Contains(user.UserCode))
+                var userCodes = new ApplicationDbContext().Users.Select(a => a.UserCode).ToArray();
+                while (userCodes.Contains(user.UserCode) || user.UserCode == null)
                 {
                     user.UserCode = AppUtil.GetUserCode();
                 }

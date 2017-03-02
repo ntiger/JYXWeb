@@ -9,15 +9,25 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
     
     $scope.startDate = new Date(new Date().getFullYear(), 0, 1);
     $scope.endDate = new Date();
-    $scope.statusList = ['全部', '未预报', '待入库', '等待合箱', '待出库', '已出库', '空运', '清关中', '国内转运', '待退货', '已退货', '问题件'];
+    $scope.statusList = ['全部', '待入库', '已入库', '已出库', '空运中', '清关中', '国内转运', '待退货', '已退货', '问题件'];
+    $scope.statusListAdmin = ['全部', '待入库', '确认发货(未到货)', '已入库', '未预报', '确认发货(已到货)', '已出库', '空运中', '清关中', '国内转运', '待退货', '已退货', '问题件'];
+    $scope.statusDict = {};
+    for (var i = 0; i < $scope.statusListAdmin.length; i++) {
+        $scope.statusDict[$scope.statusListAdmin[i]] = $scope.statusListAdmin[i];
+        if ($scope.statusListAdmin[i] === '确认发货(未到货)') {
+            $scope.statusDict[$scope.statusListAdmin[i]] = '待入库';
+        }
+        else if ($scope.statusListAdmin[i] === '确认发货(已到货)' || $scope.statusListAdmin[i] === '未预报') {
+            $scope.statusDict[$scope.statusListAdmin[i]] = '已入库';
+        }
+    }
     $scope.status = $scope.statusList[0];
+    $scope.newPackageStatusList = ['待入库'];
+
     $scope.receiver = '';
     $scope.packageCode = '';
     $scope.tracking = '';
     $scope.addressIDs = [];
-
-    $scope.newPackageStatusList = ['待入库', '等待合箱'];
-   
 
     $scope.selectedPackages = [];
     $scope.options = {
@@ -25,11 +35,17 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         multiSelect: true,
     };
 
-    $scope.init = function () {
+    $scope.init = function (callback) {
         $scope.getProductCategories();
-        $log.log($scope.isAdmin);
         if ($scope.isAdmin) {
-            $scope.newPackageStatusList = ['未预报', '待入库', '等待合箱', '待出库', '已出库', '空运', '清关中', '国内转运', '待退货', '已退货', '问题件'];
+            $scope.newPackageStatusList = $scope.statusListAdmin;
+            $scope.statusList = $scope.statusListAdmin;
+        }
+        if (callback) {
+            callback();
+        }
+        if ($scope.status !== '全部') {
+            $scope.searchPackages();
         }
     }
 
@@ -68,6 +84,23 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         });
     }
 
+    $scope.shipPackage = function (code) {
+        $scope.getPackage(code, function () {
+            if ($scope.package.SubStatus.indexOf('确认发货') > -1) {
+                $scope.package.SubStatus = $scope.package.Status;
+            }
+            else {
+                if ($scope.package.Status === '待入库') {
+                    $scope.package.SubStatus = '确认发货(未到货)';
+                }
+                else if ($scope.package.Status === '已入库') {
+                    $scope.package.SubStatus = '确认发货(已到货)';
+                }
+            }
+            $scope.updatePackage();
+        })
+    }
+
     $scope.deletePackage = function (code) {
         if (confirm('确认删除此包裹?')) {
             $http.get('/Package/DeletePackage/' + code).then(function (res) {
@@ -86,8 +119,9 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
     }
 
     $scope.addPackage = function () {
-        var status = $scope.holdPackage ? '等待合箱' : '待入库';
-        $scope.package = { Products: [{ Number: 1, Quantity: 1 }], Status: status, Address: {} };
+        var status = '待入库';
+        var subStatus = $scope.holdPackage ? '待入库' : '确认发货(未到货)';
+        $scope.package = { Products: [{ Number: 1, Quantity: 1 }], Status: status, SubStatus: subStatus, Address: {} };
         $scope.showPackageModal();
     };
 
@@ -160,7 +194,6 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 value.OrderNumber = package.OrderNumber;
                 value.Notes = package.Notes;
             });
-            $('#packageModal').modal('hide');
         }
         else {
             // update package after split
@@ -168,6 +201,12 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             package.OrderNumber = package.Products.map(function (product) { return product.OrderNumber; }).filter(function (value, index, self) { return self.indexOf(value) === index; }).join(';');
             package.Notes = package.Products.map(function (product) { return product.Notes; }).filter(function (value, index, self) { return self.indexOf(value) === index; }).join(';');
         }
+        if (typeof package.Tracking === 'undefined' || package.Tracking === '') {
+            alert('请输入包裹追踪号再保存.')
+            return;
+        }
+        $('#packageModal').modal('hide');
+        package.Status = $scope.statusDict[package.SubStatus];
         $http.post('/Package/UpdatePackage', { package: package }).then(function (res) {
             $scope.refreshPackages();
         });
@@ -276,5 +315,26 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
     };
     vm.toggleOpen = function (section) {
         $menu.toggleSelectSection(section);
+    }
+
+
+
+    $scope.getPackageOverview = function () {
+        $http.get('/Package/GetPackageOverview').then(function (res) {
+            $scope.packageOverview = [];
+            angular.forEach($scope.statusList, function (value, key) {
+                var count = 0;
+                var status = value;
+                angular.forEach(res.data, function (value, key) {
+                    if (value.Status === status) {
+                        count = value.Count;
+                        return;
+                    }
+                });
+                if (status !== '全部') {
+                    $scope.packageOverview.push({ Status: status, Count: count });
+                }
+            });
+        });
     }
 }]);

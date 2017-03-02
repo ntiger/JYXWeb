@@ -27,6 +27,19 @@ namespace JYXWeb.Controllers
             return View();
         }
 
+        public ActionResult GetPackageOverview()
+        {
+            using (var dataContext = new PackageDataContext())
+            {
+                var overview = dataContext.Packages.Where(a => a.UserCode == User.Identity.GetUserCode()).GroupBy(a => a.Status).Select(a => new
+                {
+                    Status = a.Key,
+                    Count = a.Count(),
+                }).ToList();
+                return Json(overview, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         public ActionResult SearchPackages(string criteriaStr)
         {
             dynamic criteria = JsonConvert.DeserializeObject(criteriaStr);
@@ -40,7 +53,9 @@ namespace JYXWeb.Controllers
             string userCode = criteria.userCode;
             userCode = userCode == null ? "" : userCode.ToUpper();
             userName = userName == null ? "" : userName.ToLower();
-            if (!AppUtil.IsAdmin(User.Identity.GetUserCode()) && userCode != User.Identity.GetUserCode())
+            var isAdmin = AppUtil.IsAdmin(User.Identity.GetUserCode());
+            if (!isAdmin && userCode != User.Identity.GetUserCode() ||
+                !isAdmin && userCode == "")
             {
                 return null;
             }
@@ -59,21 +74,22 @@ namespace JYXWeb.Controllers
             using (var dataContext = new PackageDataContext())
             {
                 var jointPackages = userCodes.Join(dataContext.Packages, a => a, b => b.UserCode, (a, b) => b);
-                var packages = jointPackages.Where(a => 
+                var packages = jointPackages.Where(a =>
                     a.LastUpdateTime >= startDate && a.LastUpdateTime <= endDate &&
                     (packageCode == "" || packageCode == a.ID) &&
-                    (status == null || status == "全部" || status == a.Status) &&
+                    (status == null || status == "全部" || (!isAdmin && status == a.Status || isAdmin && status == a.SubStatus)) &&
                     (receiver == "" || receiver == a.Address.Name) &&
                     (tracking == "" || a.Products.Where(b => b.Tracking == tracking).Count() > 0)).Select(a => new
                     {
                         a.ID,
                         Tracking = String.Join(";", a.Products.Select(b => b.Tracking).Distinct()),
-                        Receiver = a.Address==null?"":a.Address.Name,
+                        Receiver = a.Address == null ? "" : a.Address.Name,
                         AddressID = a.AddressID == null ? "" : a.AddressID.ToString(),
                         ProductNames = String.Join(", ", a.Products.Select(b => b.Name + " * " + b.Quantity)),
                         Status = a.Status,
+                        SubStatus = a.SubStatus,
                         a.UserCode,
-                        Disabled = a.Status.IndexOf("退货") > -1,
+                        Disabled = a.Status != "已入库" && a.Status != "待入库",
                     }).ToList();
                 return Json(packages);
             }
@@ -93,6 +109,7 @@ namespace JYXWeb.Controllers
                         Tracking = string.Join(";", package.Products.Select(a => a.Tracking).Distinct()),
                         Notes = string.Join(";", package.Products.Select(a => a.Notes).Distinct()),
                         package.Status,
+                        package.SubStatus,
                         Address = package.AddressID == null ? null : new
                         {
                             package.Address.ID,
@@ -136,6 +153,8 @@ namespace JYXWeb.Controllers
                 {
                     existingPackage.AddressID = package.AddressID;
                     existingPackage.Status = package.Status;
+                    existingPackage.SubStatus = package.SubStatus;
+                    packageDataConext.Products.DeleteAllOnSubmit(existingPackage.Products);
                     existingPackage.Products.Clear();
                     existingPackage.Products.AddRange(package.Products);
                     existingPackage.LastUpdateTime = DateTime.Now;
@@ -199,6 +218,34 @@ namespace JYXWeb.Controllers
             }
         }
 
+
+        public ActionResult Tracking(string id)
+        {
+            return Json(GetTrackingInfo(id), JsonRequestBehavior.AllowGet);
+        }
+
+        public IList<string[]> GetTrackingInfo(string id)
+        {
+            var trackingInfo = new List<string[]>();
+            var trackingRawHtml = AppUtil.SubmitUrl(TRACKING_URL + id);
+            var doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml(trackingRawHtml);
+
+            var className = "commnTxt";
+            var nodes = doc.DocumentNode.Descendants("div")
+                .Where(d => d.Attributes.Contains("class") && d.Attributes["class"].Value.Contains(className));
+            foreach (var node in nodes)
+            {
+                var trs = node.Descendants("tr").ToList();
+                for (var i = 1; i < trs.Count; i++)
+                {
+                    var tds = trs[i].Descendants("td").ToList();
+                    trackingInfo.Add(new string[] { tds[1].InnerText, tds[2].InnerText });
+                }
+            }
+            return trackingInfo;
+        }
+
         public string GeneratePackageCode()
         {
             var code = "";
@@ -210,8 +257,13 @@ namespace JYXWeb.Controllers
             return code;
         }
 
+        public string CreateTMEntry()
+        {
+            var tracking = new TMTracking();
+            return TMUtil.CreateTMEntry(tracking);
+        }
 
-
+        public const string TRACKING_URL = "http://www.expresstochina.com/TrackSearch.aspx?TXT_TRACKNO=";
 
         public const string PACKAGE_STATUS_NO_NOTICE = "未预报";
         public const string PACKAGE_STATUS_AWAIT = "待入库";
