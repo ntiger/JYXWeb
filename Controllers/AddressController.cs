@@ -48,7 +48,6 @@ namespace JYXWeb.Controllers
             }
         }
 
-
         public ActionResult UpdateAddress(Address address)
         {
             using (var packageDataContext = new PackageDataContext())
@@ -99,5 +98,70 @@ namespace JYXWeb.Controllers
             }
         }
 
+
+        public ActionResult GetSenders(int? id)
+        {
+            using (var packageDataContext = new PackageDataContext())
+            {
+                var senders = packageDataContext.Senders.Where(a => a.UserCode == User.Identity.GetUserCode() || a.ID == id).Select(a => new
+                {
+                    a.ID,
+                    a.Name,
+                    a.Phone,
+                    a.Address,
+                    a.IsDefault
+                }).OrderBy(a => a.IsDefault).ToList();
+                return Json(senders, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult UpdateSender(Sender sender)
+        {
+            using (var packageDataContext = new PackageDataContext())
+            {
+                var existingSenders = packageDataContext.Senders.Where(a => a.ID == sender.ID).SingleOrDefault();
+                if (existingSenders != null)
+                {
+                    existingSenders.Name = sender.Name;
+                    existingSenders.Phone = sender.Phone;
+                    existingSenders.Address = sender.Address;
+                    existingSenders.IsDefault = sender.IsDefault;
+                }
+                else
+                {
+                    sender.UserCode = User.Identity.GetUserCode();
+                    packageDataContext.Senders.InsertOnSubmit(sender);
+                }
+
+                packageDataContext.SubmitChanges();
+            }
+            return null;
+        }
+
+        public ActionResult DeleteSender(int id)
+        {
+            using (var packageDataContext = new PackageDataContext())
+            {
+                var returnStr = "";
+                var address = packageDataContext.Addresses.Where(a => a.ID == id).SingleOrDefault();
+                if (address != null)
+                {
+                    if (address.UserCode == User.Identity.GetUserCode())
+                    {
+                        packageDataContext.Addresses.DeleteOnSubmit(address);
+                        packageDataContext.SubmitChanges();
+                    }
+                    else
+                    {
+                        returnStr = "无法删除他人的发件人";
+                    }
+                }
+                else
+                {
+                    returnStr = "发件人不存在";
+                }
+                return Json(returnStr, JsonRequestBehavior.AllowGet);
+            }
+        }
     }
 }

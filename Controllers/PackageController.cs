@@ -110,6 +110,12 @@ namespace JYXWeb.Controllers
                         Notes = string.Join(";", package.Products.Select(a => a.Notes).Distinct()),
                         package.Status,
                         package.SubStatus,
+                        Sender = package.SenderID == null ? null :new {
+                            package.Sender.ID,
+                            package.Sender.Name,
+                            package.Sender.Address,
+                            package.Sender.Phone,
+                        },
                         Address = package.AddressID == null ? null : new
                         {
                             package.Address.ID,
@@ -152,6 +158,7 @@ namespace JYXWeb.Controllers
                 if (existingPackage != null)
                 {
                     existingPackage.AddressID = package.AddressID;
+                    existingPackage.SenderID = package.SenderID;
                     existingPackage.Status = package.Status;
                     existingPackage.SubStatus = package.SubStatus;
                     packageDataConext.Products.DeleteAllOnSubmit(existingPackage.Products);
@@ -163,6 +170,8 @@ namespace JYXWeb.Controllers
                 {
                     package.ID = GeneratePackageCode();
                     package.UserCode = User.Identity.GetUserCode();
+                    package.Sender = packageDataConext.Senders.Where(a => a.ID == package.Sender.ID).SingleOrDefault();
+                    package.Address = packageDataConext.Addresses.Where(a => a.ID == package.Address.ID).SingleOrDefault();
                     package.LastUpdateTime = DateTime.Now;
                     packageDataConext.Packages.InsertOnSubmit(package);
                 }

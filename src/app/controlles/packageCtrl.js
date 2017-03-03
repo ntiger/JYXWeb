@@ -28,6 +28,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
     $scope.packageCode = '';
     $scope.tracking = '';
     $scope.addressIDs = [];
+    $scope.senderIDs = [];
 
     $scope.selectedPackages = [];
     $scope.options = {
@@ -121,7 +122,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
     $scope.addPackage = function () {
         var status = '待入库';
         var subStatus = $scope.holdPackage ? '待入库' : '确认发货(未到货)';
-        $scope.package = { Products: [{ Number: 1, Quantity: 1 }], Status: status, SubStatus: subStatus, Address: {} };
+        $scope.package = { Products: [{ Number: 1, Quantity: 1 }], Status: status, SubStatus: subStatus, Sender: {}, Address: {} };
         $scope.showPackageModal();
     };
 
@@ -133,6 +134,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         });
         $('#packageModal').modal('show');
         $scope.getAddresses();
+        $scope.getSenders();
     }
 
     //#region split package
@@ -213,6 +215,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
     }
 
     // Address
+
     $scope.showAddressManager = function (newAddress) {
         $('#addressModal').modal({
             backdrop: 'static',
@@ -236,7 +239,6 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             });
         });
     }
-
 
     $scope.getAddresses = function () {
         if (typeof $scope.addresses === 'undefined' || $scope.addressIDs.indexOf($scope.package.Address.ID) === -1) {
@@ -286,6 +288,65 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             });
         }
     }
+    
+    // End Address
+
+
+    // Sender
+
+    $scope.showSenderManager = function (newSender) {
+        $('#senderModal').modal({
+            backdrop: 'static',
+            keyboard: false
+        });
+        $('#senderModal').modal('show');
+        if (newSender) {
+            $scope.package.Sender = {};
+        }
+    }
+
+    $scope.getSenders = function () {
+        if (typeof $scope.senders === 'undefined' || $scope.senderIDs.indexOf($scope.package.Sender.ID) === -1) {
+            $http.post('/Address/GetSenders/' + $scope.package.Sender.ID).then(function (res) {
+                $scope.senders = res.data;
+                if (typeof $scope.package.Sender.ID === 'undefined') {
+                    $scope.package.Sender = $scope.senders[0];
+                }
+                $scope.updateSenderString();
+            });
+        }
+    }
+
+    $scope.updateSender = function () {
+        $http.post('/Address/UpdateSender', { sender: $scope.package.Sender }).then(function (res) {
+            $scope.getSenders();
+        });
+    }
+
+    $scope.updateSenderString = function () {
+        $scope.senderIDs = [];
+        angular.forEach($scope.senders, function (value, key) {
+            value.senderString = value.Name + ', ' + value.Address + ', ' + value.Phone
+            $scope.senderIDs.push(value.ID);
+        });
+    }
+
+    $scope.deleteSender = function (id) {
+        if (confirm('确认删除此发件人?')) {
+            $http.get('/Address/DeleteSender/' + id).then(function (res) {
+                if (res.data !== '') { alert(res.data); }
+                for (i = $scope.senders.length - 1; i >= 0; i--) {
+                    if ($scope.senders[i].ID === id) {
+                        $scope.senders.splice(i, 1);
+                        return;
+                    }
+                }
+            });
+        }
+    }
+
+    // End Sender
+
 
     $scope.combinePackages = function () {
         var addressID = $scope.selectedPackages[0].AddressID;

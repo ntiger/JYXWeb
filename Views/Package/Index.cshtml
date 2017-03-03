@@ -4,7 +4,7 @@
     var userCode = User.Identity.GetUserCode();
     var isAdmin = AppUtil.IsAdmin(userCode).ToString().ToLower();
     var newPackage = Request.Params["newPackage"] ?? "false";
-    var holdPackage = Request.Params["holdPackage"] ?? "false";
+    var holdPackage = Request.Params["holdPackage"] ?? "true";
     var status = Request.Params["status"] ?? "全部";
 }
 
@@ -118,6 +118,7 @@
     @Html.Partial("_PackageModal")
     @Html.Partial("_SplitPackageModal")
     @Html.Partial("_AddressModal")
+    @Html.Partial("_SenderModal")
 </div>
     @section Scripts {
         <script src="~/src/app/controlles/packageCtrl.js?0.1"></script>

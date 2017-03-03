@@ -28,15 +28,15 @@
 <div layout="row">
     <md-input-container md-no-float class="md-block hide-md-error-msg">
         <label>请选择发货人</label>
-        <md-select ng-model="package.Address" ng-model-options="{trackBy: '$value.ID'}">
-            <md-option ng-repeat="address in addresses track by $index" data-ng-value="address" md-on-close="updateAddressString()">
-                {{address.addressString}}
+        <md-select ng-model="package.Sender" ng-model-options="{trackBy: '$value.ID'}">
+            <md-option ng-repeat="sender in senders track by $index" data-ng-value="sender" md-on-close="updateSenderString()">
+                {{sender.senderString}}
             </md-option>
         </md-select>
     </md-input-container>
-    <md-button class="md-raised md-warn" ng-click="showAddressManager()">编辑当前地址</md-button>
-    <md-button class="md-raised md-warn" ng-click="showAddressManager({})">创建新地址</md-button>
-    <md-button class="md-raised md-warn" ng-click="deleteAddress(package.Address.ID)">删除当前地址</md-button>
+    <md-button class="md-warn" ng-click="showSenderManager()">编辑当前发货人</md-button>
+    <md-button class="md-warn" ng-click="showSenderManager({})">添加新发货人</md-button>
+    <md-button class="md-warn" ng-click="deleteSender(package.Sender.ID)">删除当前发货人</md-button>
 </div>
 <div layout="row">
     <md-input-container md-no-float class="md-block hide-md-error-msg">
@@ -47,9 +47,9 @@
             </md-option>
         </md-select>
     </md-input-container>
-    <md-button class="md-raised md-warn" ng-click="showAddressManager()">编辑当前地址</md-button>
-    <md-button class="md-raised md-warn" ng-click="showAddressManager({})">创建新地址</md-button>
-    <md-button class="md-raised md-warn" ng-click="deleteAddress(package.Address.ID)">删除当前地址</md-button>
+    <md-button class="md-warn" ng-click="showAddressManager()">编辑当前地址</md-button>
+    <md-button class="md-warn" ng-click="showAddressManager({})">添加新地址</md-button>
+    <md-button class="md-warn" ng-click="deleteAddress(package.Address.ID)">删除当前地址</md-button>
 </div>
 <div layout="row">
     <md-table-container>
