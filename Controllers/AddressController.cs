@@ -143,12 +143,12 @@ namespace JYXWeb.Controllers
             using (var packageDataContext = new PackageDataContext())
             {
                 var returnStr = "";
-                var address = packageDataContext.Addresses.Where(a => a.ID == id).SingleOrDefault();
-                if (address != null)
+                var sender = packageDataContext.Senders.Where(a => a.ID == id).SingleOrDefault();
+                if (sender != null)
                 {
-                    if (address.UserCode == User.Identity.GetUserCode())
+                    if (sender.UserCode == User.Identity.GetUserCode())
                     {
-                        packageDataContext.Addresses.DeleteOnSubmit(address);
+                        packageDataContext.Senders.DeleteOnSubmit(sender);
                         packageDataContext.SubmitChanges();
                     }
                     else

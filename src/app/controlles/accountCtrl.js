@@ -18,9 +18,6 @@ angularApp.controller('accountCtrl', function ($scope, $http, $filter, $log, $ti
         }
     }
 
-    
-
-    
 
     $scope.query = {
         order: 'UserCode',

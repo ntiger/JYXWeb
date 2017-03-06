@@ -121,3 +121,8 @@ md-input-container.hide-md-error-msg .md-errors-spacer:empty {
 .docs-scroll-fab.scrolling {
   transform: scale(1);
 }
+
+
+.table-condensed th, .table-condensed td {
+    padding: 0 5px 0 0 !important;
+}

@@ -3,9 +3,7 @@ using JYXWeb.Models;
 using JYXWeb.Util;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace JYXWeb.Controllers
@@ -165,17 +163,24 @@ namespace JYXWeb.Controllers
                     existingPackage.Products.Clear();
                     existingPackage.Products.AddRange(package.Products);
                     existingPackage.LastUpdateTime = DateTime.Now;
+                    packageDataConext.SubmitChanges();
                 }
                 else
                 {
                     package.ID = GeneratePackageCode();
-                    package.UserCode = User.Identity.GetUserCode();
-                    package.Sender = packageDataConext.Senders.Where(a => a.ID == package.Sender.ID).SingleOrDefault();
-                    package.Address = packageDataConext.Addresses.Where(a => a.ID == package.Address.ID).SingleOrDefault();
+                    package.UserCode = package.UserCode ?? User.Identity.GetUserCode();
+                    if (package.Sender != null)
+                    {
+                        package.Sender = packageDataConext.Senders.Where(a => a.ID == package.Sender.ID).SingleOrDefault();
+                    }
+                    if (package.Address != null)
+                    {
+                        package.Address = packageDataConext.Addresses.Where(a => a.ID == package.Address.ID).SingleOrDefault();
+                    }
                     package.LastUpdateTime = DateTime.Now;
                     packageDataConext.Packages.InsertOnSubmit(package);
+                    packageDataConext.SubmitChanges();
                 }
-                packageDataConext.SubmitChanges();
             }
             return null;
         }
@@ -196,9 +201,17 @@ namespace JYXWeb.Controllers
             {
                 var packages = packageCodes.Join(packageDataConext.Packages, a => a, b => b.ID, (a, b) => b).ToList();
                 var newPackage = new Package();
-                newPackage.AddressID = packages[0].AddressID;
-                newPackage.Products.AddRange(packages.SelectMany(a=>a.Products));
+                if (packages[0].Sender != null)
+                {
+                    newPackage.Sender = packageDataConext.Senders.Where(a => a.ID == packages[0].Sender.ID).SingleOrDefault();
+                }
+                if (packages[0].Address != null)
+                {
+                    newPackage.Address = packageDataConext.Addresses.Where(a => a.ID == packages[0].Address.ID).SingleOrDefault();
+                }
+                newPackage.Products.AddRange(packages.SelectMany(a => a.Products));
                 newPackage.Status = "待入库";
+                newPackage.SubStatus = "待入库";
                 newPackage.LastUpdateTime = DateTime.Now;
                 newPackage.ID = GeneratePackageCode();
                 newPackage.UserCode = User.Identity.GetUserCode();
@@ -230,31 +243,9 @@ namespace JYXWeb.Controllers
 
         public ActionResult Tracking(string id)
         {
-            return Json(GetTrackingInfo(id), JsonRequestBehavior.AllowGet);
+            return Json(TMUtil.GetTrackingInfo(id), JsonRequestBehavior.AllowGet);
         }
-
-        public IList<string[]> GetTrackingInfo(string id)
-        {
-            var trackingInfo = new List<string[]>();
-            var trackingRawHtml = AppUtil.SubmitUrl(TRACKING_URL + id);
-            var doc = new HtmlAgilityPack.HtmlDocument();
-            doc.LoadHtml(trackingRawHtml);
-
-            var className = "commnTxt";
-            var nodes = doc.DocumentNode.Descendants("div")
-                .Where(d => d.Attributes.Contains("class") && d.Attributes["class"].Value.Contains(className));
-            foreach (var node in nodes)
-            {
-                var trs = node.Descendants("tr").ToList();
-                for (var i = 1; i < trs.Count; i++)
-                {
-                    var tds = trs[i].Descendants("td").ToList();
-                    trackingInfo.Add(new string[] { tds[1].InnerText, tds[2].InnerText });
-                }
-            }
-            return trackingInfo;
-        }
-
+        
         public string GeneratePackageCode()
         {
             var code = "";
@@ -268,11 +259,34 @@ namespace JYXWeb.Controllers
 
         public string CreateTMEntry()
         {
-            var tracking = new TMTracking();
-            return TMUtil.CreateTMEntry(tracking);
+            var package = new Package
+            {
+                Sender = new Sender
+                {
+                    Name = "Xiao",
+                    Phone = "5553331222",
+                    Address = "test"
+                },
+                Address = new PackageDataContext().Addresses.Where(a => a.District == 41).SingleOrDefault()
+            };
+            package.Products.Add(new Product {
+                Name = "test",
+                Brand = "Coach",
+                Price = 134,
+                Quantity = 1,
+                ProductCategory = new PackageDataContext().ProductCategories.Where(a => a.TMCode == "2428").First(),
+            });
+            //package.Products.Add(new Product
+            //{
+            //    Name = "test",
+            //    Brand = "Coach",
+            //    Price = 134,
+            //    Quantity = 1,
+            //    ProductCategory = new PackageDataContext().ProductCategories.Where(a => a.TMCode == "2428").First(),
+            //});
+            return TMUtil.UpdateTMEntry(package);
         }
 
-        public const string TRACKING_URL = "http://www.expresstochina.com/TrackSearch.aspx?TXT_TRACKNO=";
 
         public const string PACKAGE_STATUS_NO_NOTICE = "未预报";
         public const string PACKAGE_STATUS_AWAIT = "待入库";

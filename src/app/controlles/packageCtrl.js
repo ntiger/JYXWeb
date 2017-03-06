@@ -62,7 +62,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         model.userName = $scope.userName;
         $http.post('/Package/SearchPackages', { criteriaStr: JSON.stringify(model) }).then(function (res) {
             $scope.packages = res.data;
-            $scope.packagesOrder = 'Code';
+            $scope.packagesOrder = 'ID';
         });
     }
 
@@ -79,6 +79,9 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
     $scope.getPackage = function (code, callback) {
         $http.get('/Package/GetPackage/' + code).then(function (res) {
             $scope.package = res.data;
+            $scope.productsOrder = 'Number';
+            if (typeof $scope.package.Address === 'undefined' || $scope.package.Address === null) { $scope.package.Address = {}; }
+            if (typeof $scope.package.Sender === 'undefined' || $scope.package.Sender === null) { $scope.package.Sender = {}; }
             if (callback) {
                 callback();
             }
@@ -91,6 +94,15 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 $scope.package.SubStatus = $scope.package.Status;
             }
             else {
+                if (angular.equals($scope.package.Address, {})) {
+                    alert('请选择或添加收件人');
+                    return;
+                }
+                if (angular.equals($scope.package.Sender, {})) {
+                    alert('请选择或添加发件人');
+                    return;
+                }
+
                 if ($scope.package.Status === '待入库') {
                     $scope.package.SubStatus = '确认发货(未到货)';
                 }
@@ -146,7 +158,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         $('#splitPackageModal').modal('show');
         $scope.newPackage = {};
         angular.forEach($scope.package, function (value, key) {
-            if (key !== 'Code') {
+            if (key !== 'ID') {
                 $scope.newPackage[key] = value;
             }
         });
@@ -154,13 +166,33 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
     }
 
     $scope.splitProduct = function (index) {
-        $scope.newPackage.Products.push($scope.package.Products[index]);
-        $scope.package.Products.splice(index, 1);
+        $scope.moveProduct($scope.package.Products, $scope.newPackage.Products, index);
     }
 
     $scope.cancelSplitProduct = function (index) {
-        $scope.package.Products.push($scope.newPackage.Products[index]);
-        $scope.newPackage.Products.splice(index, 1);
+        $scope.moveProduct($scope.newPackage.Products, $scope.package.Products, index);
+    }
+
+    $scope.moveProduct = function (products1, products2, index) {
+        var product = products1[index];
+        var existsInNewPackage = false;
+        angular.forEach(products2, function (value) {
+            if (value.ID === product.ID) {
+                existsInNewPackage = true;
+                value.Quantity++;
+            }
+        });
+        if (!existsInNewPackage) {
+            products2.push(JSON.parse(JSON.stringify(product)));
+            products2[products2.length - 1].Quantity = 1;
+        }
+
+        if (product.Quantity === 1) {
+            products1.splice(index, 1);
+        }
+        else {
+            product.Quantity--;
+        }
     }
 
     $scope.splitPackage = function () {
@@ -244,7 +276,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         if (typeof $scope.addresses === 'undefined' || $scope.addressIDs.indexOf($scope.package.Address.ID) === -1) {
             $http.post('/Address/GetAddresses/' + $scope.package.Address.ID).then(function (res) {
                 $scope.addresses = res.data;
-                if (typeof $scope.package.Address.ID === 'undefined') {
+                if (typeof $scope.package.Address.ID === 'undefined' && $scope.addresses.length > 0) {
                     $scope.package.Address = $scope.addresses[0];
                 }
                 $scope.updateAddressString();
@@ -255,6 +287,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
     $scope.updateAddress = function () {
         $http.post('/Address/UpdateAddress', { address: $scope.package.Address }).then(function (res) {
             $scope.getAddresses();
+            $scope.updateAddressString();
         });
     }
 
@@ -360,7 +393,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         if (confirm('确认进行合箱?')) {
             var packageCodes = [];
             angular.forEach($scope.selectedPackages, function (value, key) {
-                packageCodes.push(value.Code);
+                packageCodes.push(value.ID);
             });
             $http.post('/Package/CombinePackages', { packageCodes: packageCodes }).then(function (res) {
                 $scope.refreshPackages();
