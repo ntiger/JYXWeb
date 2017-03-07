@@ -240,12 +240,22 @@ namespace JYXWeb.Controllers
             }
         }
 
-
         public ActionResult Tracking(string id)
         {
             return Json(TMUtil.GetTrackingInfo(id), JsonRequestBehavior.AllowGet);
         }
-        
+
+        public ActionResult ExportPackages(string[] ids)
+        {
+            using (var packageDataConext = new PackageDataContext())
+            {
+                var packages = ids.Join(packageDataConext.Packages.Where(a => a.Address != null && a.Sender != null), a => a, b => b.ID, (a, b) => b).ToArray();
+                var fileContent = TMUtil.ExportCSV(packages);
+                return File(fileContent, AppUtil.GetContentType("xxx.csv"), "packages.csv");
+            }
+        }
+
+
         public string GeneratePackageCode()
         {
             var code = "";
@@ -256,6 +266,10 @@ namespace JYXWeb.Controllers
             }
             return code;
         }
+
+
+
+
 
         public string CreateTMEntry()
         {

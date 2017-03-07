@@ -28,6 +28,16 @@ namespace JYXWeb.Util
             return false;
         }
 
+        public static string GetContentType(string fileName)
+        {
+            string contentType = "application/octetstream";
+            string ext = System.IO.Path.GetExtension(fileName).ToLower();
+            Microsoft.Win32.RegistryKey registryKey = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ext);
+            if (registryKey != null && registryKey.GetValue("Content Type") != null)
+                contentType = registryKey.GetValue("Content Type").ToString();
+            return contentType;
+        }
+
         #region External Request
 
         public static void SubmitUrlAsync(string url)

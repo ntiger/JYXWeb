@@ -401,6 +401,11 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         }
     }
 
+    $scope.export = function () {
+        var packageIDs = $scope.selectedPackages.map(function (package) { return package.ID }).join('&ids=');
+        var src = "/Package/ExportPackages?ids=" + packageIDs;
+        window.open(src, "", "", "");
+    }
 
     var vm = this;
     vm.$menu = $menu;

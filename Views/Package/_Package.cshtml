@@ -103,7 +103,8 @@
                 </tr>
             </tbody>
         </table>
-        <md-button class="md-raised md-warn pull-left" ng-click="addProduct()">添加</md-button>
+        <md-button class="md-raised md-warn pull-left" 
+                   data-ng-show="isAdmin||package.Status==='待入库'||package.Status==='已入库'" ng-click="addProduct()">添加</md-button>
         <br />
         <br />
         <md-button class="md-raised md-warn pull-right" 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Linq;
+using System.Text;
 
 namespace JYXWeb.Util
 {
@@ -191,6 +192,31 @@ namespace JYXWeb.Util
                 var result = res.Content.ReadAsStringAsync();
                 return result.Result;
             }
+        }
+
+
+        public static byte[] ExportCSV(Package[] packages)
+        {
+            var prefix = new byte[] { 0xef, 0xbb, 0xbf };
+            var sb = new StringBuilder();
+            sb.AppendLine();
+            sb.AppendLine();
+            for (var i = 0; i < packages.Length; i++)
+            {
+                var package = packages[i];
+                var str = (i + 1) + ",147706," + package.ID + ",\"" + package.Products.Where(a => a.ProductCategory.ID == package.Products.Max(b => b.ProductCategory.ID)).First().ProductCategory.Name + "\",,";
+                str += package.Sender.Name + "," + package.Sender.Phone + ",\"" + package.Sender.Address + "\",";
+                str += package.Products[0].Brand + ",\"" + package.Products[0].Name + "\"," + package.Products[0].Quantity + "," + package.Products[0].Price + ",";
+                str += "2,,,,,\"";
+                str += package.Address.Name + "\"," + package.Address.Phone + ",\"" + package.Address.District1.District1.District1.Name + "\",\"" + package.Address.District1.District1.Name + "\",\"" + package.Address.District1.Name + "\",\"" + package.Address.Street+ "\"";
+                sb.AppendLine(str);
+                foreach (var product in package.Products.Skip(1))
+                {
+                    str = ",,,,,,," + package.Products[0].Brand + "," + package.Products[0].Name + "," + package.Products[0].Quantity + "," + package.Products[0].Price;
+                    sb.AppendLine(str);
+                }
+            }
+            return prefix.Concat(Encoding.UTF8.GetBytes(sb.ToString())).ToArray();
         }
     }
 
