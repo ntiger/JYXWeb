@@ -218,12 +218,12 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         });
     }
 
-    $scope.updatePackage = function (package) {
-        if (typeof package === 'undefined') {
+    $scope.updatePackage = function (pkg) {
+        if (typeof pkg === 'undefined') {
             // update package
-            package = $scope.package;
+            pkg = $scope.package;
 
-            angular.forEach(package.Products, function (value, key) {
+            angular.forEach(pkg.Products, function (value, key) {
                 value.Tracking = package.Tracking;
                 value.OrderNumber = package.OrderNumber;
                 value.Notes = package.Notes;
@@ -231,17 +231,17 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         }
         else {
             // update package after split
-            package.Tracking = package.Products.map(function (product) { return product.Tracking; }).filter(function (value, index, self) { return self.indexOf(value) === index; }).join(';');
-            package.OrderNumber = package.Products.map(function (product) { return product.OrderNumber; }).filter(function (value, index, self) { return self.indexOf(value) === index; }).join(';');
-            package.Notes = package.Products.map(function (product) { return product.Notes; }).filter(function (value, index, self) { return self.indexOf(value) === index; }).join(';');
+            pkg.Tracking = pkg.Products.map(function (product) { return product.Tracking; }).filter(function (value, index, self) { return self.indexOf(value) === index; }).join(';');
+            pkg.OrderNumber = pkg.Products.map(function (product) { return product.OrderNumber; }).filter(function (value, index, self) { return self.indexOf(value) === index; }).join(';');
+            pkg.Notes = pkg.Products.map(function (product) { return product.Notes; }).filter(function (value, index, self) { return self.indexOf(value) === index; }).join(';');
         }
-        if (typeof package.Tracking === 'undefined' || package.Tracking === '') {
+        if (typeof pkg.Tracking === 'undefined' || pkg.Tracking === '') {
             alert('请输入包裹追踪号再保存.')
             return;
         }
         $('#packageModal').modal('hide');
-        package.Status = $scope.statusDict[package.SubStatus];
-        $http.post('/Package/UpdatePackage', { package: package }).then(function (res) {
+        pkg.Status = $scope.statusDict[pkg.SubStatus];
+        $http.post('/Package/UpdatePackage', { package: pkg }).then(function (res) {
             $scope.refreshPackages();
         });
     }
@@ -402,7 +402,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
     }
 
     $scope.export = function () {
-        var packageIDs = $scope.selectedPackages.map(function (package) { return package.ID }).join('&ids=');
+        var packageIDs = $scope.selectedPackages.map(function (pkg) { return pkg.ID }).join('&ids=');
         var src = "/Package/ExportPackages?ids=" + packageIDs;
         window.open(src, "", "", "");
     }

@@ -87,6 +87,7 @@ namespace JYXWeb.Controllers
                         Status = a.Status,
                         SubStatus = a.SubStatus,
                         a.UserCode,
+                        a.Weight,
                         Disabled = a.Status != "已入库" && a.Status != "待入库",
                     }).ToList();
                 return Json(packages);
@@ -250,8 +251,8 @@ namespace JYXWeb.Controllers
             using (var packageDataConext = new PackageDataContext())
             {
                 var packages = ids.Join(packageDataConext.Packages.Where(a => a.Address != null && a.Sender != null), a => a, b => b.ID, (a, b) => b).ToArray();
-                var fileContent = TMUtil.ExportCSV(packages);
-                return File(fileContent, AppUtil.GetContentType("xxx.csv"), "packages.csv");
+                var fileContent = TMUtil.ExportXLS(packages);
+                return File(fileContent, AppUtil.GetContentType("xxx.xls"), "packages.xls");
             }
         }
 
@@ -271,7 +272,7 @@ namespace JYXWeb.Controllers
 
 
 
-        public string CreateTMEntry()
+        public void CreateTMEntry()
         {
             var package = new Package
             {
@@ -298,7 +299,12 @@ namespace JYXWeb.Controllers
             //    Quantity = 1,
             //    ProductCategory = new PackageDataContext().ProductCategories.Where(a => a.TMCode == "2428").First(),
             //});
-            return TMUtil.UpdateTMEntry(package);
+            //return TMUtil.UpdateTMEntry(package);
+        }
+
+        public string GetPackageWeight(string id)
+        {
+            return TMUtil.GetPackageWeight(id) + "";
         }
 
 

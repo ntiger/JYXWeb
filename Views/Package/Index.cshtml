@@ -56,7 +56,7 @@
     <md-input-container class="md-block">
         <md-button class="md-raised md-warn" ng-click="addPackage($event)">新增包裹</md-button>
         <md-button class="md-raised md-warn" data-ng-disabled="selectedPackages.length<2" ng-click="combinePackages($event)">合箱</md-button>
-        <md-button class="md-raised md-warn" data-ng-disabled="selectedPackages.length<1" ng-click="export($event)">导出</md-button>
+        <md-button class="md-raised md-warn" data-ng-if="isAdmin" data-ng-disabled="selectedPackages.length<1" ng-click="export($event)">导出</md-button>
     </md-input-container>
     <div layout="row">
         <md-table-container>
@@ -68,6 +68,7 @@
                         <th md-column md-order-by="Tracking" class="text-center"><span>入库追踪号</span></th>
                         <th md-column md-order-by="Receiver" class="text-center"><span>收件人</span></th>
                         <th md-column md-order-by="Products" class="text-center"><span>货物名称</span></th>
+                        <th md-column md-order-by="Weight" class="text-center"><span>重量</span></th>
                         <th md-column md-order-by="Status" class="text-center"><span>状态</span></th>
                         <th md-column md-order-by="SubStatus" class="text-center" data-ng-show="isAdmin"><span>子状态</span></th>
                         <th md-column md-order-by="UserCode" class="text-center" data-ng-show="isAdmin"><span>用户编码</span></th>
@@ -77,7 +78,7 @@
                 <tbody md-body>
                     <tr md-row md-select="package" md-select-id="ID" md-auto-select="false" ng-repeat="package in packages | orderBy: packagesOrder">
                         <td md-cell class="text-center">
-                            <a href="#" ng-click="getPackage(package.ID, showPackageModal)">{{package.ID.replace('TM','MT')}}</a>
+                            <a href="#" ng-click="getPackage(package.ID, showPackageModal)">{{package.ID}}</a>
                         </td>
                         <td md-cell class="text-center">
                             {{package.Tracking}}
@@ -87,6 +88,9 @@
                         </td>
                         <td md-cell class="text-center">
                             {{package.ProductNames}}
+                        </td>
+                        <td md-cell class="text-center">
+                            {{package.Weight}}
                         </td>
                         <td md-cell class="text-center">
                             {{package.Status}}
