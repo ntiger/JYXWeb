@@ -10,7 +10,7 @@
 
 <p class="text-success">@ViewBag.StatusMessage</p>
 <div ng-controller="accountCtrl" data-ng-init="firstName='@firstName';lastName='@lastName';isAdmin=@isAdmin;getUsers()" ng-cloak>
-    <div layout="row" >
+    <div layout="row">
         <div flex="45" ng-controller="packageCtrl" data-ng-init="getPackageOverview()">
             <fieldset>
                 <legend>包裹信息</legend>
@@ -32,13 +32,52 @@
         <div flex>
             <fieldset>
                 <legend>个人信息</legend>
-                用户名/邮箱: @User.Identity.Name
-                [@Html.ActionLink("修改密码", "ChangePassword")]
-
+                <table class="table borderless">
+                    <tr>
+                        <td>用户名/邮箱:</td>
+                        <td>@User.Identity.Name [@Html.ActionLink("修改密码", "ChangePassword")]</td>
+                    </tr>
+                    <tr>
+                        <td>字符编码:</td>
+                        <td>@User.Identity.GetUserCode()</td>
+                    </tr>
+                </table>
             </fieldset>
-            <br />
-            <br />
-
+        </div>
+    </div>
+    <br />
+    <div layout="row">
+        <div flex="45">
+            <fieldset>
+                <legend>
+                    财务信息
+                </legend>
+                <p>
+                    我的余额: @User.Identity.GetBalance().FormatBalance()
+                    <md-button class="md-fab md-mini md-warn" style="margin:3px 3px" aria-label="deposit" data-toggle="modal" data-target="#depositModal">
+                        充值
+                    </md-button>
+                    <br />
+                    我的积分: @User.Identity.GetCredit()
+                </p>
+            </fieldset>
+            <table>
+                <tr>
+                    <td style="vertical-align:middle"></td>
+                    <td style="vertical-align:middle"></td>
+                    <td>
+                        
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+        <div flex="5"></div>
+        <div flex>
             <fieldset>
                 <legend>我的美国收货地址</legend>
                 <table class="table table-striped" style="">
@@ -115,6 +154,9 @@
                              md-total="{{users.length}}" md-on-paginate="" md-page-select></md-table-pagination>
     </div>
     
+    
+    @Html.Partial("_DepositModal")
+
 </div>
 @section Scripts {
     <script src="~/src/app/controlles/accountCtrl.js"></script>

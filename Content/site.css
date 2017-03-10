@@ -126,3 +126,11 @@ md-input-container.hide-md-error-msg .md-errors-spacer:empty {
 .table-condensed th, .table-condensed td {
     padding: 0 5px 0 0 !important;
 }
+
+.borderless td, .borderless th {
+    border: none !important;
+}
+
+.no-margin {
+    margin: 0 !important;
+}

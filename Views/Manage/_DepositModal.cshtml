@@ -1,0 +1,41 @@
+﻿@using JYXWeb.Util
+<div class="modal fade" id="depositModal" tabindex="-1" role="dialog" aria-labelledby="depositModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form name="depositForm" novalidate>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">支付宝充值</h4>
+                </div>
+                <div class="modal-body">
+                    <p>当前余额: @User.Identity.GetBalance().FormatBalance()</p>
+                    <p>请转账到: yangjilai@gmail.com</p>
+                    <md-input-container class="md-block" style="margin-top:30px">
+                        <label>支付宝交易号或带充号</label>
+                        <input ng-model="transactionID" name="transactionID" required>
+                        <div ng-messages="depositForm.transactionID.$error">
+                            <div ng-message="required">请填写交易号或带充号</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container class="md-block" style="margin-top:30px">
+                        <label>转账金额￥</label>
+                        <input ng-model="amount"  name="amount" required>
+                        <div ng-messages="depositForm.amount.$error">
+                            <div ng-message="required">请填写转账金额</div>
+                        </div>
+                        参考金额: {{ amount / 7 | currency }}
+                    </md-input-container>
+                    <p>
+                        注: 充值会在24小时内到达您的美天账户余额。
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary" ng-submit="deposit()">确认充值</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
