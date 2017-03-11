@@ -1,0 +1,43 @@
+﻿<div class="modal fade" id="pricingModal" tabindex="-1" role="dialog" aria-labelledby="pricingModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <md-input-container class="hide-md-error-msg pull-right no-margin" data-ng-show="isAdmin">
+                        <input ng-model="userCode" ng-change="getPricing(userCode)" ng-model-options="{ updateOn: 'blur' }" aria-label="userCode" />
+                    </md-input-container>
+                    <h4 class="modal-title">
+                        运费价格表
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>渠道</th>
+                                <th>价格 $/磅</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="price in pricing">
+                                <td>{{price.Name}}</td>
+                                <td>
+                                    <span data-ng-if="!isAdmin">{{price.Price}}</span>
+                                    <md-input-container class="hide-md-error-msg no-margin" data-ng-if="isAdmin">
+                                        <input ng-model="price.Price" ng-change="savePricing()" ng-model-options="{ updateOn: 'blur' }" aria-label="price" />
+                                    </md-input-container>
+                                </td>
+                                <td>{{price.Category}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+    </div>
+</div>

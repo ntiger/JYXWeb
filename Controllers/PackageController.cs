@@ -140,7 +140,7 @@ namespace JYXWeb.Controllers
                             a.ID,
                             a.Tracking,
                             Number = index + 1,
-                            a.Category,
+                            a.Channel,
                         }),
                     };
                     return Json(newObj, JsonRequestBehavior.AllowGet);
@@ -227,7 +227,7 @@ namespace JYXWeb.Controllers
         {
             using (var packageDataConext = new PackageDataContext())
             {
-                var result = packageDataConext.ProductCategories.GroupBy(a => a.Port).Select(a => new
+                var result = packageDataConext.Channels.GroupBy(a => a.Port).Select(a => new
                 {
                     Port = a.Key,
                     Categories = a.Select(b => new
@@ -286,17 +286,8 @@ namespace JYXWeb.Controllers
                 Brand = "Coach",
                 Price = 134,
                 Quantity = 1,
-                ProductCategory = new PackageDataContext().ProductCategories.Where(a => a.TMCode == "2428").First(),
+                Channel1 = new PackageDataContext().Channels.Where(a => a.DefaultPrice == 3.5).First(),
             });
-            //package.Products.Add(new Product
-            //{
-            //    Name = "test",
-            //    Brand = "Coach",
-            //    Price = 134,
-            //    Quantity = 1,
-            //    ProductCategory = new PackageDataContext().ProductCategories.Where(a => a.TMCode == "2428").First(),
-            //});
-            //return TMUtil.UpdateTMEntry(package);
         }
 
         public string GetPackageWeight(string id)

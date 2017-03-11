@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using JYXWeb.Models;
 using JYXWeb.Util;
+using JYXWeb.DB;
 
 namespace JYXWeb.Controllers
 {
@@ -170,7 +171,7 @@ namespace JYXWeb.Controllers
                     // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                     // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
-                    return RedirectToAction("Index", "Manage");
+                    return RedirectToAction("Index");
                 }
                 ModelState.AddModelError(string.Empty, "用户名/邮箱已存在");
                 //AddErrors(result);
@@ -280,120 +281,6 @@ namespace JYXWeb.Controllers
         }
 
         //
-        // POST: /Account/ExternalLogin
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public ActionResult ExternalLogin(string provider, string returnUrl)
-        {
-            // Request a redirect to the external login provider
-            return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
-        }
-
-        //
-        // GET: /Account/SendCode
-        [AllowAnonymous]
-        public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
-        {
-            var userId = await SignInManager.GetVerifiedUserIdAsync();
-            if (userId == null)
-            {
-                return View("Error");
-            }
-            var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
-            var factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
-            return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
-        }
-
-        //
-        // POST: /Account/SendCode
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> SendCode(SendCodeViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View();
-            }
-
-            // Generate the token and send it
-            if (!await SignInManager.SendTwoFactorCodeAsync(model.SelectedProvider))
-            {
-                return View("Error");
-            }
-            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
-        }
-
-        //
-        // GET: /Account/ExternalLoginCallback
-        [AllowAnonymous]
-        public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
-        {
-            var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
-            if (loginInfo == null)
-            {
-                return RedirectToAction("Login");
-            }
-
-            // Sign in the user with this external login provider if the user already has a login
-            var result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false);
-            switch (result)
-            {
-                case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = false });
-                case SignInStatus.Failure:
-                default:
-                    // If the user does not have an account, then prompt the user to create an account
-                    ViewBag.ReturnUrl = returnUrl;
-                    ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
-            }
-        }
-
-        //
-        // POST: /Account/ExternalLoginConfirmation
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Index", "Manage");
-            }
-
-            if (ModelState.IsValid)
-            {
-                // Get the information about the user from the external login provider
-                var info = await AuthenticationManager.GetExternalLoginInfoAsync();
-                if (info == null)
-                {
-                    return View("ExternalLoginFailure");
-                }
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await UserManager.CreateAsync(user);
-                if (result.Succeeded)
-                {
-                    result = await UserManager.AddLoginAsync(user.Id, info.Login);
-                    if (result.Succeeded)
-                    {
-                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                        return RedirectToLocal(returnUrl);
-                    }
-                }
-                AddErrors(result);
-            }
-
-            ViewBag.ReturnUrl = returnUrl;
-            return View(model);
-        }
-
-        //
         // POST: /Account/LogOff
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -402,14 +289,43 @@ namespace JYXWeb.Controllers
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             return RedirectToAction("Index", "Home");
         }
-
+        
         //
-        // GET: /Account/ExternalLoginFailure
-        [AllowAnonymous]
-        public ActionResult ExternalLoginFailure()
+        // GET: /Manage/ChangePassword
+        public ActionResult ChangePassword()
         {
             return View();
         }
+
+        //
+        // POST: /Manage/ChangePassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            var result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
+            if (result.Succeeded)
+            {
+                var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+                if (user != null)
+                {
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                    user.PasswordPlain = model.NewPassword;
+                    await UserManager.UpdateAsync(user);
+                }
+
+                return RedirectToAction("Index", new { Message = "密码修改成功" });
+            }
+            ModelState.AddModelError(string.Empty, "旧密码输入错误");
+            return View(model);
+        }
+
+
+
 
         protected override void Dispose(bool disposing)
         {
@@ -430,6 +346,87 @@ namespace JYXWeb.Controllers
 
             base.Dispose(disposing);
         }
+
+
+        #region Account Center
+
+        public ActionResult Index()
+        {
+            ViewBag.angularAppName = "accountApp";
+            ViewBag.angularControllerName = "accountCtrl as vm";
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> SaveName(string firstName, string lastName)
+        {
+            var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user != null)
+            {
+                user.FirstName = firstName;
+                user.LastName = lastName;
+                await UserManager.UpdateAsync(user);
+                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+            }
+            return null;
+        }
+
+        [Authorize(Users = "yangjilai@gmail.com,shawn.ntiger@gmail.com")]
+        public ActionResult GetUsers()
+        {
+            using (var appDbContext = new ApplicationDbContext())
+            {
+                return Json(appDbContext.Users.Select(a => new {
+                    a.UserName,
+                    a.UserCode,
+                    a.FirstName,
+                    a.LastName,
+                }).ToList(), JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+        public ActionResult GetPricing(string id)
+        {
+            id = id ?? User.Identity.GetUserCode();
+            using (var packageDataContext = new PackageDataContext())
+            {
+                var pricing = packageDataContext.Pricings.Where(a => a.UserCode == id.ToUpper()).Select(a => new
+                {
+                    Channel = a.Channel1.ID,
+                    a.Channel1.Name,
+                    a.Channel1.Category,
+                    a.Price
+                }).ToList();
+                if (pricing.Count == 0)
+                {
+                    pricing = packageDataContext.Channels.Select(a => new
+                    {
+                        Channel = a.ID,
+                        a.Name,
+                        a.Category,
+                        Price = a.DefaultPrice,
+                    }).ToList();
+                }
+                return Json(pricing, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult SavePricing(Pricing[] pricing)
+        {
+            using (var packageDataContext = new PackageDataContext())
+            {
+                packageDataContext.Pricings.DeleteAllOnSubmit(packageDataContext.Pricings.Where(a => a.UserCode == pricing[0].UserCode.ToUpper()));
+                packageDataContext.Pricings.InsertAllOnSubmit(pricing);
+                packageDataContext.SubmitChanges();
+            }
+            return Json("Success");
+        }
+
+
+        #endregion
+
+
 
         #region Helpers
         // Used for XSRF protection when adding external logins
@@ -457,7 +454,7 @@ namespace JYXWeb.Controllers
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "Manage");
+            return RedirectToAction("Index", "Account");
         }
 
         internal class ChallengeResult : HttpUnauthorizedResult

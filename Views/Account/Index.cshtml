@@ -1,5 +1,4 @@
 ﻿@using JYXWeb.Util;
-@model JYXWeb.Models.IndexViewModel
 @{
     ViewBag.Title = "个人中心";
     var userCode = User.Identity.GetUserCode();
@@ -9,9 +8,48 @@
 }
 
 <p class="text-success">@ViewBag.StatusMessage</p>
-<div ng-controller="accountCtrl" data-ng-init="firstName='@firstName';lastName='@lastName';isAdmin=@isAdmin;getUsers()" ng-cloak>
-    <div layout="row">
-        <div flex="45" ng-controller="packageCtrl" data-ng-init="getPackageOverview()">
+<div data-ng-init="firstName='@firstName';lastName='@lastName';isAdmin=@isAdmin;init()" ng-cloak>
+    <div layout="column">
+        <div flex>
+            <fieldset>
+                <legend>
+                    财务信息
+                </legend>
+                <p>
+                    我的余额: &nbsp; @User.Identity.GetBalance().FormatBalance()
+                    &nbsp;
+                    <md-button class="md-fab md-mini md-warn" style="margin:3px 3px" aria-label="deposit" data-toggle="modal" data-target="#depositModal">
+                        充值
+                    </md-button>
+                    <br />
+                    @*我的积分: &nbsp; @User.Identity.GetCredit()*@
+                </p>
+                <p>
+                    运费价格表
+                    <md-button class="md-fab md-mini md-warn" data-toggle="modal" data-target="#pricingModal" aria-label="pricing">
+                        <md-icon class="material-icons">description</md-icon>
+                    </md-button>
+                </p>
+            </fieldset>
+            <br />
+        </div>
+        <div flex>
+            <fieldset>
+                <legend>个人信息</legend>
+                <table class="table borderless">
+                    <tr>
+                        <td>用户名/邮箱:</td>
+                        <td>@User.Identity.Name [@Html.ActionLink("修改密码", "ChangePassword")]</td>
+                    </tr>
+                    <tr>
+                        <td>字符编码:</td>
+                        <td>@User.Identity.GetUserCode()</td>
+                    </tr>
+                </table>
+            </fieldset>
+            <br />
+        </div>
+        <div flex data-ng-controller="packageCtrl" data-ng-init="getPackageOverview()">
             <fieldset>
                 <legend>包裹信息</legend>
                 <md-chips ng-model="packageOverview" readonly="true" md-removable="false">
@@ -27,56 +65,9 @@
                     </md-chip-template>
                 </md-chips>
             </fieldset>
+            <br />
+            <br />
         </div>
-        <div flex="5"></div>
-        <div flex>
-            <fieldset>
-                <legend>个人信息</legend>
-                <table class="table borderless">
-                    <tr>
-                        <td>用户名/邮箱:</td>
-                        <td>@User.Identity.Name [@Html.ActionLink("修改密码", "ChangePassword")]</td>
-                    </tr>
-                    <tr>
-                        <td>字符编码:</td>
-                        <td>@User.Identity.GetUserCode()</td>
-                    </tr>
-                </table>
-            </fieldset>
-        </div>
-    </div>
-    <br />
-    <div layout="row">
-        <div flex="45">
-            <fieldset>
-                <legend>
-                    财务信息
-                </legend>
-                <p>
-                    我的余额: @User.Identity.GetBalance().FormatBalance()
-                    <md-button class="md-fab md-mini md-warn" style="margin:3px 3px" aria-label="deposit" data-toggle="modal" data-target="#depositModal">
-                        充值
-                    </md-button>
-                    <br />
-                    我的积分: @User.Identity.GetCredit()
-                </p>
-            </fieldset>
-            <table>
-                <tr>
-                    <td style="vertical-align:middle"></td>
-                    <td style="vertical-align:middle"></td>
-                    <td>
-                        
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </table>
-        </div>
-        <div flex="5"></div>
         <div flex>
             <fieldset>
                 <legend>我的美国收货地址</legend>
@@ -125,7 +116,6 @@
             </fieldset>
         </div>
     </div>
-    
    
     <div data-ng-if="isAdmin">
         <md-table-container>
@@ -142,7 +132,7 @@
 
                 <tbody md-body>
                     <tr md-row md-auto-select="false" ng-repeat="user in users | orderBy: query.order | limitTo: query.limit : (query.page-1) * query.limit">
-                        <td md-cell>{{user.UserCode}}</td>
+                        <td md-cell><a href="" data-toggle="modal" ng-click="getPricing(user.UserCode)" data-target="#pricingModal">{{user.UserCode}}</a></td>
                         <td md-cell>{{user.UserName}}</td>
                         <td md-cell>{{user.LastName}}</td>
                         <td md-cell>{{user.FirstName}}</td>
@@ -156,9 +146,10 @@
     
     
     @Html.Partial("_DepositModal")
+    @Html.Partial("_PricingModal")
 
 </div>
 @section Scripts {
-    <script src="~/src/app/controlles/accountCtrl.js"></script>
-    <script src="~/src/app/controlles/packageCtrl.js"></script>
+    <script src="~/src/app/controllers/accountCtrl.js"></script>
+    <script src="~/src/app/controllers/packageCtrl.js"></script>
 }

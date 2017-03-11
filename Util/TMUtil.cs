@@ -311,7 +311,7 @@ namespace JYXWeb.Util
             for (var i = 0; i < packages.Length; i++)
             {
                 var package = packages[i];
-                var str = (i + 1) + ",147706," + package.ID + ",\"" + package.Products.Where(a => a.ProductCategory.ID == package.Products.Max(b => b.ProductCategory.ID)).First().ProductCategory.Name + "\",,";
+                var str = (i + 1) + ",147706," + package.ID + ",\"" + package.Products.Where(a => a.Channel == package.Products.Max(b => b.Channel)).First().Channel1.Name + "\",,";
                 str += package.Sender.Name + "," + package.Sender.Phone + ",\"" + package.Sender.Address + "\",";
                 str += package.Products[0].Brand + ",\"" + package.Products[0].Name + "\"," + package.Products[0].Quantity + "," + package.Products[0].Price + ",";
                 str += "2,,,,,\"";
@@ -348,7 +348,7 @@ namespace JYXWeb.Util
                     workSheet.Cells[row, col++] = (i + 1);
                     workSheet.Cells[row, col++] = TM_USER_CODE;
                     workSheet.Cells[row, col++] = package.ID;
-                    workSheet.Cells[row, col++] = package.Products.Where(a => a.ProductCategory.ID == package.Products.Max(b => b.ProductCategory.ID)).First().ProductCategory.Name;
+                    workSheet.Cells[row, col++] = package.Products.Where(a => a.Channel == package.Products.Max(b => b.Channel)).First().Channel1.Name;
 
                     col++;
                     workSheet.Cells[row, col++] = package.Sender.Name;
