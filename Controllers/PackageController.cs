@@ -165,6 +165,7 @@ namespace JYXWeb.Controllers
                     existingPackage.Products.Clear();
                     existingPackage.Products.AddRange(package.Products);
                     existingPackage.LastUpdateTime = DateTime.Now;
+                    existingPackage.LastUpdateUser = User.Identity.Name;
                     packageDataConext.SubmitChanges();
                 }
                 else
@@ -180,6 +181,7 @@ namespace JYXWeb.Controllers
                         package.Address = packageDataConext.Addresses.Where(a => a.ID == package.Address.ID).SingleOrDefault();
                     }
                     package.LastUpdateTime = DateTime.Now;
+                    package.LastUpdateUser = User.Identity.Name;
                     packageDataConext.Packages.InsertOnSubmit(package);
                     packageDataConext.SubmitChanges();
                 }
