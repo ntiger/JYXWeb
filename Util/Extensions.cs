@@ -43,6 +43,22 @@ namespace JYXWeb.Util
             }
         }
 
+        public static double GetUnitPrice(this IIdentity identity, int channelID)
+        {
+            var userCode = identity.GetUserCode();
+            using (var dataContext = new PackageDataContext())
+            {
+                var channel = dataContext.Channels.Where(a => a.ID == channelID).Single();
+                var existingPricing = channel.Pricings.Where(a => a.UserCode == userCode).SingleOrDefault();
+                if (existingPricing == null)
+                {
+                    return channel.DefaultPrice.Value;
+                }
+                return existingPricing.Price.Value;
+            }
+        }
+
+
         public static string FormatBalance(this double balance)
         {
             return string.Format("{0:c}", balance);

@@ -69,6 +69,7 @@
                         <th md-column md-order-by="Receiver" class="text-center"><span>收件人</span></th>
                         <th md-column md-order-by="Products" class="text-center"><span>货物名称</span></th>
                         <th md-column md-order-by="Weight" class="text-center"><span>重量</span></th>
+                        <th md-column md-order-by="Cost" class="text-center"><span>价格</span></th>
                         <th md-column md-order-by="Status" class="text-center"><span>状态</span></th>
                         <th md-column md-order-by="SubStatus" class="text-center" data-ng-show="isAdmin"><span>子状态</span></th>
                         <th md-column md-order-by="UserCode" class="text-center" data-ng-show="isAdmin"><span>用户编码</span></th>
@@ -93,6 +94,9 @@
                             {{package.Weight}}
                         </td>
                         <td md-cell class="text-center">
+                            {{package.Cost}}
+                        </td>
+                        <td md-cell class="text-center">
                             {{package.Status}}
                         </td>
                         <td md-cell class="text-center" ng-show="isAdmin">
@@ -101,9 +105,9 @@
                         <td md-cell class="text-center" ng-show="isAdmin">
                             {{package.UserCode}}
                         </td>
-                        <td md-cell class="text-center">
+                        <td md-cell class="text-center" style="white-space:nowrap">
                             <md-button class="md-fab md-mini" style="margin:3px 3px" data-ng-disabled="package.Disabled" aria-label="Separate" ng-click="shipPackage(package.ID)">
-                                {{(package.SubStatus.indexOf('确认发货')>-1?'撤回':'发货')}}
+                                发货
                             </md-button>
                             <md-button class="md-fab md-mini md-primary" style="margin:3px 3px" data-ng-disabled="package.Disabled" aria-label="Separate" ng-click="getPackage(package.ID, showSplitPackageModal)">
                                 分箱

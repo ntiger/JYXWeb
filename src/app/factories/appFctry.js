@@ -84,7 +84,7 @@
             id: 'account',
             name: '个人中心',
             type: 'link',
-            url: '/Manage'
+            url: '/Account'
         });
 
         var self;

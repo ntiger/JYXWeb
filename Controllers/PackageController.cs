@@ -88,7 +88,8 @@ namespace JYXWeb.Controllers
                         SubStatus = a.SubStatus,
                         a.UserCode,
                         a.Weight,
-                        Disabled = a.Status != "已入库" && a.Status != "待入库",
+                        a.Cost,
+                        Disabled = a.SubStatus != "已入库" && a.SubStatus != "待入库",
                     }).ToList();
                 return Json(packages);
             }

@@ -49,7 +49,7 @@
     </md-input-container>
     <md-button class="md-warn" ng-show="addresses.length>0" ng-click="showAddressManager()">编辑当前地址</md-button>
     <md-button class="md-warn" ng-click="showAddressManager({})">添加新地址</md-button>
-    <md-button class="md-warn" ng-click="deleteAddress(package.Address.ID)">删除当前地址</md-button>
+    @*<md-button class="md-warn" ng-click="deleteAddress(package.Address.ID)">删除当前地址</md-button>*@
 </div>
 <div layout="row">
     <md-table-container>
@@ -104,11 +104,11 @@
             </tbody>
         </table>
         <md-button class="md-raised md-warn pull-left" 
-                   data-ng-show="isAdmin||package.Status==='待入库'||package.Status==='已入库'" ng-click="addProduct()">添加</md-button>
+                   data-ng-if="isAdmin||package.SubStatus==='待入库'||package.SubStatus==='已入库'" ng-click="addProduct()">添加</md-button>
         <br />
         <br />
         <md-button class="md-raised md-warn pull-right" 
-                   data-ng-show="isAdmin||package.Status==='待入库'||package.Status==='已入库'" data-ng-click="updatePackage()">保存包裹</md-button>
+                   data-ng-if="isAdmin||package.SubStatus==='待入库'||package.SubStatus==='已入库'" data-ng-click="updatePackage()">保存包裹</md-button>
     
     </md-table-container>
 

@@ -17,5 +17,7 @@ namespace JYXWeb
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
+
+        public const string ADMIN_USERS = "yangjilai@gmail.com,shawn.ntiger@gmail.com";
     }
 }

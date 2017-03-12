@@ -371,7 +371,7 @@ namespace JYXWeb.Controllers
             return null;
         }
 
-        [Authorize(Users = "yangjilai@gmail.com,shawn.ntiger@gmail.com")]
+        [Authorize(Users = MvcApplication.ADMIN_USERS)]
         public ActionResult GetUsers()
         {
             using (var appDbContext = new ApplicationDbContext())
@@ -381,6 +381,7 @@ namespace JYXWeb.Controllers
                     a.UserCode,
                     a.FirstName,
                     a.LastName,
+                    a.Id
                 }).ToList(), JsonRequestBehavior.AllowGet);
             }
         }
@@ -412,6 +413,7 @@ namespace JYXWeb.Controllers
             }
         }
 
+        [Authorize(Users = MvcApplication.ADMIN_USERS)]
         public ActionResult SavePricing(Pricing[] pricing)
         {
             using (var packageDataContext = new PackageDataContext())

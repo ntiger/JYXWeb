@@ -36,7 +36,7 @@ angularApp.controller('accountCtrl', function ($scope, $http, $filter, $log, $ti
             pricing.push({ Price: value.Price, UserCode: $scope.userCode, Channel: value.Channel });
         });
         $http.post('/Account/SavePricing', { pricing: pricing }).then(function (res) {
-            $scope.pricing = res.data;
+            
         });
     }
 

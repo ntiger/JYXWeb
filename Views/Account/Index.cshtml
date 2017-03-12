@@ -15,21 +15,21 @@
                 <legend>
                     财务信息
                 </legend>
-                <p>
-                    我的余额: &nbsp; @User.Identity.GetBalance().FormatBalance()
+                <div>
+
+                    我的余额:&nbsp;
+                    @User.Identity.GetBalance().FormatBalance()
                     &nbsp;
                     <md-button class="md-fab md-mini md-warn" style="margin:3px 3px" aria-label="deposit" data-toggle="modal" data-target="#depositModal">
                         充值
                     </md-button>
-                    <br />
-                    @*我的积分: &nbsp; @User.Identity.GetCredit()*@
-                </p>
-                <p>
-                    运费价格表
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    运费价格表:&nbsp;
                     <md-button class="md-fab md-mini md-warn" data-toggle="modal" data-target="#pricingModal" aria-label="pricing">
                         <md-icon class="material-icons">description</md-icon>
                     </md-button>
-                </p>
+                </div>
+                @*我的积分: &nbsp; @User.Identity.GetCredit()*@
             </fieldset>
             <br />
         </div>

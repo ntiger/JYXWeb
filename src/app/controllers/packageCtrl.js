@@ -90,29 +90,26 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
 
         $scope.shipPackage = function (code) {
             $scope.getPackage(code, function () {
-                if ($scope.package.SubStatus.indexOf('确认发货') > -1) {
-                    $scope.package.SubStatus = $scope.package.Status;
+                if (angular.equals($scope.package.Address, {})) {
+                    alert('请选择或添加收件人');
+                    return;
                 }
-                else {
-                    if (angular.equals($scope.package.Address, {})) {
-                        alert('请选择或添加收件人');
-                        return;
-                    }
-                    if (angular.equals($scope.package.Sender, {})) {
-                        alert('请选择或添加发件人');
-                        return;
-                    }
-
+                if (angular.equals($scope.package.Sender, {})) {
+                    alert('请选择或添加发件人');
+                    return;
+                }
+                if (confirm('确认发货以后将不能修改包裹信息、分箱、退货或者删除包裹，确认发货吗？')) {
                     if ($scope.package.Status === '待入库') {
                         $scope.package.SubStatus = '确认发货(未到货)';
                     }
                     else if ($scope.package.Status === '已入库') {
                         $scope.package.SubStatus = '确认发货(已到货)';
                     }
+                    $scope.updatePackage();
                 }
-                $scope.updatePackage();
-            })
+            });
         }
+    
 
         $scope.deletePackage = function (code) {
             if (confirm('确认删除此包裹?')) {
@@ -224,9 +221,9 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 pkg = $scope.package;
 
                 angular.forEach(pkg.Products, function (value, key) {
-                    value.Tracking = package.Tracking;
-                    value.OrderNumber = package.OrderNumber;
-                    value.Notes = package.Notes;
+                    value.Tracking = pkg.Tracking;
+                    value.OrderNumber = pkg.OrderNumber;
+                    value.Notes = pkg.Notes;
                 });
             }
             else {
