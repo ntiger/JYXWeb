@@ -353,7 +353,7 @@ namespace JYXWeb.Controllers
         public ActionResult Index()
         {
             ViewBag.angularAppName = "accountApp";
-            ViewBag.angularControllerName = "accountCtrl as vm";
+            ViewBag.angularControllerName = "accountCtrl";
             return View();
         }
 

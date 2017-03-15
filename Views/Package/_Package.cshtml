@@ -11,6 +11,10 @@
         <label>备注 (可以添加其他要求)</label>
         <input ng-model="package.Notes">
     </md-input-container>
+    <md-input-container class="md-block" flex>
+        <label>重量 (预估)</label>
+        <input ng-model="package.WeightEst">
+    </md-input-container>
     <md-input-container class="md-block" data-ng-show="isAdmin">
         <label>包裹状态</label>
         <md-select ng-model="package.SubStatus">

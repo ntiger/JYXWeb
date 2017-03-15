@@ -1,4 +1,5 @@
-﻿@if (this.ViewContext.RouteData.Values["controller"].ToString() == "Package" || 
+﻿@if (this.ViewContext.RouteData.Values["controller"].ToString() == "Package" ||
+    this.ViewContext.RouteData.Values["controller"].ToString() == "Message" ||
     this.ViewContext.RouteData.Values["controller"].ToString() == "Account" && this.ViewContext.RouteData.Values["action"].ToString() == "Index")
 {
     Layout = "~/Views/Shared/_LayoutSideMenu.cshtml";

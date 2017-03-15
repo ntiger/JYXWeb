@@ -131,7 +131,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         $scope.addPackage = function () {
             var status = '待入库';
             var subStatus = $scope.holdPackage ? '待入库' : '确认发货(未到货)';
-            $scope.package = { Products: [{ Number: 1, Quantity: 1 }], Status: status, SubStatus: subStatus, Sender: {}, Address: {} };
+            $scope.package = { Products: [{ Number: 1, Quantity: 1 }], Status: status, SubStatus: subStatus, Sender: {}, Address: {}, WeightEst: 2 };
             $scope.showPackageModal();
         };
 

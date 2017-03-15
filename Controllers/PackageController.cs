@@ -14,14 +14,14 @@ namespace JYXWeb.Controllers
         public ActionResult Index()
         {
             ViewBag.angularAppName = "packageApp";
-            ViewBag.angularControllerName = "packageCtrl as vm";
+            ViewBag.angularControllerName = "packageCtrl";
             return View();
         }
 
         public ActionResult New()
         {
             ViewBag.angularAppName = "packageApp";
-            ViewBag.angularControllerName = "packageCtrl as vm";
+            ViewBag.angularControllerName = "packageCtrl";
             return View();
         }
 
@@ -87,8 +87,14 @@ namespace JYXWeb.Controllers
                         Status = a.Status,
                         SubStatus = a.SubStatus,
                         a.UserCode,
-                        a.Weight,
-                        a.Cost,
+                        Weight = a.Weight == null ? a.WeightEst + " (预估)" : a.Weight + " (实际)",
+                        Cost = a.Cost == null ? 
+                            string.Format("{0:c}", 
+                                RoundPackageWeight(a.Weight ?? a.WeightEst.Value) * 
+                                (a.Products.Count == 0 ? null : a.Products.Where(b => b.Channel == a.Products.Max(c => c.Channel)).First()
+                                .Channel1.Pricings.Where(c => c.UserCode == a.UserCode).Select(c => c.Price).SingleOrDefault() ??
+                                a.Products.Where(b => b.Channel == a.Products.Max(c => c.Channel)).First().Channel1.DefaultPrice)) + " (预估)" :
+                            string.Format("{0:c}", a.Cost) + " (实际)",
                         Disabled = a.SubStatus != "已入库" && a.SubStatus != "待入库",
                     }).ToList();
                 return Json(packages);
@@ -110,6 +116,7 @@ namespace JYXWeb.Controllers
                         Notes = string.Join(";", package.Products.Select(a => a.Notes).Distinct()),
                         package.Status,
                         package.SubStatus,
+                        package.WeightEst,
                         Sender = package.SenderID == null ? null :new {
                             package.Sender.ID,
                             package.Sender.Name,
@@ -161,6 +168,7 @@ namespace JYXWeb.Controllers
                     existingPackage.SenderID = package.SenderID;
                     existingPackage.Status = package.Status;
                     existingPackage.SubStatus = package.SubStatus;
+                    existingPackage.WeightEst = package.WeightEst;
                     packageDataConext.Products.DeleteAllOnSubmit(existingPackage.Products);
                     existingPackage.Products.Clear();
                     existingPackage.Products.AddRange(package.Products);
@@ -291,6 +299,11 @@ namespace JYXWeb.Controllers
                 Quantity = 1,
                 Channel1 = new PackageDataContext().Channels.Where(a => a.DefaultPrice == 3.5).First(),
             });
+        }
+
+        public double RoundPackageWeight(double weight)
+        {
+            return Math.Floor(weight) + (weight - Math.Floor(weight) > 0.1 ? 1 : 0);
         }
 
         public string GetPackageWeight(string id)

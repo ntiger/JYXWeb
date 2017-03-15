@@ -16,7 +16,7 @@
 </head>
 
 <body class="body-side-menu" id="main-document-body" @if (angularEnabled) { <text> data-ng-app="@angularAppName" </text>}>
-    <div @if (angularEnabled) { <text> data-ng-controller="@angularControllerName" </text>} layout-fill layout="column">
+    <div @if (angularEnabled) { <text> data-ng-controller="@angularControllerName as vm" </text>} layout-fill layout="column">
         <div layout="row" flex>
             @Html.Partial("_SideNav")
             <div layout="column" flex role="main">
