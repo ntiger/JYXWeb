@@ -68,7 +68,6 @@ namespace JYXWeb.Controllers
                 {
                     existingMessage.MessageContents.Add(new MessageContent
                     {
-                        MessageID = existingMessage.ID,
                         Comment = messageStr,
                         Sender = User.Identity.GetUserCode(),
                         Timestamp = DateTime.Now,
@@ -78,15 +77,13 @@ namespace JYXWeb.Controllers
                 else
                 {
                     message.UserCode = User.Identity.GetUserCode();
-                    packageDataContext.Messages.InsertOnSubmit(message);
-                    packageDataContext.SubmitChanges();
                     message.MessageContents.Add(new MessageContent
                     {
-                        MessageID = message.ID,
                         Comment = messageStr,
                         Sender = User.Identity.GetUserCode(),
                         Timestamp = DateTime.Now,
                     });
+                    packageDataContext.Messages.InsertOnSubmit(message);
                     packageDataContext.SubmitChanges();
                 }
             }

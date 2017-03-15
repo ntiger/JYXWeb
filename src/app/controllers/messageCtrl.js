@@ -44,7 +44,8 @@ angularApp.controller('messageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         $scope.postMessage = function (comment) {
             var model = { message: $scope.message, messageStr: comment };
             $http.post('/Message/PostMessage', model).then(function (res) {
-                $scope.messge = res.data;
+                $scope.comment = '';
+                $scope.message = res.data;
             });
         }
 
