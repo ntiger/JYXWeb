@@ -38,9 +38,9 @@
                             <h6 style="margin:5px 0">{{ content.Timestamp }}</h6>
                             <p>{{ content.Comment }}</p>
                         </div>
-                        <a href="" ng-click="deleteMessage($index)" ng-if="content.Sender===message.UserCode" style="margin-left:-100px"><i class="material-icons">remove_circle</i></a>
+                        <a href="" ng-click="deleteMessageContent($event, $index)" ng-if="content.Sender===message.UserCode" style="margin-left:-100px"><i class="material-icons">remove_circle</i></a>
                         <span flex></span>
-                        <a href="" ng-click="deleteMessage($index)" ng-if="isAdmin&&content.Sender!==message.UserCode" style="margin-right:-100px"><i class="material-icons">remove_circle</i></a>
+                        <a href="" ng-click="deleteMessageContent($event, $index)" ng-if="isAdmin&&content.Sender!==message.UserCode" style="margin-right:-100px"><i class="material-icons">remove_circle</i></a>
                         <div ng-if="content.Sender!==message.UserCode" class="md-list-item-text message-bubble message-bubble-you" style="margin:5px 20px 5px 120px">
                             <h6 style="margin:5px 0" class="text-right">{{ content.Timestamp }}</h6>
                             <p class="">{{ content.Comment }}</p>
@@ -57,7 +57,7 @@
                     <label>点击这里添加新留言</label>
                     <textarea ng-model="comment" style="max-width:100%" md-maxlength="500" md-select-on-focus></textarea>
                 </md-input-container>
-                <md-button class="md-raised md-warn" aria-label="submit" ng-click="postMessage(comment)">
+                <md-button class="md-raised md-warn" aria-label="submit" ng-click="postMessage($event, comment)">
                     提交
                 </md-button>
             </div>

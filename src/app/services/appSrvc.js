@@ -1,6 +1,6 @@
 ﻿// AngularJS services
 angular.module('appSrvc', ['ngMaterial'])
-    .service('$appUtil', ['$http', '$mdUtil', '$mdSidenav', '$timeout', function ($http, $mdUtil, $mdSidenav, $timeout) {
+    .service('$appUtil', ['$http', '$mdUtil', '$mdSidenav', '$timeout', '$mdDialog', function ($http, $mdUtil, $mdSidenav, $timeout, $mdDialog) {
         var $appUtil = this;
 
         // open a new window with 4/5 width and height of current window.
@@ -130,4 +130,38 @@ angular.module('appSrvc', ['ngMaterial'])
         this.openMenu = function () {
             $timeout(function () { $mdSidenav('left').open(); });
         }
+
+        this.appConfirm = function (ev, title, textContent, yesText, noText, callback) {
+            if (typeof yesText === 'undefined' || yesText === '') { okText = '确定'; }
+            if (typeof noText === 'undefined' || noText === '') { okText = '取消'; }
+            var confirm = $mdDialog.confirm()
+                  .title(title)
+                  .textContent(textContent)
+                  .ariaLabel('confirm dialog')
+                  .targetEvent(ev)
+                  .ok(yesText)
+                  .cancel(noText);
+
+            $mdDialog.show(confirm).then(function () {
+                if (callback) {
+                    callback();
+                }
+            }, function () {
+                
+            });
+        };
+
+        this.appAlert = function (ev, title, textContent, okText) {
+            if (typeof okText === 'undefined' || okText === '') { okText = '好';}
+            $mdDialog.show(
+              $mdDialog.alert()
+                .parent(angular.element(document.querySelector('#popupContainer')))
+                .clickOutsideToClose(true)
+                .title(title)
+                .textContent(textContent)
+                .ariaLabel('alert dialog')
+                .ok(okText)
+                .targetEvent(ev)
+            );
+        };
     }]);

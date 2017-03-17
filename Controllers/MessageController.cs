@@ -33,6 +33,7 @@ namespace JYXWeb.Controllers
                     a.ID,
                     a.UserCode,
                     a.Category,
+                    a.Tracking,
                     Comment = a.MessageContents.Select(b => b.Comment).FirstOrDefault(),
                     Timestamp = a.MessageContents.Select(b => b.Timestamp).LastOrDefault().ToString("MM/dd/yyyy hh:mm tt"),
                     a.Status,
@@ -52,6 +53,9 @@ namespace JYXWeb.Controllers
                     message.Category,
                     message.UserCode,
                     message.Status,
+                    message.Tracking,
+                    Comment = message.MessageContents.Select(b => b.Comment).FirstOrDefault(),
+                    Timestamp = message.MessageContents.Count == 0 ? "" : message.MessageContents.Max(b => b.Timestamp).ToString("MM/dd/yyyy hh:mm tt"),
                     MessageContents = message.MessageContents.Select(a => new
                     {
                         a.ID,

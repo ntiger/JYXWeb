@@ -140,6 +140,13 @@ md-input-container.hide-md-error-msg .md-errors-spacer:empty {
 }
 
 
+/***** Make sure Dialog is in front of bootstrap modal *****/
+.md-dialog-container {
+  z-index: 1080 !important;
+}
+
+/***** Message Bubble *****/
+
 .message-bubble{
     background-color: #F2F2F2;
     border-radius: 5px;
@@ -183,3 +190,4 @@ md-input-container.hide-md-error-msg .md-errors-spacer:empty {
     box-shadow: 2px -2px 2px 0 rgba( 178, 178, 178, .4 );
     right: -9px;    
 }
+

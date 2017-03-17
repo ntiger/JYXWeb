@@ -53,7 +53,6 @@
 
     .factory('$menu', function () {
         var sections = [];
-
         sections.push({
             id: 'package',
             name: '我要转运',
@@ -85,6 +84,13 @@
             name: '个人中心',
             type: 'link',
             url: '/Account'
+        });
+
+        sections.push({
+            id: 'message',
+            name: '站内留言',
+            type: 'link',
+            url: '/Message'
         });
 
         var self;

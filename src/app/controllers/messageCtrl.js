@@ -28,12 +28,12 @@ angularApp.controller('messageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             });
         }
 
-        $scope.delete = function (index) {
-            if (confirm('确认要删除这条留言吗?')) {
+        $scope.deleteMessage = function (ev, index) {
+            $appUtil.appConfirm(ev, '', '删除以后将会无法找回这条留言, 确认要删除吗?', '确认', '取消', function () {
                 $http.get('/Message/DeleteMessage/' + $scope.messages[index].ID).then(function (res) {
                     $scope.messages.splice(index, 1);
                 });
-            }
+            });
         }
 
         $scope.closeMessage = function () {
@@ -47,19 +47,32 @@ angularApp.controller('messageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             });
         }
 
-        $scope.deleteMessage = function (index) {
-            if (confirm('确认要删除这条记录吗?')) {
+        $scope.deleteMessageContent = function (ev, index) {
+            $appUtil.appConfirm(ev, '', '删除以后将会无法找回这条记录, 确认要删除吗?', '确认', '取消', function () {
                 $http.get('/Message/DeleteMessageContent/' + $scope.message.MessageContents[index].ID).then(function (res) {
                     $scope.message.MessageContents.splice(index, 1);
                 });
-            }
+            });
         }
 
-        $scope.postMessage = function (comment) {
+        $scope.postMessage = function (ev, comment) {
+            if (typeof comment === 'undefined' || comment.trim() === '') {
+                $appUtil.appAlert(ev, '', '不能提交空留言');
+                return false;
+            }
             var model = { message: $scope.message, messageStr: comment };
             $http.post('/Message/PostMessage', model).then(function (res) {
                 $scope.comment = '';
                 $scope.message = res.data;
+                var hasMessage = false;
+                angular.forEach($scope.messages, function (value) {
+                    if (value.ID === $scope.message.ID) {
+                        hasMessage = true;
+                    }
+                });
+                if (!hasMessage) {
+                    $scope.messages.push($scope.message);
+                }
             });
         }
 
