@@ -1,18 +1,33 @@
-﻿@{
+﻿@using JYXWeb.Util;
+@{
     ViewBag.Title = "站内留言";
+    var userCode = User.Identity.GetUserCode();
+    var isAdmin = AppUtil.IsAdmin(userCode).ToString().ToLower();
 }
 
-<div layout="column" ng-cloak ng-init="init()">
+<div layout="column" ng-cloak ng-init="isAdmin=@isAdmin;init()">
     <div layout="row">
-        <md-button class="md-raised md-warn" style="margin-top:0;" ng-click="message={Category:messageCategories[0], Status:messageStatus}" data-toggle="modal" data-target="#messageModal">
-            <md-icon class="material-icons">message</md-icon> 留言 
-        </md-button>
+        <md-input-container class="md-block  hide-md-error-msg">
+            <md-button class="md-raised md-warn" style="margin-top:0;" ng-click="message={Category:messageCategories[0], Status:defaultStatus}" data-toggle="modal" data-target="#messageModal">
+                <md-icon class="material-icons">message</md-icon> 添加新留言
+            </md-button>
+        </md-input-container>
+        <span flex="5"></span>
+        <md-input-container class="md-block  hide-md-error-msg">
+            <label>状态</label>
+            <md-select ng-model="messageStatus" data-ng-change="getMessages()">
+                <md-option ng-repeat="status in messageStatusList track by $index" data-ng-value="status">
+                    {{status}}
+                </md-option>
+            </md-select>
+        </md-input-container>
     </div>
     <md-table-container layout="row">
         <table class="table table-striped" md-table md-row-select="options.rowSelection" multiple="{{options.multiSelect}}"
                ng-model="selectedMessages" md-progress="promise">
             <thead md-head md-order="messageOrder">
                 <tr md-row>
+                    <th md-column md-order-by="UserCode" ng-if="isAdmin" class="text-center"><span>用户编码</span></th>
                     <th md-column md-order-by="Category" class="text-center"><span>分类</span></th>
                     <th md-column md-order-by="Message" class="text-center"><span>留言内容</span></th>
                     <th md-column md-order-by="Tracking" class="text-center"><span>相关单号</span></th>
@@ -23,6 +38,9 @@
             </thead>
             <tbody md-body>
                 <tr md-row md-select="package" md-select-id="ID" md-auto-select="false" ng-repeat="message in messages | orderBy: messageOrder track by $index">
+                    <td md-cell ng-if="isAdmin" class="text-center">
+                        {{message.UserCode}}
+                    </td>
                     <td md-cell class="text-center">
                         {{message.Category}}
                     </td>

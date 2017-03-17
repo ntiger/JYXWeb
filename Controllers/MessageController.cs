@@ -18,14 +18,20 @@ namespace JYXWeb.Controllers
             return View();
         }
 
-        public ActionResult GetMessages(string id)
+        public ActionResult GetMessages(string id, string status)
         {
-            var userCode = id ?? User.Identity.GetUserCode();
-            using(var packageDataContext = new PackageDataContext())
+            if (!AppUtil.IsAdmin(User.Identity.GetUserCode()))
             {
-                var messages = packageDataContext.Messages.Where(a => a.UserCode == userCode).ToList().Select(a => new
+                id = User.Identity.GetUserCode();
+            }
+            var isAdmin = AppUtil.IsAdmin(User.Identity.GetUserCode());
+            if (id != null) { isAdmin = false; }
+            using (var packageDataContext = new PackageDataContext())
+            {
+                var messages = packageDataContext.Messages.Where(a => (id == null || a.UserCode == id) && (status == "全部" || a.Status == status)).ToList().Select(a => new
                 {
                     a.ID,
+                    a.UserCode,
                     a.Category,
                     Comment = a.MessageContents.Select(b => b.Comment).FirstOrDefault(),
                     Timestamp = a.MessageContents.Select(b => b.Timestamp).LastOrDefault().ToString("MM/dd/yyyy hh:mm tt"),
@@ -34,7 +40,6 @@ namespace JYXWeb.Controllers
                 return Json(messages, JsonRequestBehavior.AllowGet);
             }
         }
-
 
         public ActionResult GetMessage(int id)
         {
@@ -45,11 +50,13 @@ namespace JYXWeb.Controllers
                 {
                     message.ID,
                     message.Category,
+                    message.UserCode,
                     message.Status,
                     MessageContents = message.MessageContents.Select(a => new
                     {
-                        ID = a.ID,
-                        MessageID = a.MessageID,
+                        a.ID,
+                        a.MessageID,
+                        a.Sender,
                         a.Comment,
                         Timestamp = a.Timestamp.ToString("MM/dd/yyyy hh:mm tt"),
                     }).ToList()
@@ -58,6 +65,38 @@ namespace JYXWeb.Controllers
             }
         }
 
+        public ActionResult DeleteMessage(long id)
+        {
+            using (var packageDataContext = new PackageDataContext())
+            {
+                var existingMessage = packageDataContext.Messages.Where(a => a.ID == id).SingleOrDefault();
+                if (existingMessage != null)
+                {
+                    if (AppUtil.IsAdmin(User.Identity.GetUserCode()) || existingMessage.UserCode == User.Identity.GetUserCode())
+                    {
+                        packageDataContext.Messages.DeleteOnSubmit(existingMessage);
+                        packageDataContext.SubmitChanges();
+                        return Json("Success", JsonRequestBehavior.AllowGet);
+                    }
+                }
+            }
+            return Json("Error", JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult CloseMessage(long id)
+        {
+            using (var packageDataContext = new PackageDataContext())
+            {
+                var existingMessage = packageDataContext.Messages.Where(a => a.ID == id).SingleOrDefault();
+                if (existingMessage != null)
+                {
+                    existingMessage.Status = "已解决";
+                    packageDataContext.SubmitChanges();
+                }
+            }
+            return Json("Success", JsonRequestBehavior.AllowGet);
+        }
+        
 
         public ActionResult PostMessage(Message message, string messageStr)
         {
@@ -66,12 +105,17 @@ namespace JYXWeb.Controllers
                 var existingMessage = packageDataContext.Messages.Where(a => a.ID == message.ID).SingleOrDefault();
                 if (existingMessage != null)
                 {
-                    existingMessage.MessageContents.Add(new MessageContent
+                    var messageContent = new MessageContent
                     {
                         Comment = messageStr,
                         Sender = User.Identity.GetUserCode(),
                         Timestamp = DateTime.Now,
-                    });
+                    };
+                    existingMessage.MessageContents.Add(messageContent);
+                    if (messageContent.Sender != existingMessage.UserCode)
+                    {
+                        existingMessage.Status = "已回复";
+                    }
                     packageDataContext.SubmitChanges();
                 }
                 else
@@ -90,5 +134,22 @@ namespace JYXWeb.Controllers
             return GetMessage(message.ID);
         }
 
+        public ActionResult DeleteMessageContent(long id)
+        {
+            using (var packageDataContext = new PackageDataContext())
+            {
+                var existingMessageContent = packageDataContext.MessageContents.Where(a => a.ID == id).SingleOrDefault();
+                if (existingMessageContent != null)
+                {
+                    if (AppUtil.IsAdmin(User.Identity.GetUserCode()) || existingMessageContent.Message.UserCode == User.Identity.GetUserCode())
+                    {
+                        packageDataContext.MessageContents.DeleteOnSubmit(existingMessageContent);
+                        packageDataContext.SubmitChanges();
+                        return Json("Success", JsonRequestBehavior.AllowGet);
+                    }
+                }
+            }
+            return Json("Error", JsonRequestBehavior.AllowGet);
+        }
     }
 }

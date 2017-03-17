@@ -7,14 +7,17 @@ angularApp.controller('messageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
     function ($scope, $http, $filter, $log, $timeout, $appUtil, $mdDialog, $menu) {
         $scope.$appUtil = $appUtil;
         $scope.messageCategories = ['系统问题', '清关问题', '包裹入库', '包裹出库', '充值问题', '其他问题'];
-        $scope.messageStatus = '待回复';
-
+        $scope.messageStatusList = ['待回复', '已回复', '已解决', '全部'];
+        $scope.defaultStatus = $scope.messageStatusList[0];
+        $scope.messageStatus = $scope.messageStatusList[3];
+        
         $scope.init = function () {
             $scope.getMessages();
         }
 
         $scope.getMessages = function () {
-            $http.get('/Message/GetMessages').then(function (res) {
+            var model = { status: $scope.messageStatus };
+            $http.post('/Message/GetMessages', model).then(function (res) {
                 $scope.messages = res.data;
             });
         }
@@ -33,10 +36,21 @@ angularApp.controller('messageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             }
         }
 
+        $scope.closeMessage = function () {
+            $http.get('/Message/CloseMessage/' + $scope.message.ID).then(function (res) {
+                $scope.message.Status = '已解决';
+                angular.forEach($scope.messages, function (value) {
+                    if (value.ID === $scope.message.ID) {
+                        value.Status = '已解决'
+                    }
+                });
+            });
+        }
+
         $scope.deleteMessage = function (index) {
             if (confirm('确认要删除这条记录吗?')) {
-                $http.get('/Message/DeleteMessage/' + $scope.message.MessageContents[index].ID).then(function (res) {
-                    $scope.message.messageContents.splice(index, 1);
+                $http.get('/Message/DeleteMessageContent/' + $scope.message.MessageContents[index].ID).then(function (res) {
+                    $scope.message.MessageContents.splice(index, 1);
                 });
             }
         }

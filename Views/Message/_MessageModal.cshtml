@@ -17,32 +17,44 @@
                             </md-option>
                         </md-select>
                     </md-input-container>
-                    <md-input-container class="md-block" flex>
+                    <md-input-container class="md-block">
                         <label>状态</label>
-                        <input ng-disabled="true" ng-model="message.Status">
+                        <input disabled ng-model="message.Status">
                     </md-input-container>
+
                     <md-input-container class="md-block" flex>
                         <label>相关单号</label>
                         <input ng-model="message.Tracking">
                     </md-input-container>
                 </div>
+
                 <md-list flex>
-                    <md-list-item class="md-2-line md-long-text no-margin" data-ng-repeat="content in message.MessageContents">
-                        <md-button ng-class="content.Sender===message.UserCode?'':'pull-right'" class="md-fab md-mini md-warn" style="margin:3px 3px;min-width:40px !important" aria-label="">
-                            {{content.Sender===message.UserCode?'我':'管理员'}}
+                    <md-list-item class="md-long-text no-margin" data-ng-repeat="content in message.MessageContents track by $index">
+                        <md-button ng-if="content.Sender===message.UserCode" class="md-fab md-mini md-warn" 
+                                   style="margin:3px 3px;min-width:40px !important;align-self:flex-start" aria-label="">
+                            我
                         </md-button>
-                        <div class="md-list-item-text" style="margin:5px">
-                            <h3>{{ content.Timestamp }}</h3>
-                            <p>
-                                {{ content.Comment }}
-                            </p>
+                        <div ng-if="content.Sender===message.UserCode" class="md-list-item-text message-bubble message-bubble-me" style="margin:5px 120px 5px 20px">
+                            <h6 style="margin:5px 0">{{ content.Timestamp }}</h6>
+                            <p>{{ content.Comment }}</p>
                         </div>
+                        <a href="" ng-click="deleteMessage($index)" ng-if="content.Sender===message.UserCode" style="margin-left:-100px"><i class="material-icons">remove_circle</i></a>
+                        <span flex></span>
+                        <a href="" ng-click="deleteMessage($index)" ng-if="isAdmin&&content.Sender!==message.UserCode" style="margin-right:-100px"><i class="material-icons">remove_circle</i></a>
+                        <div ng-if="content.Sender!==message.UserCode" class="md-list-item-text message-bubble message-bubble-you" style="margin:5px 20px 5px 120px">
+                            <h6 style="margin:5px 0" class="text-right">{{ content.Timestamp }}</h6>
+                            <p class="">{{ content.Comment }}</p>
+                        </div>
+                        <md-button ng-if="content.Sender!==message.UserCode" class="md-fab md-mini md-primary" 
+                                   style="margin:3px 3px;min-width:40px !important;align-self:flex-start" aria-label="">
+                            美天
+                        </md-button>
                     </md-list-item>
                 </md-list>
                 <br />
                 <br />
                 <md-input-container class="md-block" layout-fill>
-                    <label>新留言</label>
+                    <label>点击这里添加新留言</label>
                     <textarea ng-model="comment" style="max-width:100%" md-maxlength="500" md-select-on-focus></textarea>
                 </md-input-container>
                 <md-button class="md-raised md-warn" aria-label="submit" ng-click="postMessage(comment)">
@@ -50,6 +62,7 @@
                 </md-button>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-ng-click="closeMessage()" data-dismiss="modal">设置为已解决</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
             </div>
         </div>
