@@ -17,6 +17,8 @@ namespace JYXWeb.Controllers
     [Authorize]
     public class AccountController : Controller
     {
+        #region Account Credential
+
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
@@ -24,7 +26,7 @@ namespace JYXWeb.Controllers
         {
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -36,9 +38,9 @@ namespace JYXWeb.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -93,48 +95,6 @@ namespace JYXWeb.Controllers
             }
         }
 
-        //
-        // GET: /Account/VerifyCode
-        [AllowAnonymous]
-        public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
-        {
-            // Require that the user has already logged in via username/password or external login
-            if (!await SignInManager.HasBeenVerifiedAsync())
-            {
-                return View("Error");
-            }
-            return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
-        }
-
-        //
-        // POST: /Account/VerifyCode
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> VerifyCode(VerifyCodeViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            // The following code protects for brute force attacks against the two factor codes. 
-            // If a user enters incorrect codes for a specified amount of time then the user account 
-            // will be locked out for a specified amount of time. 
-            // You can configure the account lockout settings in IdentityConfig
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
-            switch (result)
-            {
-                case SignInStatus.Success:
-                    return RedirectToLocal(model.ReturnUrl);
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.Failure:
-                default:
-                    ModelState.AddModelError("", "Invalid code.");
-                    return View(model);
-            }
-        }
 
         //
         // GET: /Account/Register
@@ -163,8 +123,8 @@ namespace JYXWeb.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
                     // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
@@ -280,16 +240,13 @@ namespace JYXWeb.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/LogOff
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             return RedirectToAction("Index", "Home");
         }
-        
+
         //
         // GET: /Manage/ChangePassword
         public ActionResult ChangePassword()
@@ -347,6 +304,7 @@ namespace JYXWeb.Controllers
             base.Dispose(disposing);
         }
 
+        #endregion
 
         #region Account Center
 
@@ -376,7 +334,8 @@ namespace JYXWeb.Controllers
         {
             using (var appDbContext = new ApplicationDbContext())
             {
-                return Json(appDbContext.Users.Select(a => new {
+                return Json(appDbContext.Users.Select(a => new
+                {
                     a.UserName,
                     a.UserCode,
                     a.FirstName,
@@ -428,6 +387,25 @@ namespace JYXWeb.Controllers
 
         #endregion
 
+        #region Transaction Management
+
+        [Authorize(Users = MvcApplication.ADMIN_USERS)]
+        public ActionResult ManageTransactions()
+        {
+            return View();
+        }
+
+        [Authorize(Users = MvcApplication.ADMIN_USERS)]
+        public ActionResult GetTransactions(string id, DateTime? startDate, DateTime? endDate)
+        {
+            using (var dataContext = new PackageDataContext())
+            {
+                var transactions = dataContext.Transactions.Where(a => a.UserCode == id);
+                return Json(transactions);
+            }
+        }
+
+        #endregion
 
 
         #region Helpers

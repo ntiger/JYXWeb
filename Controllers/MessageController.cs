@@ -109,16 +109,22 @@ namespace JYXWeb.Controllers
                 var existingMessage = packageDataContext.Messages.Where(a => a.ID == message.ID).SingleOrDefault();
                 if (existingMessage != null)
                 {
-                    var messageContent = new MessageContent
+                    existingMessage.Category = message.Category;
+                    existingMessage.Tracking = message.Tracking;
+                    if (messageStr != null && messageStr.Trim() != "")
                     {
-                        Comment = messageStr,
-                        Sender = User.Identity.GetUserCode(),
-                        Timestamp = DateTime.Now,
-                    };
-                    existingMessage.MessageContents.Add(messageContent);
-                    if (messageContent.Sender != existingMessage.UserCode)
-                    {
-                        existingMessage.Status = "已回复";
+                        var messageContent = new MessageContent
+                        {
+                            Comment = messageStr,
+                            Sender = User.Identity.GetUserCode(),
+                            Timestamp = DateTime.Now,
+                        };
+
+                        existingMessage.MessageContents.Add(messageContent);
+                        if (messageContent.Sender != existingMessage.UserCode)
+                        {
+                            existingMessage.Status = "已回复";
+                        }
                     }
                     packageDataContext.SubmitChanges();
                 }

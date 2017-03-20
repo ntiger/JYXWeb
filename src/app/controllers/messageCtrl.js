@@ -56,10 +56,6 @@ angularApp.controller('messageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         }
 
         $scope.postMessage = function (ev, comment) {
-            if (typeof comment === 'undefined' || comment.trim() === '') {
-                $appUtil.appAlert(ev, '', '不能提交空留言');
-                return false;
-            }
             var model = { message: $scope.message, messageStr: comment };
             $http.post('/Message/PostMessage', model).then(function (res) {
                 $scope.comment = '';
@@ -68,6 +64,9 @@ angularApp.controller('messageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 angular.forEach($scope.messages, function (value) {
                     if (value.ID === $scope.message.ID) {
                         hasMessage = true;
+                        value.Tracking = $scope.message.Tracking;
+                        value.Timestamp = $scope.message.Timestamp;
+                        value.Category = $scope.message.Category;
                     }
                 });
                 if (!hasMessage) {

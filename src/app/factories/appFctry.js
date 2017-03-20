@@ -93,6 +93,13 @@
             url: '/Message'
         });
 
+        sections.push({
+            id: 'logoff',
+            name: '退出',
+            type: 'link',
+            url: '/Account/LogOff'
+        });
+
         var self;
 
         return self = {

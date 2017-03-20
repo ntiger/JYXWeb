@@ -1,4 +1,5 @@
-﻿<md-toolbar class="md-warn" ng-cloak>
+﻿@using JYXWeb.Util;
+<md-toolbar class="md-warn" ng-cloak>
     <div class="md-toolbar-tools">
         <md-button class="md-icon-button" ng-click="$appUtil.openMenu()" hide-gt-sm aria-label="Toggle Menu">
             <md-icon class="material-icons">menu</md-icon>
@@ -32,7 +33,15 @@
             公司简介
         </md-button>
         <span flex></span>
-        @Html.Partial("_LoginPartialToolBar")
+        @{var username = User.Identity.Name.Split('@')[0];
+            if (User.Identity.GetFirstName() != "" || User.Identity.GetLastName() != "")
+            {
+                username = User.Identity.GetFirstName() + " " + User.Identity.GetLastName();
+            }
+        }
+        <md-button aria-label="" href="/Home/About">
+            @(username + " 欢迎你")
+        </md-button>
     </div>
 </md-toolbar>
 

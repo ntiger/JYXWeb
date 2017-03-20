@@ -31,5 +31,35 @@ namespace JYXWeb.Controllers
         {
             return View();
         }
+
+        #region News
+
+        public ActionResult News()
+        {
+            return View();
+        }
+
+        public ActionResult GetNews()
+        {
+
+            return Json(null);
+        }
+
+        public ActionResult GetNewsEntry()
+        {
+            return Json(null);
+        }
+
+        public ActionResult CreateNews()
+        {
+            return null;
+        }
+
+        public ActionResult PostNews()
+        {
+            return null;
+        }
+
+        #endregion
     }
 }
