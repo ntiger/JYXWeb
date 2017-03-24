@@ -88,10 +88,11 @@ namespace JYXWeb.Controllers
                         SubStatus = a.SubStatus,
                         a.UserCode,
                         Weight = a.Weight == null ? a.WeightEst + " (预估)" : a.Weight + " (实际)",
-                        Cost = a.Cost == null ? 
-                            string.Format("{0:c}", 
-                                RoundPackageWeight(a.Weight ?? a.WeightEst.Value) * 
-                                (a.Products.Count == 0 ? null : a.Products.Where(b => b.Channel == a.Products.Max(c => c.Channel)).First()
+                        Cost = a.Cost == null ?
+                            string.Format("{0:c}",
+                                RoundPackageWeight(a.Weight ?? a.WeightEst.Value) *
+                                (a.Products.Count == 0 || a.Products.Where(b => b.Channel != null).Count() == 0 ? null :
+                                a.Products.Where(b => b.Channel == a.Products.Max(c => c.Channel)).First()
                                 .Channel1.Pricings.Where(c => c.UserCode == a.UserCode).Select(c => c.Price).SingleOrDefault() ??
                                 a.Products.Where(b => b.Channel == a.Products.Max(c => c.Channel)).First().Channel1.DefaultPrice)) + " (预估)" :
                             string.Format("{0:c}", a.Cost) + " (实际)",
@@ -155,6 +156,19 @@ namespace JYXWeb.Controllers
                 }
             }
             return null;
+        }
+
+        public ActionResult CheckTracking(string id)
+        {
+            using (var packageDataConext = new PackageDataContext())
+            {
+                var packages = packageDataConext.Packages.Where(a => a.UserCode == User.Identity.GetUserCode()).ToList();
+                if (packages.Select(a => String.Join(";", a.Products.Select(b => b.Tracking).Distinct())).Contains(id))
+                {
+                    return Json("exist", JsonRequestBehavior.AllowGet);
+                }
+            }
+            return Json("not exist", JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult UpdatePackage(Package package)

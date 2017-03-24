@@ -131,7 +131,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         $scope.addPackage = function () {
             var status = '待入库';
             var subStatus = $scope.holdPackage ? '待入库' : '确认发货(未到货)';
-            $scope.package = { Products: [{ Number: 1, Quantity: 1 }], Status: status, SubStatus: subStatus, Sender: {}, Address: {}, WeightEst: 2 };
+            $scope.package = { Products: [{ Number: 1, Quantity: 1, Channel: 1 }], Status: status, SubStatus: subStatus, Sender: {}, Address: {}, WeightEst: 2 };
             $scope.showPackageModal();
         };
 
@@ -205,7 +205,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         }
 
         $scope.addProduct = function () {
-            $scope.package.Products.push({ Number: $scope.package.Products.length + 1, Quantity: 1 });
+            $scope.package.Products.push({ Number: $scope.package.Products.length + 1, Quantity: 1, Channel: 1 });
         }
 
         $scope.removeProduct = function (index) {
@@ -236,10 +236,13 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 alert('请输入包裹追踪号再保存.')
                 return;
             }
-            $('#packageModal').modal('hide');
-            pkg.Status = $scope.statusDict[pkg.SubStatus];
-            $http.post('/Package/UpdatePackage', { package: pkg }).then(function (res) {
-                $scope.refreshPackages();
+            $http.post('/Package/CheckTracking/' + pkg.Tracking).then(function (res) {
+                if (res.data === 'exist') { $appUtil.appAlert(null, '', '此包裹追踪号已存在，请输入其他追踪号'); return; }
+                $('#packageModal').modal('hide');
+                pkg.Status = $scope.statusDict[pkg.SubStatus];
+                $http.post('/Package/UpdatePackage', { package: pkg }).then(function (res) {
+                    $scope.refreshPackages();
+                });
             });
         }
 

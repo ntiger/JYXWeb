@@ -63,7 +63,7 @@
                     <th md-column md-numeric md-order-by="Number" class="text-center"><span>#</span></th>
                     <th md-column md-order-by="Brand" class="text-center"><span>品牌(英文)</span></th>
                     <th md-column md-order-by="Name" class="text-center"><span>名称(中文)</span></th>
-                    <th md-column md-order-by="Category" class="text-center"><span>种类</span></th>
+                    <th md-column md-order-by="Channel" class="text-center"><span>种类</span></th>
                     <th md-column md-order-by="Price" class="text-center"><span>单价(美金)</span></th>
                     <th md-column md-order-by="Quantity" class="text-center"><span>数量</span></th>
                     <th md-column md-order-by="" class="text-center"><span></span></th>
@@ -85,8 +85,8 @@
                     </td>
                     <td md-cell>
                         <md-input-container md-no-float class="md-block hide-md-error-msg" layout-fill>
-                            @*<input ng-model="product.Category" aria-label="category">*@
-                            <md-select ng-model="product.Category" aria-label="category">
+                            @*<input ng-model="product.Channel" aria-label="category">*@
+                            <md-select ng-model="product.Channel" aria-label="category">
                                 <md-optgroup ng-repeat="category in categories" label="{{category.Port}}">
                                     <md-option ng-value="c.ID" ng-repeat="c in category.Categories">{{c.Category}}</md-option>
                                 </md-optgroup>
