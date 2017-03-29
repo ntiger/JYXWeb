@@ -153,7 +153,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 keyboard: false
             });
             $('#splitPackageModal').modal('show');
-            $scope.newPackage = {};
+            $scope.newPackage = { ID: -1 };
             angular.forEach($scope.package, function (value, key) {
                 if (key !== 'ID') {
                     $scope.newPackage[key] = value;
@@ -236,14 +236,24 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 alert('请输入包裹追踪号再保存.')
                 return;
             }
-            $http.post('/Package/CheckTracking/' + pkg.Tracking).then(function (res) {
-                if (res.data === 'exist') { $appUtil.appAlert(null, '', '此包裹追踪号已存在，请输入其他追踪号'); return; }
+
+            if (typeof pkg.ID === 'undefined') {
+                $http.post('/Package/CheckTracking/' + pkg.Tracking).then(function (res) {
+                    if (res.data === 'exist') { $appUtil.appAlert(null, '', '此包裹追踪号已存在，请输入其他追踪号'); return; }
+                    $('#packageModal').modal('hide');
+                    pkg.Status = $scope.statusDict[pkg.SubStatus];
+                    $http.post('/Package/UpdatePackage', { package: pkg }).then(function (res) {
+                        $scope.refreshPackages();
+                    });
+                });
+            }
+            else {
                 $('#packageModal').modal('hide');
                 pkg.Status = $scope.statusDict[pkg.SubStatus];
                 $http.post('/Package/UpdatePackage', { package: pkg }).then(function (res) {
                     $scope.refreshPackages();
                 });
-            });
+            }
         }
 
         // Address
