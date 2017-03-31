@@ -10,6 +10,8 @@ namespace JYXWeb.Controllers
     {
         public ActionResult Index()
         {
+            ViewBag.angularAppName = "homeApp";
+            ViewBag.angularControllerName = "homeCtrl";
             return View();
         }
 

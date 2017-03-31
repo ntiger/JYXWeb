@@ -46,6 +46,7 @@ namespace JYXWeb
                       "~/Content/ng-table.min.css",
                       "~/Content/md-data-table.css",
                       "~/Content/side-nav.css",
+                      "~/Content/timeline.css",
                       "~/Content/site.css"));
         }
     }

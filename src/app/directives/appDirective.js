@@ -33,7 +33,9 @@
                 };
             }
         };
-    }]).directive('docsScrollClass', function () {
+    }])
+
+    .directive('docsScrollClass', function () {
         return {
             restrict: 'A',
             link: function (scope, element, attr) {
@@ -58,4 +60,22 @@
                 }
             }
         }
-    });
+    })
+
+    .directive('packageTracking', ['$http',function ($http) {
+        return {
+            scope: {
+                
+            },
+            templateUrl: '/src/app/templates/package-tracking.tmpl.html',
+            link: function ($scope, $element) {
+                $scope.track = function (code) {
+                    $http.get('/Package/Tracking/' + code).then(function (res) {
+                        $scope.trackings = res.data;
+                        $('#trackingModal').modal('show');
+                    });
+                };
+            }
+        };
+    }])
+;

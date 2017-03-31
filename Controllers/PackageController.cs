@@ -88,14 +88,13 @@ namespace JYXWeb.Controllers
                         SubStatus = a.SubStatus,
                         a.UserCode,
                         Weight = a.Weight == null ? a.WeightEst + " (预估)" : a.Weight + " (实际)",
-                        Cost = a.Cost == null ?
-                            string.Format("{0:c}",
+                        Cost = string.Format("{0:c}",
                                 RoundPackageWeight(a.Weight ?? a.WeightEst.Value) *
                                 (a.Products.Count == 0 || a.Products.Where(b => b.Channel != null).Count() == 0 ? null :
                                 a.Products.Where(b => b.Channel == a.Products.Max(c => c.Channel)).First()
                                 .Channel1.Pricings.Where(c => c.UserCode == a.UserCode).Select(c => c.Price).SingleOrDefault() ??
-                                a.Products.Where(b => b.Channel == a.Products.Max(c => c.Channel)).First().Channel1.DefaultPrice)) + " (预估)" :
-                            string.Format("{0:c}", a.Cost) + " (实际)",
+                                a.Products.Where(b => b.Channel == a.Products.Max(c => c.Channel)).First().Channel1.DefaultPrice)) +
+                                (a.Weight == null ? " (预估)" : " (实际)"),
                         Disabled = a.SubStatus != "已入库" && a.SubStatus != "待入库",
                     }).ToList();
                 return Json(packages);
@@ -116,6 +115,7 @@ namespace JYXWeb.Controllers
                         Tracking = string.Join(";", package.Products.Select(a => a.Tracking).Distinct()),
                         Notes = string.Join(";", package.Products.Select(a => a.Notes).Distinct()),
                         package.Status,
+                        package.UserCode,
                         package.SubStatus,
                         package.WeightEst,
                         Sender = package.SenderID == null ? null :new {
@@ -266,6 +266,7 @@ namespace JYXWeb.Controllers
             }
         }
 
+        [AllowAnonymous]
         public ActionResult Tracking(string id)
         {
             return Json(TMUtil.GetTrackingInfo(id), JsonRequestBehavior.AllowGet);
@@ -320,9 +321,20 @@ namespace JYXWeb.Controllers
             return Math.Floor(weight) + (weight - Math.Floor(weight) > 0.1 ? 1 : 0);
         }
 
-        public string GetPackageWeight(string id)
+        public void GetPackageWeight(string id)
         {
-            return TMUtil.GetPackageWeight(id) + "";
+            using (var packageDataContext = new PackageDataContext())
+            {
+                var packages = packageDataContext.Packages.Where(a => a.Status != PACKAGE_STATUS_NO_NOTICE &&
+                    a.Status != PACKAGE_STATUS_AWAIT && a.Status != PACKAGE_STATUS_IN_WAREHOUSE).ToList();
+                foreach(var package in packages)
+                {
+                    double? weight, cost;
+                    TMUtil.GetPackageWeightAndCost(package.ID, out weight, out cost);
+                    package.Weight = weight;
+                }
+                packageDataContext.SubmitChanges();
+            }
         }
 
 

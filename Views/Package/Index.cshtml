@@ -7,7 +7,6 @@
     var holdPackage = Request.Params["holdPackage"] ?? "true";
     var status = Request.Params["status"] ?? "全部";
 }
-
 <div data-ng-init="isAdmin=@isAdmin;userCode='@userCode';newPackage=@newPackage;holdPackage=@holdPackage;status='@status';init(newPackage?addPackage:'');" ng-cloak layout="column">
     <div layout-gt-sm="row">
         <md-input-container class="md-block hide-md-error-msg">
@@ -106,10 +105,13 @@
                             {{package.UserCode}}
                         </td>
                         <td md-cell class="text-center" style="white-space:nowrap">
+                            <md-button class="md-fab md-mini md-warn" style="margin:3px 3px"  aria-label="Separate" ng-click="trackPackage(package.ID)">
+                                追踪
+                            </md-button>
                             <md-button class="md-fab md-mini" style="margin:3px 3px" data-ng-disabled="package.Disabled" aria-label="Separate" ng-click="shipPackage(package.ID)">
                                 发货
                             </md-button>
-                            <md-button class="md-fab md-mini md-primary" style="margin:3px 3px" data-ng-disabled="package.Disabled" aria-label="Separate" ng-click="getPackage(package.ID, showSplitPackageModal)">
+                            <md-button class="md-fab md-mini md-primary md-hue-2" style="margin:3px 3px" data-ng-disabled="package.Disabled" aria-label="Separate" ng-click="getPackage(package.ID, showSplitPackageModal)">
                                 分箱
                             </md-button>
                             <md-button class="md-fab md-mini md-warn" style="margin:3px 3px" data-ng-disabled="package.Disabled" aria-label="Return" ng-click="returnPackage(package.ID)">
@@ -128,6 +130,7 @@
     @Html.Partial("_SplitPackageModal")
     @Html.Partial("_AddressModal")
     @Html.Partial("_SenderModal")
+    @Html.Partial("_TrackingModal")
 </div>
     @section Scripts {
         <script src="~/src/app/controllers/packageCtrl.js?0.1.1"></script>

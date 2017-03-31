@@ -1,6 +1,7 @@
 ﻿@{
     var angularEnabled = (ViewBag.AngularAppName != null);
     var angularAppName = ViewBag.AngularAppName;
+    var angularControllerName = ViewBag.AngularControllerName;
 }
 <!DOCTYPE html>
 <html>
@@ -14,15 +15,14 @@
 </head>
 
 <body id="main-document-body" @if (angularEnabled) { <text> data-ng-app="@angularAppName" </text>  }>
-    <div class="container-full">
+    <div class="container-full" style="height:100%" @if (angularEnabled) { <text> data-ng-controller="@angularControllerName as vm" </text>}>
         @Html.Partial("_Menu")
-        <div>
-            @RenderBody()
+        @RenderBody()
+        <div layout="row" flex="noshrink" layout-align="center center">
+            <div flex class="text-center" style="border-top:1px solid #ddd;padding:16px 32px">
+                &copy; @DateTime.Now.Year 美天优递 版权所有. Powered by Xiao Wang &copy;2016&#8211;@DateTime.Today.Year.
+            </div>
         </div>
-        <hr />
-        <footer>
-            <p class="text-center">&copy; @DateTime.Now.Year 美天优递 版权所有</p>
-        </footer>
     </div>
 
     @Scripts.Render("~/bundles/jquery")

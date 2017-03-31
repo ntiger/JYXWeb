@@ -110,6 +110,12 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             });
         }
     
+        $scope.trackPackage = function (code) {
+            $http.get('/Package/Tracking/' + code).then(function (res) {
+                $scope.trackings = res.data;
+                $('#trackingModal').modal('show');
+            });
+        }
 
         $scope.deletePackage = function (code) {
             if (confirm('确认删除此包裹?')) {
@@ -153,13 +159,11 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 keyboard: false
             });
             $('#splitPackageModal').modal('show');
-            $scope.newPackage = { ID: -1 };
-            angular.forEach($scope.package, function (value, key) {
-                if (key !== 'ID') {
-                    $scope.newPackage[key] = value;
-                }
-            });
+            $scope.newPackage = JSON.parse(JSON.stringify($scope.package));
+            $scope.newPackage.ID = -1;
             $scope.newPackage.Products = [];
+            $log.log($scope.package);
+            $log.log($scope.newPackage);
         }
 
         $scope.splitProduct = function (index) {

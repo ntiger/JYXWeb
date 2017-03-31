@@ -1,0 +1,30 @@
+﻿<div class="modal fade" id="trackingModal" tabindex="-1" role="dialog" aria-labelledby="trackingModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">包裹追踪</h4>
+            </div>
+            <div class="modal-body">
+                <ul class="timeline">
+                    <li data-ng-repeat="tracking in trackings track by $index">
+                        <div class="timeline-badge primary"><i class="glyphicon glyphicon-ok" style="color:white"></i></div>
+                        <div class="timeline-panel">
+                            <div class="timeline-heading">
+                                <h4 class="timeline-title">{{tracking[0]}}</h4>
+                            </div>
+                            <div class="timeline-body">
+                                <p>{{tracking[1]}}</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>

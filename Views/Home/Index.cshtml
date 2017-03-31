@@ -2,29 +2,27 @@
     ViewBag.Title = "美天优递";
 }
 
-<div class="">
-    <div class="jumbotron">
-        <h1>美天优递</h1>
-        <p class="lead">快递 & 转运 & 海淘</p>
-        <p><a href="#" class="btn btn-primary btn-lg">更多 &raquo;</a></p>
+<style>
+    #home {
+        background-image: url('/Images/homepic.jpg');
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        height: 100%;
+    }
+</style>
+<div class="no-margin jumbotron" id="home">
+    <div class="container" >
+        <br />
+        <h1 style="color:white">美天优递</h1>
+        <br />
+        <p class="lead" style="color:white">快递 & 转运 & 海淘</p>
+        <br />
+        <br />
+        <package-tracking></package-tracking>
     </div>
 </div>
-<div class="row">
-    <div class="col-md-4">
-        <h2>快递</h2>
-        <p>
-            最经济 最快捷 最安全
-        </p>
-        <p><a class="btn btn-default" href="#">更多 &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>转运</h2>
-        <p>免税仓储</p>
-        <p><a class="btn btn-default" href="#">更多 &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>海淘</h2>
-        <p>价格实惠、时效最优</p>
-        <p><a class="btn btn-default" href="#">更多 &raquo;</a></p>
-    </div>
-</div>
+
+@section Scripts {
+    <script src="~/src/app/controllers/homeCtrl.js?0.1.0"></script>
+}
+
