@@ -1,0 +1,52 @@
+﻿@using JYXWeb.Util
+<script type="text/ng-template" id="pending-deposits-dialog.html">
+    <md-dialog aria-label="options dialog">
+        <form name="depositForm" novalidate>
+            <md-toolbar class="md-warn">
+                <div class="md-toolbar-tools">
+                    <h2>支付宝充值记录</h2>
+                    <span flex></span>
+                    <md-button class="md-icon-button" ng-click="close()">
+                        <md-icon class="material-icons">clear</md-icon>
+                    </md-button>
+                </div>
+            </md-toolbar>
+            <md-dialog-content layout-padding>
+                <p>当前余额: {{currentUser.Balance}}</p>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>用户输入金额</th>
+                            <th>实际充值金额</th>
+                            <th>交易号</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="entry in deposits">
+                            <td>{{entry.InputTimestamp | formatDateTime}}</td>
+                            <td>{{entry.InputAmount}}</td>
+                            <td style="padding-top:3px">
+                                <md-input-container class="hide-md-error-msg no-margin">
+                                    <input ng-model="entry.DepositAmount" aria-label="depositAmount" />
+                                </md-input-container>
+                            </td>
+                            <td>{{entry.Reference}}</td>
+                            <td>{{entry.Status}}</td>
+                            <td>
+                                <md-button class="md-raised md-warn no-margin" ng-show="entry.Status==='@JYXWeb.Controllers.TransactionController.DEPOSIT_STATUS_PENDING'" ng-click="confirmDeposit(entry)">确认充值</md-button>
+                                <md-button class="md-raised md-warn md-hue-2 no-margin" ng-show="entry.Status==='@JYXWeb.Controllers.TransactionController.DEPOSIT_STATUS_PENDING'" ng-click="cancelDeposit(entry)">取消充值</md-button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </md-dialog-content>
+            <md-dialog-actions>
+                <span flex></span>
+                <md-button ng-click="close()">关闭</md-button>
+            </md-dialog-actions>
+        </form>
+    </md-dialog>
+</script>

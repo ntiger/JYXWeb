@@ -17,6 +17,8 @@ namespace JYXWeb.Models
             userIdentity.AddClaim(new Claim("UserCode", this.UserCode ?? ""));
             userIdentity.AddClaim(new Claim("FirstName", this.FirstName ?? ""));
             userIdentity.AddClaim(new Claim("LastName", this.LastName ?? ""));
+            userIdentity.AddClaim(new Claim("UserType", this.UserType ?? ""));
+            userIdentity.AddClaim(new Claim("Memo", this.Memo ?? ""));
 
             return userIdentity;
         }
@@ -25,6 +27,8 @@ namespace JYXWeb.Models
         public string UserCode { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string UserType { get; set; }
+        public string Memo { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>

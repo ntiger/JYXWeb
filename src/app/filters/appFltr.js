@@ -4,7 +4,7 @@ angular.module('appFltr', [])
     .filter('percentage', ['$filter', function ($filter) {
         // Percentage filter
         return function (input, decimals) {
-            if (typeof decimals === 'undefined') { decimals = 2;}
+            if (typeof decimals === 'undefined') { decimals = 2; }
             return input === null || isNaN(input) ? '' : $filter('number')(input * 100, decimals) + '%';
         };
     }])
@@ -19,7 +19,7 @@ angular.module('appFltr', [])
     .filter('round', ['$filter', function ($filter) {
         // Round filter
         return function (input, decimals, forceRound) {
-            if (typeof decimals === 'undefined') { decimals = 2;}
+            if (typeof decimals === 'undefined') { decimals = 2; }
             var str = '.' + Array(decimals + 1).join('0');
             return input === null || !input ? '' : forceRound ? $filter('number')(input, decimals) : $filter('number')(input, decimals).replace(str, '');
         };
@@ -37,7 +37,7 @@ angular.module('appFltr', [])
     .filter('noSpace', function () {
         // return string without space
         return function (str) {
-            if (typeof str === 'undefined') { return '';}
+            if (typeof str === 'undefined') { return ''; }
             return str.replace(/\s+/g, '');
         }
     })
@@ -169,7 +169,7 @@ angular.module('appFltr', [])
                     arr.splice(i, 1);
                 }
             }
-            if (arr.length === 0) { return '';}
+            if (arr.length === 0) { return ''; }
             arr.sort(function (a, b) {
                 if (isNaN(a[field]) || isNaN(b[field])) {
                     return 0;
@@ -191,7 +191,7 @@ angular.module('appFltr', [])
             if (typeof objects === 'undefined') { return 0; }
             var count = 0;
             for (var i = 0; i < objects.length; i++) {
-                if (objects[i][field] > 0) { count++;};
+                if (objects[i][field] > 0) { count++; };
             }
             return count / objects.length;
         };
@@ -204,5 +204,15 @@ angular.module('appFltr', [])
                 input.push(i);
             return input;
         };
+    })
+
+    .filter('formatDateTime', function () {
+        return function (input) {
+            var date = eval("new " + input.replace(/\//g, '') + ";");
+            return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear() + " " +
+                date.getHours() + ':' + ((date.getMinutes() < 10) ? ("0" + date.getMinutes()) : (date.getMinutes()));
+        };
     });
-;
+
+
+

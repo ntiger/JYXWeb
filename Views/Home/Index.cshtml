@@ -1,27 +1,48 @@
 ﻿@{
     ViewBag.Title = "美天优递";
 }
-
 <style>
     #home {
-        background-image: url('/Images/homepic.jpg');
+        margin-bottom:0;
+        padding-bottom:250px;
+        background-image: url('/Images/homepic.png');
+        background-position: center center;
         background-repeat: no-repeat;
         background-size: 100% 100%;
-        height: 100%;
+        background-size: cover;
+    }
+
+    @@media screen and (max-width: 480px) {
+        #home {
+            padding-bottom:50px;
+        }
     }
 </style>
-<div class="no-margin jumbotron" id="home">
+<div class="jumbotron" id="home">
     <div class="container" >
         <br />
-        <h1 style="color:white">美天优递</h1>
-        <br />
-        <p class="lead" style="color:white">快递 & 转运 & 海淘</p>
-        <br />
+        <h1 style="color:white;">美天优递</h1>
+        <h3 style="color:white;padding-left:50px;font-family:KaiTi">美好的一天，从收包裹开始</h3>
         <br />
         <package-tracking></package-tracking>
     </div>
 </div>
-
+<div class="container">
+    <div class="col-lg-4">
+        <h3 class="text-center">公告栏</h3>
+        <div class="list-group">
+            <button type="button" class="list-group-item">
+                <span class="text-primary">
+                    04/02/2017 买手出囤货，点击进入
+                </span>
+            </button>
+            <div class="list-group-item">
+                在4月1日、2日，Coach堪比黑五的折扣活动当中，我店买手为大家买入大量低价包包，支持一件代发，详情可咨询:
+                815-556-9028
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
     <script src="~/src/app/controllers/homeCtrl.js?0.1.0"></script>
 }

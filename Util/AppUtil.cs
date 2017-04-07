@@ -10,7 +10,7 @@ namespace JYXWeb.Util
 {
     public class AppUtil
     {
-        public static string GetUserCode(int size = 6)
+        public static string GenerateUserCode(int size = 6)
         {
             string input = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             Random random = new Random();

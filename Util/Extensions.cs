@@ -30,16 +30,8 @@ namespace JYXWeb.Util
             var userCode = identity.GetUserCode();
             using (var dataContext = new PackageDataContext())
             {
-                return dataContext.Transactions.Where(a => a.UserCode == userCode).OrderByDescending(a => a.ID).Select(a => a.Balance).FirstOrDefault() ?? 0;
-            }
-        }
-
-        public static double GetCredit(this IIdentity identity)
-        {
-            var userCode = identity.GetUserCode();
-            using (var dataContext = new PackageDataContext())
-            {
-                return dataContext.Transactions.Where(a => a.UserCode == userCode).OrderByDescending(a => a.ID).Select(a => a.Credit).FirstOrDefault() ?? 0;
+                return dataContext.Transactions.Where(a => a.UserCode == userCode).OrderByDescending(a => a.ID)
+                    .Select(a => a.Balance).FirstOrDefault();
             }
         }
 
@@ -57,7 +49,6 @@ namespace JYXWeb.Util
                 return existingPricing.Price.Value;
             }
         }
-
 
         public static string FormatBalance(this double balance)
         {

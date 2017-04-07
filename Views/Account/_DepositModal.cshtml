@@ -1,5 +1,5 @@
 ﻿@using JYXWeb.Util
-<div class="modal fade" id="depositModal" tabindex="-1" role="dialog" aria-labelledby="depositModalLabel" aria-hidden="true">
+@*<div class="modal fade" id="depositModal" tabindex="-1" role="dialog" aria-labelledby="depositModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <form name="depositForm" novalidate>
             <div class="modal-content">
@@ -38,4 +38,47 @@
             </div>
         </form>
     </div>
-</div>
+</div>*@
+
+<script type="text/ng-template" id="deposit-dialog.html">
+    <md-dialog aria-label="options dialog">
+        <form name="depositForm" novalidate>
+            <md-toolbar class="md-warn">
+                <div class="md-toolbar-tools">
+                    <h2>支付宝充值</h2>
+                    <span flex></span>
+                    <md-button class="md-icon-button" ng-click="close()">
+                        <md-icon class="material-icons">clear</md-icon>
+                    </md-button>
+                </div>
+            </md-toolbar>
+            <md-dialog-content layout-padding>
+                <p>当前余额: @User.Identity.GetBalance().FormatBalance()</p>
+                <p>请转账到: yangjilai@gmail.com</p>
+                <md-input-container class="md-block" style="margin-top:30px">
+                    <label>支付宝交易号或带充号</label>
+                    <input ng-model="deposit.Reference" name="reference" required>
+                    <div ng-messages="depositForm.transactionID.$error">
+                        <div ng-message="required">请填写交易号或带充号</div>
+                    </div>
+                </md-input-container>
+                <md-input-container class="md-block" style="margin-top:30px">
+                    <label>转账金额￥</label>
+                    <input ng-model="deposit.InputAmount" name="amount" required>
+                    <div ng-messages="depositForm.amount.$error">
+                        <div ng-message="required">请填写转账金额</div>
+                    </div>
+                    参考金额: {{ deposit.InputAmount / @JYXWeb.Controllers.TransactionController.CURRENCY_RATE | currency }}
+                </md-input-container>
+                <p>
+                    注: 充值金额会在24小时内到达您的账户余额。
+                </p>
+            </md-dialog-content>
+            <md-dialog-actions>
+                <span flex></span>
+                <md-button class="md-raised md-warn" ng-click="makeDeposit()">确认充值</md-button>
+                <md-button ng-click="close()">关闭</md-button>
+            </md-dialog-actions>
+        </form>
+    </md-dialog>
+</script>

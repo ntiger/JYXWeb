@@ -48,11 +48,11 @@ md-input-container.hide-md-error-msg .md-errors-spacer:empty {
 }
 
 .md-select-menu-container {
-    z-index: 1053 !important;
+    z-index: 1083 !important;
 }
 
 .md-select-backdrop{
-    z-index: 1052 !important;
+    z-index: 1082 !important;
 }
 
 .md-datepicker-button {
@@ -144,8 +144,15 @@ md-input-container.hide-md-error-msg .md-errors-spacer:empty {
 .md-dialog-container {
   z-index: 1080 !important;
 }
+.modal {
+  z-index: 1050 !important;
+}
+.modal-dialog{
+  z-index: 1060 !important;
+}
 
-/***** Message Bubble *****/
+
+/***** Message Bubble Start *****/
 
 .message-bubble{
     background-color: #F2F2F2;
@@ -191,3 +198,4 @@ md-input-container.hide-md-error-msg .md-errors-spacer:empty {
     right: -9px;    
 }
 
+/***** Message Bubble End *****/

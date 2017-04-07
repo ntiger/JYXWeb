@@ -7,5 +7,4 @@ angularApp.controller('homeCtrl', ['$scope', '$http', '$filter', '$log', '$timeo
     function ($scope, $http, $filter, $log, $timeout, $appUtil, $mdDialog, $menu) {
         $scope.$appUtil = $appUtil;
 
-
     }]);

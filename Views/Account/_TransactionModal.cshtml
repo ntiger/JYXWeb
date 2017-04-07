@@ -1,0 +1,81 @@
+﻿@*<div class="modal fade" id="transactionModal" tabindex="-1" role="dialog" aria-labelledby="transactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <md-input-container class="hide-md-error-msg pull-right no-margin" data-ng-show="isAdmin">
+                        <input ng-model="userCode" ng-change="getPricing(userCode)" ng-model-options="{ updateOn: 'blur' }" aria-label="userCode" />
+                    </md-input-container>
+                    <h4 class="modal-title">
+                        消费明细
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>消费详情</th>
+                                <th>金额</th>
+                                <th>结余</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="transaction in transactions">
+                                <td>{{transaction.Timestamp}}</td>
+                                <td>{{transaction.Description}}</td>
+                                <td>{{transaction.Amount}}</td>
+                                <td>{{transaction.Balance}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+    </div>
+</div>*@
+
+<script type="text/ng-template" id="transaction-dialog.html">
+    <md-dialog aria-label="options dialog">
+        <md-toolbar class="md-warn">
+            <div class="md-toolbar-tools">
+                <h2>消费明细</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="close()">
+                    <md-icon class="material-icons">clear</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content layout-padding>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>交易类型</th>
+                        <th>金额</th>
+                        <th>交易详情</th>
+                        <th>结余</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="transaction in transactions">
+                        <td>{{transaction.Timestamp | formatDateTime}}</td>
+                        <td>{{transaction.Type}}</td>
+                        <td>{{transaction.Amount | currency}}</td>
+                        <td>{{transaction.Description}}</td>
+                        <td>{{transaction.Balance | currency}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </md-dialog-content>
+        <md-dialog-actions>
+            <span flex></span>
+            <md-button ng-click="close()">关闭</md-button>
+        </md-dialog-actions>
+    </md-dialog>
+
+</script>

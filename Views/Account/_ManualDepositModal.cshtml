@@ -1,0 +1,35 @@
+﻿@using JYXWeb.Util
+<script type="text/ng-template" id="manual-deposit-dialog.html">
+    <md-dialog aria-label="options dialog">
+        <form name="manualDepositForm" novalidate>
+            <md-toolbar class="md-warn">
+                <div class="md-toolbar-tools">
+                    <h2>手动充值</h2>
+                    <span flex></span>
+                    <md-button class="md-icon-button" ng-click="close()">
+                        <md-icon class="material-icons">clear</md-icon>
+                    </md-button>
+                </div>
+            </md-toolbar>
+            <md-dialog-content layout-padding>
+                <p>当前余额: {{currentUser.Balance|currency}}</p>
+                <md-input-container class="md-block" style="margin-top:30px">
+                    <label>充值金额 $</label>
+                    <input ng-model="amount" name="amount" required>
+                    <div ng-messages="manualDepositForm.amount.$error">
+                        <div ng-message="required">请填写充值金额</div>
+                    </div>
+                </md-input-container>
+                <md-input-container class="md-block" style="margin-top:30px">
+                    <label>备注</label>
+                    <input ng-model="memo" name="memo">
+                </md-input-container>
+            </md-dialog-content>
+            <md-dialog-actions>
+                <span flex></span>
+                <md-button class="md-raised md-warn" ng-click="manualDeposit(amount, memo, currentUser.UserCode)">确认充值</md-button>
+                <md-button ng-click="close()">关闭</md-button>
+            </md-dialog-actions>
+        </form>
+    </md-dialog>
+</script>

@@ -63,5 +63,23 @@ namespace JYXWeb.Controllers
         }
 
         #endregion
+
+        #region Test
+
+        public ActionResult Test()
+        {
+            ViewBag.angularAppName = "testApp";
+            ViewBag.angularControllerName = "testCtrl";
+            return View();
+        }
+
+        public ActionResult Test1()
+        {
+            ViewBag.angularAppName = "testApp";
+            ViewBag.angularControllerName = "testCtrl";
+            return View();
+        }
+
+        #endregion
     }
 }

@@ -123,7 +123,7 @@ angular.module('appSrvc', ['ngMaterial'])
 
         this.scrollTop = function ($event) {
             var mainContentArea = document.querySelector("[role='main']");
-            var scrollContentEl = mainContentArea.querySelector('md-content[md-scroll-y]');
+            var scrollContentEl = mainContentArea.querySelector('[md-scroll-y]');
             $mdUtil.animateScrollTo(scrollContentEl, 0, 200);
         }
 
@@ -164,4 +164,10 @@ angular.module('appSrvc', ['ngMaterial'])
                 .targetEvent(ev)
             );
         };
+
+        this.getBalance = function (callback) {
+            $http.get('/Account/GetBalance').then(function (res) {
+                if (callback) { callback(res.data); }
+            });
+        }
     }]);

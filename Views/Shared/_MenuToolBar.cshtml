@@ -4,33 +4,30 @@
         <md-button class="md-icon-button" ng-click="$appUtil.openMenu()" hide-gt-sm aria-label="Toggle Menu">
             <md-icon class="material-icons">menu</md-icon>
         </md-button>
-        <md-menu>
-            <md-button aria-label="" ng-mouseenter="$mdMenu.open()" href="/Package/Index">
-                我要转运
-                <md-icon class="material-icons">keyboard_arrow_down</md-icon>
-            </md-button>
-            <md-menu-content width="4" ng-mouseleave="$mdMenu.close()" style="margin-top:64px">
-                <md-menu-item>
-                    <md-button href="/Package?newPackage=true">
-                        原装闪运
-                    </md-button>
-                </md-menu-item>
-                <md-menu-item>
-                    <md-button href="/Package?newPackage=true&holdPackage=true">
-                        普通转运
-                    </md-button>
-                </md-menu-item>
-                <md-menu-item>
-                    <md-button href="/Package">
-                        包裹管理
-                    </md-button>
-                </md-menu-item>
-        </md-menu>
+        @*<md-menu>
+        <md-button aria-label="" ng-mouseenter="$mdMenu.open()" href="/Package/Index">
+            我要转运
+            <md-icon class="material-icons">keyboard_arrow_down</md-icon>
+        </md-button>
+        <md-menu-content width="4" ng-mouseleave="$mdMenu.close()" style="margin-top:64px">
+            <md-menu-item>
+                <md-button href="/Package?newPackage=true">
+                    原装闪运
+                </md-button>
+            </md-menu-item>
+            <md-menu-item>
+                <md-button href="/Package?newPackage=true&holdPackage=true">
+                    普通转运
+                </md-button>
+            </md-menu-item>
+            <md-menu-item>
+                <md-button href="/Package">
+                    包裹管理
+                </md-button>
+            </md-menu-item>
+    </md-menu>*@
         <md-button aria-label="" href="/Home/Service">
             渠道说明
-        </md-button>
-        <md-button aria-label="" href="/Home/About">
-            公司简介
         </md-button>
         <span flex></span>
         @{var username = User.Identity.Name.Split('@')[0];
@@ -39,7 +36,7 @@
                 username = User.Identity.GetFirstName() + " " + User.Identity.GetLastName();
             }
         }
-        <md-button aria-label="" href="/Home/About">
+        <md-button aria-label="" href="/Account">
             @(username + " 欢迎你")
         </md-button>
     </div>

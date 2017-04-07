@@ -15,19 +15,30 @@
                 <legend>
                     财务信息
                 </legend>
-                <div>
-
-                    我的余额:&nbsp;
-                    @User.Identity.GetBalance().FormatBalance()
-                    &nbsp;
-                    <md-button class="md-fab md-mini md-warn" style="margin:3px 3px" aria-label="deposit" data-toggle="modal" data-target="#depositModal">
-                        充值
-                    </md-button>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    运费价格表:&nbsp;
-                    <md-button class="md-fab md-mini md-warn" data-toggle="modal" data-target="#pricingModal" aria-label="pricing">
-                        <md-icon class="material-icons">description</md-icon>
-                    </md-button>
+                <div layout="row" layout-wrap layout-fill>
+                    <div flex-sm="50" flex-gt-sm="33" flex-gt-md="25">
+                        我的余额:
+                        &nbsp;
+                        @User.Identity.GetBalance().FormatBalance()
+                        &nbsp;
+                        <md-button class="md-fab md-mini md-warn" data-ng-click="showDeposit($event)" aria-label="deposit">
+                            充值
+                        </md-button>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div flex-sm="50" flex-gt-sm="33" flex-gt-md="25">
+                        运费价格表:&nbsp;
+                        <md-button class="md-fab md-mini md-warn" data-ng-click="showPricing($event)" aria-label="pricing">
+                            <md-icon class="material-icons">description</md-icon>
+                        </md-button>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div flex-sm="50" flex-gt-sm="33" flex-gt-md="25">
+                        消费明细:&nbsp;
+                        <md-button class="md-fab md-mini md-warn" data-ng-click="showTransactions($event)" aria-label="transaction">
+                            <md-icon class="material-icons">list</md-icon>
+                        </md-button>
+                    </div>
                 </div>
                 @*我的积分: &nbsp; @User.Identity.GetCredit()*@
             </fieldset>
@@ -119,23 +130,42 @@
    
     <div data-ng-if="isAdmin">
         <md-table-container>
-            <table class="table table-striped" md-table ng-model="userTable" md-progress="promise">
+            @*<table md-table md-row-select="options.rowSelection" multiple="{{options.multiSelect}}" ng-model="selected" md-progress="promise">*@
+            <table md-table ng-model="userTable" md-progress="promise">
                 <thead md-head md-order="query.order">
                     <tr md-row>
+                        <th md-column class="text-center"><span>操作</span></th>
+                        <th md-column md-order-by="Balance" class="text-center"><span>余额</span></th>
+                        <th md-column md-order-by="PendingBalance" class="text-center"><span>待充金额</span></th>
                         <th md-column md-order-by="UserCode" class="text-center"><span>用户编码</span></th>
                         <th md-column md-order-by="UserName" class="text-center"><span>登录邮箱</span></th>
                         <th md-column md-order-by="LastName" class="text-center"><span>姓</span></th>
                         <th md-column md-order-by="FirstName" class="text-center"><span>名</span></th>
+                        <th md-column md-order-by="Memo" class="text-center"><span>备注</span></th>
                     </tr>
                 </thead>
-
-
                 <tbody md-body>
                     <tr md-row md-auto-select="false" ng-repeat="user in users | orderBy: query.order | limitTo: query.limit : (query.page-1) * query.limit">
-                        <td md-cell><a href="" data-toggle="modal" ng-click="getPricing(user.UserCode)" data-target="#pricingModal">{{user.UserCode}}</a></td>
+                        <td md-cell>
+                            <md-button class="md-fab md-mini md-warn" aria-label="ManualDeposit" ng-click="showManualDeposit($event, user)">
+                                充值
+                            </md-button>
+                        </td>
+                        <td md-cell>
+                            <a href="" ng-click="showTransactions($event, user)">{{user.Balance}}</a>
+                        </td>
+                        <td md-cell>
+                            <a href="" ng-click="showPendingDeposits($event, user)">{{user.PendingBalance}}</a>
+                        </td>
+                        <td md-cell><a href="" data-toggle="modal" ng-click="getPricing(user.UserCode);showPricing($event)">{{user.UserCode}}</a></td>
                         <td md-cell>{{user.UserName}}</td>
                         <td md-cell>{{user.LastName}}</td>
                         <td md-cell>{{user.FirstName}}</td>
+                        <td md-cell>
+                            <md-input-container class="hide-md-error-msg no-margin">
+                                <input ng-model="user.Memo" aria-label="memo" data-ng-change="updateUserMemo(user)" ng-model-options="{ updateOn: 'blur' }" />
+                            </md-input-container>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -146,7 +176,10 @@
     
     
     @Html.Partial("_DepositModal")
+    @Html.Partial("_PendingDepositModal")
+    @Html.Partial("_ManualDepositModal")
     @Html.Partial("_PricingModal")
+    @Html.Partial("_TransactionModal")
 
 </div>
 @section Scripts {

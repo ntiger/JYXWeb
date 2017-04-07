@@ -57,9 +57,9 @@
         <md-button class="md-raised md-warn" data-ng-disabled="selectedPackages.length<2" ng-click="combinePackages($event)">合箱</md-button>
         <md-button class="md-raised md-warn" data-ng-if="isAdmin" data-ng-disabled="selectedPackages.length<1" ng-click="export($event)">导出</md-button>
     </md-input-container>
-    <div layout="row">
+    <div layout="column">
         <md-table-container>
-            <table class="table table-striped" md-table md-row-select="options.rowSelection" multiple="{{options.multiSelect}}" 
+            <table class="table-striped" md-table md-row-select="options.rowSelection" multiple="{{options.multiSelect}}"
                    ng-model="selectedPackages" md-progress="promise">
                 <thead md-head md-order="packagesOrder">
                     <tr md-row>
@@ -105,7 +105,7 @@
                             {{package.UserCode}}
                         </td>
                         <td md-cell class="text-center" style="white-space:nowrap">
-                            <md-button class="md-fab md-mini md-warn" style="margin:3px 3px"  aria-label="Separate" ng-click="trackPackage(package.ID)">
+                            <md-button class="md-fab md-mini md-warn" style="margin:3px 3px" aria-label="Separate" ng-click="trackPackage(package.ID)">
                                 追踪
                             </md-button>
                             <md-button class="md-fab md-mini" style="margin:3px 3px" data-ng-disabled="package.Disabled" aria-label="Separate" ng-click="shipPackage(package.ID)">
@@ -126,12 +126,13 @@
             </table>
         </md-table-container>
     </div>
+
+</div>
+@section Scripts {
     @Html.Partial("_PackageModal")
     @Html.Partial("_SplitPackageModal")
     @Html.Partial("_AddressModal")
     @Html.Partial("_SenderModal")
     @Html.Partial("_TrackingModal")
-</div>
-    @section Scripts {
-        <script src="~/src/app/controllers/packageCtrl.js?0.1.1"></script>
-    }
+    <script src="~/src/app/controllers/packageCtrl.js?0.1.1"></script>
+}

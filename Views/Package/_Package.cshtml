@@ -55,66 +55,62 @@
     <md-button class="md-warn" ng-click="showAddressManager({})">添加新地址</md-button>
     @*<md-button class="md-warn" ng-click="deleteAddress(package.Address.ID)">删除当前地址</md-button>*@
 </div>
+<div layout="column" style="overflow:auto;width:100%">
+    <table md-table md-row-select="options.rowSelection" multiple="{{options.multiSelect}}" ng-model="selected" md-progress="promise">
+        <thead ng-if="!options.decapitate" md-head md-order="productsOrder" md-on-reorder="logOrder">
+            <tr md-row>
+                <th md-column md-numeric md-order-by="Number" class="text-center"><span>#</span></th>
+                <th md-column md-order-by="Brand" class="text-center"><span>品牌(英文)</span></th>
+                <th md-column md-order-by="Name" class="text-center"><span>名称(中文)</span></th>
+                <th md-column md-order-by="Channel" class="text-center"><span>种类</span></th>
+                <th md-column md-order-by="Price" class="text-center"><span>单价(美金)</span></th>
+                <th md-column md-order-by="Quantity" class="text-center"><span>数量</span></th>
+                <th md-column md-order-by="" class="text-center"><span></span></th>
+            </tr>
+        </thead>
+        <tbody md-body>
+            <tr md-row md-select="product" md-select-id="Number" md-auto-select="false" ng-repeat="product in package.Products | orderBy: productsOrder track by $index">
+                <td md-cell>{{product.Number}}</td>
+                <td md-cell>
+                    <md-input-container md-no-float class="md-block hide-md-error-msg" layout-fill>
+                        <input ng-model="product.Brand" aria-label="brand">
+                    </md-input-container>
+                </td>
+                <td md-cell>
+                    <md-input-container md-no-float class="md-block hide-md-error-msg" layout-fill>
+                        <input ng-model="product.Name" aria-label="name">
+                    </md-input-container>
+                </td>
+                <td md-cell>
+                    <md-input-container md-no-float class="md-block hide-md-error-msg" layout-fill>
+                        @*<input ng-model="product.Channel" aria-label="category">*@
+                        <md-select ng-model="product.Channel" aria-label="category">
+                            <md-optgroup ng-repeat="category in categories" label="{{category.Port}}">
+                                <md-option ng-value="c.ID" ng-repeat="c in category.Categories">{{c.Category}}</md-option>
+                            </md-optgroup>
+                        </md-select>
+                    </md-input-container>
+                </td>
+                <td md-cell>
+                    <md-input-container md-no-float class="md-block hide-md-error-msg" layout-fill>
+                        <input type="number" ng-model="product.Price" aria-label="price">
+                    </md-input-container>
+                </td>
+                <td md-cell>
+                    <md-input-container md-no-float class="md-block hide-md-error-msg" layout-fill>
+                        <input type="number" ng-model="product.Quantity" aria-label="quantity">
+                    </md-input-container>
+                </td>
+                <td md-cell><md-button class="md-warn md-mini" data-ng-show="$index>0" ng-click="removeProduct($index)" layout-fill>删除</md-button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 <div layout="row">
-    <md-table-container>
-        <table class="table table-striped table-condensed" md-table md-row-select="options.rowSelection" style="max-width:90%" multiple="{{options.multiSelect}}" ng-model="selected" md-progress="promise">
-            <thead ng-if="!options.decapitate" md-head md-order="productsOrder" md-on-reorder="logOrder">
-                <tr md-row>
-                    <th md-column md-numeric md-order-by="Number" class="text-center"><span>#</span></th>
-                    <th md-column md-order-by="Brand" class="text-center"><span>品牌(英文)</span></th>
-                    <th md-column md-order-by="Name" class="text-center"><span>名称(中文)</span></th>
-                    <th md-column md-order-by="Channel" class="text-center"><span>种类</span></th>
-                    <th md-column md-order-by="Price" class="text-center"><span>单价(美金)</span></th>
-                    <th md-column md-order-by="Quantity" class="text-center"><span>数量</span></th>
-                    <th md-column md-order-by="" class="text-center"><span></span></th>
-                </tr>
-            </thead>
-
-            <tbody md-body>
-                <tr md-row md-select="product" md-select-id="Number" md-auto-select="false" ng-repeat="product in package.Products | orderBy: productsOrder track by $index">
-                    <td md-cell>{{product.Number}}</td>
-                    <td md-cell>
-                        <md-input-container md-no-float class="md-block hide-md-error-msg" layout-fill>
-                            <input ng-model="product.Brand" aria-label="brand">
-                        </md-input-container>
-                    </td>
-                    <td md-cell>
-                        <md-input-container md-no-float class="md-block hide-md-error-msg" layout-fill>
-                            <input ng-model="product.Name" aria-label="name">
-                        </md-input-container>
-                    </td>
-                    <td md-cell>
-                        <md-input-container md-no-float class="md-block hide-md-error-msg" layout-fill>
-                            @*<input ng-model="product.Channel" aria-label="category">*@
-                            <md-select ng-model="product.Channel" aria-label="category">
-                                <md-optgroup ng-repeat="category in categories" label="{{category.Port}}">
-                                    <md-option ng-value="c.ID" ng-repeat="c in category.Categories">{{c.Category}}</md-option>
-                                </md-optgroup>
-                            </md-select>
-                        </md-input-container>
-                    </td>
-                    <td md-cell>
-                        <md-input-container md-no-float class="md-block hide-md-error-msg" layout-fill>
-                            <input type="number" ng-model="product.Price" aria-label="price">
-                        </md-input-container>
-                    </td>
-                    <td md-cell>
-                        <md-input-container md-no-float class="md-block hide-md-error-msg" layout-fill>
-                            <input type="number" ng-model="product.Quantity" aria-label="quantity">
-                        </md-input-container>
-                    </td>
-                    <td md-cell><md-button class="md-warn md-mini" data-ng-show="$index>0" ng-click="removeProduct($index)" layout-fill>删除</md-button></td>
-                </tr>
-            </tbody>
-        </table>
-        <md-button class="md-raised md-warn pull-left" 
-                   data-ng-if="isAdmin||package.SubStatus==='待入库'||package.SubStatus==='已入库'" ng-click="addProduct()">添加</md-button>
-        <br />
-        <br />
-        <md-button class="md-raised md-warn pull-right" 
-                   data-ng-if="isAdmin||package.SubStatus==='待入库'||package.SubStatus==='已入库'" data-ng-click="updatePackage()">保存包裹</md-button>
-    
-    </md-table-container>
-
+    <md-button class="md-raised md-warn"
+               data-ng-if="isAdmin||package.SubStatus==='待入库'||package.SubStatus==='已入库'" ng-click="addProduct()">添加</md-button>
+    <span flex></span>
+    <md-button class="md-raised md-warn"
+               data-ng-if="isAdmin||package.SubStatus==='待入库'||package.SubStatus==='已入库'" data-ng-click="updatePackage()">保存包裹</md-button>
 </div>
 <br />

@@ -54,4 +54,30 @@ namespace JYXWeb.Migrations
             DropColumn("dbo.AspNetUsers", "LastName");
         }
     }
+
+    public partial class Memo : DbMigration
+    {
+        public override void Up()
+        {
+            AddColumn("dbo.AspNetUsers", "Memo", c => c.String());
+        }
+
+        public override void Down()
+        {
+            DropColumn("dbo.AspNetUsers", "Memo");
+        }
+    }
+
+    public partial class UserType : DbMigration
+    {
+        public override void Up()
+        {
+            AddColumn("dbo.AspNetUsers", "UserType", c => c.String());
+        }
+
+        public override void Down()
+        {
+            DropColumn("dbo.AspNetUsers", "UserType");
+        }
+    }
 }

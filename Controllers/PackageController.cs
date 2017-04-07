@@ -87,14 +87,14 @@ namespace JYXWeb.Controllers
                         Status = a.Status,
                         SubStatus = a.SubStatus,
                         a.UserCode,
-                        Weight = a.Weight == null ? a.WeightEst + " (预估)" : a.Weight + " (实际)",
-                        Cost = string.Format("{0:c}",
+                        Weight = a.Weight == null ? a.WeightEst + " (预估)" : a.Weight + "",
+                        Cost = string.Format("{0:c}", a.Cost != null ? a.Cost.Value :
                                 RoundPackageWeight(a.Weight ?? a.WeightEst.Value) *
                                 (a.Products.Count == 0 || a.Products.Where(b => b.Channel != null).Count() == 0 ? null :
                                 a.Products.Where(b => b.Channel == a.Products.Max(c => c.Channel)).First()
                                 .Channel1.Pricings.Where(c => c.UserCode == a.UserCode).Select(c => c.Price).SingleOrDefault() ??
                                 a.Products.Where(b => b.Channel == a.Products.Max(c => c.Channel)).First().Channel1.DefaultPrice)) +
-                                (a.Weight == null ? " (预估)" : " (实际)"),
+                                (a.Weight == null ? " (预估)" : ""),
                         Disabled = a.SubStatus != "已入库" && a.SubStatus != "待入库",
                     }).ToList();
                 return Json(packages);
@@ -178,10 +178,36 @@ namespace JYXWeb.Controllers
                 var existingPackage = packageDataConext.Packages.Where(a => a.ID == package.ID).SingleOrDefault();
                 if (existingPackage != null)
                 {
+                    // 出库扣款
+                    if ((existingPackage.Status == PACKAGE_STATUS_AWAIT || existingPackage.Status == PACKAGE_STATUS_IN_WAREHOUSE) &&
+                        package.Status == PACKAGE_STATUS_OUT_OF_WAREHOUSE && AppUtil.IsAdmin(User.Identity.GetUserCode()))
+                    {
+                        if (package.Weight == null)
+                        {
+                            double? weight, cost;
+                            TMUtil.GetPackageWeightAndCost(package.ID, out weight, out cost);
+                            package.Weight = weight;
+                        }
+                        var unitPrice = 0d;
+                        if (package.Products.Count > 0 && package.Products.Where(b => b.Channel != null).Count() > 0)
+                        {
+                            var channelNumber = package.Products.Max(c => c.Channel);
+                            var channel = packageDataConext.Channels.Where(a => a.ID == channelNumber).First();
+                            var assignedUnitPrice = channel.Pricings.Where(c => c.UserCode == package.UserCode).Select(c => c.Price).SingleOrDefault();
+                            unitPrice = assignedUnitPrice ?? channel.DefaultPrice.Value;
+                        }
+                        package.Cost = RoundPackageWeight(package.Weight.Value) * unitPrice;
+                        new TransactionController().SaveTransaction(package.UserCode,
+                            TransactionController.TRANSACTION_TYPE_EXPENSE_SHIPPING, package.Cost * -1 ?? 0, package.ID);
+                    }
+                    // 出库扣款
+
                     existingPackage.AddressID = package.AddressID;
                     existingPackage.SenderID = package.SenderID;
                     existingPackage.Status = package.Status;
                     existingPackage.SubStatus = package.SubStatus;
+                    existingPackage.Weight = package.Weight;
+                    existingPackage.Cost = package.Cost;
                     existingPackage.WeightEst = package.WeightEst;
                     packageDataConext.Products.DeleteAllOnSubmit(existingPackage.Products);
                     existingPackage.Products.Clear();
@@ -327,7 +353,11 @@ namespace JYXWeb.Controllers
             {
                 var packages = packageDataContext.Packages.Where(a => a.Status != PACKAGE_STATUS_NO_NOTICE &&
                     a.Status != PACKAGE_STATUS_AWAIT && a.Status != PACKAGE_STATUS_IN_WAREHOUSE).ToList();
-                foreach(var package in packages)
+                if (id != null)
+                {
+                    packages = packages.Where(a => a.ID == id).ToList();
+                }
+                foreach (var package in packages)
                 {
                     double? weight, cost;
                     TMUtil.GetPackageWeightAndCost(package.ID, out weight, out cost);

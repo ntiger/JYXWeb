@@ -117,7 +117,7 @@ namespace JYXWeb.Controllers
                 var userCodes = new ApplicationDbContext().Users.Select(a => a.UserCode).ToArray();
                 while (userCodes.Contains(user.UserCode) || user.UserCode == null)
                 {
-                    user.UserCode = AppUtil.GetUserCode();
+                    user.UserCode = AppUtil.GenerateUserCode();
                 }
 
                 var result = await UserManager.CreateAsync(user, model.Password);
@@ -329,19 +329,63 @@ namespace JYXWeb.Controllers
             return null;
         }
 
+        [HttpPost]
+        [Authorize(Users = MvcApplication.ADMIN_USERS)]
+        public async Task<ActionResult> UpdateUserMemo(string id, string memo)
+        {
+            var user = await UserManager.FindByIdAsync(id);
+            if (user != null)
+            {
+                user.Memo = memo;
+                await UserManager.UpdateAsync(user);
+            }
+            return null;
+        }
+
+
         [Authorize(Users = MvcApplication.ADMIN_USERS)]
         public ActionResult GetUsers()
         {
             using (var appDbContext = new ApplicationDbContext())
+            using (var packageDbContext = new PackageDataContext())
             {
-                return Json(appDbContext.Users.Select(a => new
+                var users = appDbContext.Users.Select(a => new
                 {
                     a.UserName,
                     a.UserCode,
                     a.FirstName,
                     a.LastName,
+                    a.Memo,
                     a.Id
-                }).ToList(), JsonRequestBehavior.AllowGet);
+                }).ToList();
+                var userBalances = packageDbContext.Transactions.OrderByDescending(a => a.ID).GroupBy(a => a.UserCode).Select(a => new
+                {
+                    UserCode = a.Key,
+                    Balance = a.Select(b => b.Balance).First(),
+                }).ToList();
+
+                var userPendingBalances = packageDbContext.Deposits.Where(a => a.Status == TransactionController.DEPOSIT_STATUS_PENDING)
+                    .GroupBy(a => a.UserCode).Select(a => new
+                    {
+                        UserCode = a.Key,
+                        PendingBalance = a.Count() == 0 ? 0 : a.Sum(b => b.DepositAmount),
+                    }).ToList();
+
+                var results = from a in users
+                              from b in userBalances.Where(b => b.UserCode == a.UserCode).DefaultIfEmpty()
+                              from c in userPendingBalances.Where(c => c.UserCode == a.UserCode).DefaultIfEmpty()
+                              select new
+                              {
+                                  a.UserName,
+                                  a.UserCode,
+                                  a.FirstName,
+                                  a.LastName,
+                                  a.Memo,
+                                  a.Id,
+                                  Balance = b == null ? 0 : b.Balance,
+                                  PendingBalance = c == null ? 0 : c.PendingBalance,
+                              };
+                return Json(results, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -386,27 +430,6 @@ namespace JYXWeb.Controllers
 
 
         #endregion
-
-        #region Transaction Management
-
-        [Authorize(Users = MvcApplication.ADMIN_USERS)]
-        public ActionResult ManageTransactions()
-        {
-            return View();
-        }
-
-        [Authorize(Users = MvcApplication.ADMIN_USERS)]
-        public ActionResult GetTransactions(string id, DateTime? startDate, DateTime? endDate)
-        {
-            using (var dataContext = new PackageDataContext())
-            {
-                var transactions = dataContext.Transactions.Where(a => a.UserCode == id);
-                return Json(transactions);
-            }
-        }
-
-        #endregion
-
 
         #region Helpers
         // Used for XSRF protection when adding external logins

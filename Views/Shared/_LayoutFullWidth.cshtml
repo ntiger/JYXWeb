@@ -17,12 +17,21 @@
 <body id="main-document-body" @if (angularEnabled) { <text> data-ng-app="@angularAppName" </text>  }>
     <div class="container-full" style="height:100%" @if (angularEnabled) { <text> data-ng-controller="@angularControllerName as vm" </text>}>
         @Html.Partial("_Menu")
-        @RenderBody()
+        <div style="margin-top:50px">
+            @RenderBody()
+        </div>
         <div layout="row" flex="noshrink" layout-align="center center">
             <div flex class="text-center" style="border-top:1px solid #ddd;padding:16px 32px">
                 &copy; @DateTime.Now.Year 美天优递 版权所有. Powered by Xiao Wang &copy;2016&#8211;@DateTime.Today.Year.
             </div>
         </div>
+        <md-button class="md-fab md-fab-bottom-right docs-scroll-fab md-warn"
+                   docs-scroll-class="scrolling"
+                   ng-click="$appUtil.scrollTop($event)"
+                   aria-label="Back to Top">
+            <md-tooltip md-direction="top">回到顶部</md-tooltip>
+            <md-icon class="material-icons">keyboard_arrow_up</md-icon>
+        </md-button>
     </div>
 
     @Scripts.Render("~/bundles/jquery")

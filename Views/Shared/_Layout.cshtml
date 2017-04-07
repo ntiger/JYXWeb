@@ -1,6 +1,7 @@
 ﻿@{
     var angularEnabled = (ViewBag.AngularAppName != null);
     var angularAppName = ViewBag.AngularAppName;
+    var angularControllerName = ViewBag.AngularControllerName;
 }
 <!DOCTYPE html>
 <html>
@@ -14,10 +15,18 @@
 </head>
 
 <body class="body-normal" id="main-document-body" @if (angularEnabled) { <text> data-ng-app="@angularAppName" </text>  }>
-    <div class="container">
+    <div class="container" @if (angularEnabled) { <text> data-ng-controller="@angularControllerName" </text>  }>
         @Html.Partial("_Menu")
         <div>
             @RenderBody()
+
+            <md-button class="md-fab md-fab-bottom-right docs-scroll-fab md-warn"
+                       docs-scroll-class="scrolling"
+                       ng-click="$appUtil.scrollTop($event)"
+                       aria-label="Back to Top">
+                <md-tooltip md-direction="top">回到顶部</md-tooltip>
+                <md-icon class="material-icons">keyboard_arrow_up</md-icon>
+            </md-button>
         </div>
         <hr />
         <footer>
