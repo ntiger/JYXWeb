@@ -1,0 +1,79 @@
+﻿<script type="text/ng-template" id="upload-dialog.html">
+    <md-dialog aria-label="options dialog">
+        <md-toolbar class="md-warn">
+            <div class="md-toolbar-tools">
+                <h2>{{goodsEntry.ID?'修改':'添加'}}商品</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="close()">
+                    <md-icon class="material-icons">clear</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content layout="column" layout-padding>
+            <div layout="row" layout-wrap>
+                <md-input-container md-no-float class="md-block hide-md-error-msg">
+                    <label>分类</label>
+                    <md-select ng-model="goodsEntry.Category" ng-change="category=goodsEntry.Category">
+                        <md-option ng-repeat="category in categories track by $index" data-ng-value="category"
+                                   md-on-close="search()">
+                            {{category}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+                <md-input-container class="md-block hide-md-error-msg">
+                    <label>品牌</label>
+                    <input ng-model="goodsEntry.Brand" />
+                </md-input-container>
+                <md-input-container class="md-block hide-md-error-msg">
+                    <label>名称</label>
+                    <input ng-model="goodsEntry.Name" />
+                </md-input-container>
+                <md-input-container class="md-block hide-md-error-msg">
+                    <md-button class="md-raised md-warn" data-ng-click="goodsEntry.GoodsItems.push({})">添加新颜色/尺寸</md-button>
+                </md-input-container>
+            </div>
+            <div layout="row"  layout-wrap ng-repeat="item in goodsEntry.GoodsItems track by $index">
+                <md-input-container class="md-block hide-md-error-msg">
+                    <label>颜色</label>
+                    <input ng-model="item.Color" />
+                </md-input-container>
+                <md-input-container class="md-block hide-md-error-msg">
+                    <label>大小</label>
+                    <input ng-model="item.Size" />
+                </md-input-container>
+                <md-input-container class="md-block hide-md-error-msg">
+                    <label>数量</label>
+                    <input ng-model="item.Quantity" />
+                </md-input-container>
+                <md-input-container class="md-block hide-md-error-msg">
+                    <label>单价</label>
+                    <input ng-model="item.Price" />
+                </md-input-container>
+                <div layout="row" layout-wrap>
+                    <md-input-container class="md-block hide-md-error-msg">
+                        <span class="btn btn-xs btn-primary fileinput-button">
+                            <span>上传图片</span>
+                            <input type="file" name="files" multiple ng-file-select="currentItem=item;addImage()">
+                        </span>
+                    </md-input-container>
+                    <div layout="row" layout-wrap>
+                        <div style="height:80px" data-ng-repeat="img in item.GoodsImages track by $index">
+                            <a href="" style="position:absolute" ng-click="item.GoodsImages.splice($index,1)" >
+                                <md-icon class="material-icons" style="color:red;font-weight:bold;min-height:10px;min-width:10px;font-size:16px">clear</md-icon>
+                            </a>
+                            <img style="height:100%;width:auto;display:block;" data-ng-src="{{img.Image}}" imgload />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div data-ng-show="showLoading">
+                <img src="/Images/ajax-loader-small.gif" />
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions>
+            <span flex></span>
+            <md-button class="md-raised md-warn" ng-click="updateGoodsEntry()">提交</md-button>
+            <md-button class="md-raised" ng-click="close()">取消</md-button>
+        </md-dialog-actions>
+    </md-dialog>
+</script>

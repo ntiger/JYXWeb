@@ -62,10 +62,10 @@
         }
     })
 
-    .directive('packageTracking', ['$http',function ($http) {
+    .directive('packageTracking', ['$http', function ($http) {
         return {
             scope: {
-                
+
             },
             templateUrl: '/src/app/templates/package-tracking.tmpl.html',
             link: function ($scope, $element) {
@@ -77,5 +77,18 @@
                 };
             }
         };
+    }])
+
+    .directive("ngFileSelect", ['$parse', function ($parse) {
+        return {
+            link: function ($scope, el, attrs) {
+                var expressionHandler = $parse(attrs.ngFileSelect);
+                el.bind("change", function (e) {
+                    $scope.files = (e.srcElement || e.target).files;
+                    expressionHandler($scope);
+                    e.target.value = '';
+                });
+            }
+        }
     }])
 ;

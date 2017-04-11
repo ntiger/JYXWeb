@@ -5,7 +5,7 @@
     var isAdmin = AppUtil.IsAdmin(userCode).ToString().ToLower();
 }
 
-<div layout="column" ng-cloak ng-init="isAdmin=@isAdmin;init()">
+<div layout="column" ng-init="isAdmin=@isAdmin;init()">
     <div layout="row">
         <md-input-container class="md-block  hide-md-error-msg">
             <md-button class="md-raised md-warn" style="margin-top:0;" ng-click="message={Category:messageCategories[0], Status:defaultStatus}" data-toggle="modal" data-target="#messageModal">
@@ -23,14 +23,15 @@
         </md-input-container>
     </div>
     <md-table-container layout="row">
-        <table class="table table-striped" md-table md-row-select="options.rowSelection" multiple="{{options.multiSelect}}"
+        <table class="table-striped" md-table md-row-select="options.rowSelection" multiple="{{options.multiSelect}}"
                ng-model="selectedMessages" md-progress="promise">
             <thead md-head md-order="messageOrder">
                 <tr md-row>
                     <th md-column md-order-by="UserCode" ng-if="isAdmin" class="text-center"><span>用户编码</span></th>
                     <th md-column md-order-by="Category" class="text-center"><span>分类</span></th>
-                    <th md-column md-order-by="Message" class="text-center"><span>留言内容</span></th>
                     <th md-column md-order-by="Tracking" class="text-center"><span>相关单号</span></th>
+                    <th md-column md-order-by="Message" class="text-center"><span>留言内容</span></th>
+                    <th md-column md-order-by="Timestamp" class="text-center"><span>最后留言内容</span></th>
                     <th md-column md-order-by="Timestamp" class="text-center"><span>最后更新时间</span></th>
                     <th md-column md-order-by="Status" class="text-center"><span>状态</span></th>
                     <th md-column md-order-by="" class="text-center" style="text-align:center"><span>操作</span></th>
@@ -45,10 +46,13 @@
                         {{message.Category}}
                     </td>
                     <td md-cell class="text-center">
+                        {{message.Tracking}}
+                    </td>
+                    <td md-cell class="text-center">
                         <a href="#" ng-click="getMessage($index)" data-toggle="modal" data-target="#messageModal">{{message.Comment}}</a>
                     </td>
                     <td md-cell class="text-center">
-                        {{message.Tracking}}
+                        <a href="#" ng-click="getMessage($index)" data-toggle="modal" data-target="#messageModal">{{message.LastComment}}</a>
                     </td>
                     <td md-cell class="text-center">
                         {{message.Timestamp}}
@@ -67,8 +71,7 @@
         </table>
     </md-table-container>
 </div>
-@Html.Partial("_MessageModal")
-
 @section Scripts {
+    @Html.Partial("_MessageModal")
     <script src="~/src/app/controllers/messageCtrl.js"></script>
 }

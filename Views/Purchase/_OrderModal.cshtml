@@ -1,0 +1,92 @@
+﻿<script type="text/ng-template" id="purchase-order-dialog.html">
+    <md-dialog aria-label="options dialog">
+        <form name="orderForm" novalidate>
+            <md-toolbar class="md-warn">
+                <div class="md-toolbar-tools">
+                    <h2>{{order.ID?'修改':'添加'}}代刷订单</h2>
+                    <span flex></span>
+                    <md-button class="md-icon-button" ng-click="close()">
+                        <md-icon class="material-icons">clear</md-icon>
+                    </md-button>
+                </div>
+            </md-toolbar>
+            <md-dialog-content layout-padding>
+                <div layout="row">
+                    <md-input-container flex="80">
+                        <label>商品链接</label>
+                        <input ng-model="order.Link" name="link" required/>
+                        <div ng-messages="orderForm.link.$error">
+                            <div ng-message="required">请填写商品链接</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container flex="20" ng-show="order.ID">
+                        <label>订单状态</label>
+                        <input disabled ng-model="order.Status">
+                    </md-input-container>
+                </div>
+                <div layout="row">
+                    <md-input-container flex="50">
+                        <label>名称</label>
+                        <input ng-model="order.Name" name="orderName" required />
+                        <div ng-messages="orderForm.orderName.$error">
+                            <div ng-message="required">请填写商品名称</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container flex="25">
+                        <label>颜色</label>
+                        <input ng-model="order.Color" />
+                    </md-input-container>
+                    <md-input-container flex="25">
+                        <label>大小/尺寸</label>
+                        <input ng-model="order.Size" />
+                    </md-input-container>
+                </div>
+                <div layout="row">
+                    <md-input-container  flex="50">
+                        <label>备注</label>
+                        <input ng-model="order.Notes" />
+                    </md-input-container>
+                    <md-input-container  flex="25">
+                        <label>数量</label>
+                        <input type="number" ng-model="order.Quantity" name="quantity" required />
+                        <div ng-messages="orderForm.quantity.$error">
+                            <div ng-message="required">请填写购买数量</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container  flex="25">
+                        <label>单价</label>
+                        <input ng-model="order.Price" name="price" required />
+                        <div ng-messages="orderForm.price.$error">
+                            <div ng-message="required">请填写商品单价</div>
+                        </div>
+                    </md-input-container>
+                </div>
+                <div layout="row">
+                    <div style="height:300px" data-ng-repeat="img in order.PurchaseOrderImages track by $index">
+                        <a href="" ng-click="order.PurchaseOrderImages.splice($index,1)">
+                            <md-icon class="material-icons" style="color:red;font-weight:bold;">clear</md-icon>
+                        </a>
+                        <img style="height:100%;width:auto;display:block;" data-ng-src="{{img.Image}}" />
+                    </div>
+                </div>
+                <div data-ng-show="showLoading">
+                    <img src="/Images/ajax-loader-small.gif" />
+                </div>
+            </md-dialog-content>
+            <md-dialog-actions>
+                <md-input-container class="md-block hide-md-error-msg">
+                    <span class="btn btn-xs btn-primary fileinput-button">
+                        <span>上传图片</span>
+                        <input type="file" name="files" aria-label="file" multiple ng-file-select="addImage()">
+                    </span>
+                </md-input-container>
+                <span flex></span>
+                <md-button class="md-raised md-warn" ng-click="updateOrder($event)"
+                           ng-show="order.Status!=='@JYXWeb.Controllers.PurchaseController.PURCHASE_ORDER_STATUS_CANCELLED'">
+                    提交
+                </md-button>
+                <md-button class="md-raised" ng-click="close()">取消</md-button>
+            </md-dialog-actions>
+        </form>
+</md-dialog>
+</script>

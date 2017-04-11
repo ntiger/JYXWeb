@@ -16,7 +16,7 @@
 </head>
 
 <body class="body-side-menu" id="main-document-body" @if (angularEnabled) { <text> data-ng-app="@angularAppName" data-ng-controller="@angularControllerName as vm" </text>}>
-    <div layout-fill layout="row">
+    <div layout-fill layout="row" ng-cloak>
         @Html.Partial("_SideNav")
         <div layout="column" flex role="main">
             @Html.Partial("_MenuToolBar")

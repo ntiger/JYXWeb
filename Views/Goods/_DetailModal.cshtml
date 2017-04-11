@@ -1,0 +1,71 @@
+﻿<script type="text/ng-template" id="detail-dialog.html">
+    <md-dialog aria-label="options dialog">
+        <md-toolbar class="md-warn">
+            <div class="md-toolbar-tools">
+                <h2>商品详情</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="close()">
+                    <md-icon class="material-icons">clear</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div>
+                <div class="col-xs-7" style="max-width:700px">
+                    <img style="max-width:100%;height:auto;display:block;" data-ng-src="{{detailImage}}" />
+                    <div layout="row">
+                        <div ng-repeat="item in goodsEntry.GoodsItems">
+                            <div ng-repeat="image in item.GoodsImages">
+                                <a href="" ng-click="$parent.$parent.detailImage=image.Image">
+                                    <div style="height:50px;width:50px;border:1px solid #555;position:relative">
+                                        <img style="max-height:100%;max-width:100%;width:auto;height:auto;position:absolute;top:0;bottom:0;left:0;right:0;margin:auto;"
+                                             data-ng-src="{{image.Image}}" />
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-5">
+                    <h2>{{goodsEntry.Brand}}</h2>
+                    <h1>{{goodsEntry.Name}}</h1>
+                    <p>{{goodsEntry.Description}}</p>
+                    <hr />
+                    <div layout="column" data-ng-repeat="(key, value) in goodsEntry.ColorSizes">
+                        <div layout="row">
+                            {{key}}
+                        </div>
+                        <div layout="row">
+                            <div data-ng-repeat="v in value">
+                                <md-button ng-class="">{{v}}</md-button>
+                            </div>
+                        </div>
+                    </div>
+                    <div data-ng-repeat=""></div>
+                    <div class="pull-right text-right">
+                        <p>库存量: {{goodsEntry.Quantity}}</p>
+                        <span style="font-size:25px">{{goodsEntry.Price|currency:undefined:0}}</span>
+                        <br />
+                        <br />
+                        <div layout="row" class="text-left">
+                            <span flex="95"></span>
+                            <md-input-container class="md-block hide-md-error-msg">
+                                <label>数量: </label>
+                                <input type="number" ng-model="quantity" ng-init="quantity=1" />
+                            </md-input-container>
+                        </div>
+                        <md-button class="md-raised md-warn" style="margin-top:0" data-ng-click="purchase()">
+                            点击购买
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+            <div data-ng-show="showLoading">
+                <img src="/Images/ajax-loader-small.gif" />
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions>
+            <md-button class="md-raised" ng-click="close()">取消</md-button>
+        </md-dialog-actions>
+    </md-dialog>
+</script>

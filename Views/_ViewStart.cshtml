@@ -3,13 +3,11 @@
     var action = this.ViewContext.RouteData.Values["action"].ToString();
     if (controller == "Package" ||
         controller == "Message" ||
+        controller == "Goods" ||
+        controller == "Purchase" ||
         controller == "Account" && (action == "Index" || action == "ManageTransactions"))
     {
         Layout = "~/Views/Shared/_LayoutSideMenu.cshtml";
-    }
-    else if(controller == "Home" && action == "Test")
-    {
-        Layout = "~/Views/Shared/_LayoutSideMenu1.cshtml";
     }
     else if (controller == "Home")
     {

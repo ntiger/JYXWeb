@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -36,6 +39,92 @@ namespace JYXWeb.Util
             if (registryKey != null && registryKey.GetValue("Content Type") != null)
                 contentType = registryKey.GetValue("Content Type").ToString();
             return contentType;
+        }
+
+        public static string GetThumbnail(string sourceImageBase64, int? outputWidth, bool keepOriginalRatio = true)
+        {
+            if (sourceImageBase64 == "" || outputWidth == null) { return sourceImageBase64; }
+            var imageBytes = Convert.FromBase64String(sourceImageBase64);
+            MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length);
+            ms.Write(imageBytes, 0, imageBytes.Length);
+            Image sourceImage = Image.FromStream(ms, true);
+            var width = outputWidth.Value;
+            if (width >= sourceImage.Width) { return sourceImageBase64; }
+            int X = sourceImage.Width;
+            int Y = sourceImage.Height;
+            int height = (int)((width * Y) / X);
+            if (!keepOriginalRatio)
+            {
+                height = width * 618 / 1000;
+            }
+            string base64String;
+            using (var thumbnail = sourceImage.GetThumbnailImage(width, height, new Image.GetThumbnailImageAbort(ThumbnailCallback), IntPtr.Zero))
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    thumbnail.Save(memoryStream, sourceImage.RawFormat);
+                    Byte[] bytes = new Byte[memoryStream.Length];
+                    memoryStream.Position = 0;
+                    memoryStream.Read(bytes, 0, (int)bytes.Length);
+                    base64String = Convert.ToBase64String(bytes, 0, bytes.Length);
+                }
+            }
+            return base64String;
+        }
+
+        private static bool ThumbnailCallback()
+        {
+            return false;
+        }
+
+        public static string ResizeImage(string sourceImageBase64, int? outputWidth, bool keepOriginalRatio = true)
+        {
+            if (sourceImageBase64 == "" || outputWidth == null) { return sourceImageBase64; }
+            var imageBytes = Convert.FromBase64String(sourceImageBase64);
+            MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length);
+            ms.Write(imageBytes, 0, imageBytes.Length);
+            Image sourceImage = Image.FromStream(ms, true);
+            var width = outputWidth.Value;
+            if (width >= sourceImage.Width) { return sourceImageBase64; }
+            int X = sourceImage.Width;
+            int Y = sourceImage.Height;
+            int height = (int)((width * Y) / X);
+            if (!keepOriginalRatio)
+            {
+                height = width * 618 / 1000;
+            }
+
+            var destRect = new Rectangle(0, 0, width, height);
+            var destImage = new Bitmap(width, height);
+
+            destImage.SetResolution(sourceImage.HorizontalResolution, sourceImage.VerticalResolution);
+
+            using (var graphics = Graphics.FromImage(destImage))
+            {
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                using (var wrapMode = new ImageAttributes())
+                {
+                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                    graphics.DrawImage(sourceImage, destRect, 0, 0, sourceImage.Width, sourceImage.Height, GraphicsUnit.Pixel, wrapMode);
+                }
+            }
+
+            string base64String;
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                destImage.Save(memoryStream, sourceImage.RawFormat);
+                Byte[] bytes = new Byte[memoryStream.Length];
+                memoryStream.Position = 0;
+                memoryStream.Read(bytes, 0, (int)bytes.Length);
+                base64String = Convert.ToBase64String(bytes, 0, bytes.Length);
+            }
+
+            return base64String;
         }
 
         #region External Request

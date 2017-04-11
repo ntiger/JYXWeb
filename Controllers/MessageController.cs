@@ -20,11 +20,11 @@ namespace JYXWeb.Controllers
 
         public ActionResult GetMessages(string id, string status)
         {
-            if (!AppUtil.IsAdmin(User.Identity.GetUserCode()))
+            var isAdmin = AppUtil.IsAdmin(User.Identity.GetUserCode());
+            if (!isAdmin)
             {
                 id = User.Identity.GetUserCode();
             }
-            var isAdmin = AppUtil.IsAdmin(User.Identity.GetUserCode());
             if (id != null) { isAdmin = false; }
             using (var packageDataContext = new PackageDataContext())
             {
@@ -35,6 +35,7 @@ namespace JYXWeb.Controllers
                     a.Category,
                     a.Tracking,
                     Comment = a.MessageContents.Select(b => b.Comment).FirstOrDefault(),
+                    LastComment = a.MessageContents.Select(b => b.Comment).LastOrDefault(),
                     Timestamp = a.MessageContents.Select(b => b.Timestamp).LastOrDefault().ToString("MM/dd/yyyy hh:mm tt"),
                     a.Status,
                 }).ToList();
@@ -47,6 +48,7 @@ namespace JYXWeb.Controllers
             using (var packageDataContext = new PackageDataContext())
             {
                 var message = packageDataContext.Messages.Where(a => a.ID == id).SingleOrDefault();
+                if (message == null) { return null; }
                 var result = new
                 {
                     message.ID,

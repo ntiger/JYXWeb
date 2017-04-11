@@ -208,6 +208,7 @@ angular.module('appFltr', [])
 
     .filter('formatDateTime', function () {
         return function (input) {
+            if (typeof input === 'undefined' || input === null) { return ''; }
             var date = eval("new " + input.replace(/\//g, '') + ";");
             return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear() + " " +
                 date.getHours() + ':' + ((date.getMinutes() < 10) ? ("0" + date.getMinutes()) : (date.getMinutes()));

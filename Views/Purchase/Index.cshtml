@@ -1,0 +1,85 @@
+﻿@using JYXWeb.Util;
+@{
+    ViewBag.Title = "代刷购物";
+    var userCode = User.Identity.GetUserCode();
+    var isAdmin = AppUtil.IsAdmin(userCode).ToString().ToLower();
+}
+
+<div layout="column" ng-init="isAdmin=@isAdmin;init()">
+    <div layout="row">
+        <md-input-container class="md-block  hide-md-error-msg">
+            <md-button class="md-raised md-warn" style="margin-top:0;" ng-click="order={Price:0,Quantity:1,Status:defaultStatus};showPurchaseOrder($event)">
+                <md-icon class="material-icons">add</md-icon> 添加新订单
+            </md-button>
+        </md-input-container>
+        <span flex="5"></span>
+        <md-input-container class="md-block  hide-md-error-msg">
+            <label>状态</label>
+            <md-select ng-model="orderStatus" data-ng-change="getPurchaseOrders()">
+                <md-option ng-repeat="status in statusList track by $index" data-ng-value="status">
+                    {{status}}
+                </md-option>
+            </md-select>
+        </md-input-container>
+    </div>
+    
+    <md-table-container layout="row">
+        <table class="table-striped" md-table md-row-select="options.rowSelection" multiple="{{options.multiSelect}}"
+               ng-model="selectedOrders" md-progress="promise">
+            <thead md-head md-order="purchaseOrder">
+                <tr md-row>
+                    <th md-column md-order-by="ID" class="text-center"><span>订单号</span></th>
+                    <th md-column md-order-by="CreateTime" class="text-center"><span>下单时间</span></th>
+                    <th md-column md-order-by="Name" class="text-center"><span>名称</span></th>
+                    <th md-column md-order-by="Quantity" class="text-center"><span>数量</span></th>
+                    <th md-column md-order-by="Price" class="text-center"><span>价格</span></th>
+                    <th md-column md-order-by="Notes" class="text-center"><span>备注</span></th>
+                    <th md-column md-order-by="Status" class="text-center"><span>状态</span></th>
+                    <th md-column md-order-by="" class="text-center" style="text-align:center"><span>操作</span></th>
+                </tr>
+            </thead>
+            <tbody md-body>
+                <tr md-row md-select="package" md-select-id="ID" md-auto-select="false" ng-repeat="order in orders | orderBy: messageOrder track by $index">
+                    <td md-cell class="text-center">
+                        <a href="#" ng-click="showPurchaseOrder($event,$index)">
+                            {{order.ID}}
+                        </a>
+                    </td>
+                    <td md-cell class="text-center">{{order.CreateTime|formatDateTime}}</td>
+                    <td md-cell class="text-center">{{order.Name}}</td>
+                    <td md-cell class="text-center">{{order.Quantity}}</td>
+                    <td md-cell class="text-center">{{order.Quantity * order.Price | currency}}</td>
+                    <td md-cell class="text-center">{{order.Notes}}</td>
+                    <td md-cell class="text-center">{{order.Status}}</td>
+                    <td md-cell class="text-center" style="white-space:nowrap">
+                        <md-button ng-show="isAdmin" class="md-fab md-mini md-primary" style="margin:3px 3px" aria-label="Modify"
+                                   data-ng-disabled="order.Status!=='@JYXWeb.Controllers.PurchaseController.PURCHASE_ORDER_STATUS_SUBMITTED'"
+                                   data-ng-click="confirmOrder($event, $index)">
+                            结单
+                        </md-button>
+                        <md-button class="md-fab md-mini md-warn" style="margin:3px 3px" aria-label="Modify"
+                                   data-ng-disabled="order.Status!=='@JYXWeb.Controllers.PurchaseController.PURCHASE_ORDER_STATUS_SUBMITTED'"
+                                   data-ng-click="cancelOrder($event, $index)">
+                            取消
+                        </md-button>
+                        <md-button class="md-fab md-mini md-warn md-hue-2" style="margin:3px 3px" aria-label="Delete"
+                                   data-ng-disabled="order.Status!=='@JYXWeb.Controllers.PurchaseController.PURCHASE_ORDER_STATUS_SUBMITTED'"
+                                   data-ng-click="deleteOrder($event, $index)">
+                            删除
+                        </md-button>
+
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </md-table-container>
+
+    <p style="margin-top:30px">
+        <md-icon class="material-icons md-warn">info</md-icon>
+        由于很多美国商家对非美国银行卡，非美国私人地址的订单砍单严重，我们为大家提供这一美卡美私代刷服务。您给出商品链接，国内地址，然后坐等收货就好啦！
+    </p>
+</div>
+@section Scripts {
+    @Html.Partial("_OrderModal")
+    <script src="~/src/app/controllers/purchaseCtrl.js"></script>
+}

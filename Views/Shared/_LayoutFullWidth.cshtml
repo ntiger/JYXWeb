@@ -15,7 +15,7 @@
 </head>
 
 <body id="main-document-body" @if (angularEnabled) { <text> data-ng-app="@angularAppName" </text>  }>
-    <div class="container-full" style="height:100%" @if (angularEnabled) { <text> data-ng-controller="@angularControllerName as vm" </text>}>
+    <div class="container-full" style="height:100%" @if (angularEnabled) { <text> data-ng-controller="@angularControllerName as vm" ng-cloak</text>}>
         @Html.Partial("_Menu")
         <div style="margin-top:50px">
             @RenderBody()
