@@ -1,0 +1,67 @@
+﻿<script type="text/ng-template" id="orders-dialog.html">
+    <md-dialog aria-label="options dialog">
+        <md-toolbar class="md-warn">
+            <div class="md-toolbar-tools">
+                <h2>消费记录</h2>
+                <span flex></span>
+                <md-select ng-model="orderStatus" data-ng-change="getOrders()" aria-label="status">
+                    <md-option ng-repeat="status in statusList track by $index" data-ng-value="status">
+                        {{status}}
+                    </md-option>
+                </md-select>
+                <md-button class="md-icon-button" ng-click="close()">
+                    <md-icon class="material-icons">clear</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content layout-padding>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>品牌</th>
+                        <th>名称</th>
+                        <th>规格</th>
+                        <th>数量</th>
+                        <th>总价格</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="order in orders">
+                        <td>{{order.CreateTime | formatDateTime}}</td>
+                        <td>{{order.Brand}}</td>
+                        <td>{{order.Name}}</td>
+                        <td>{{order.ColorSize}}</td>
+                        <td>{{order.Quantity}}</td>
+                        <td>{{order.TotalPrice|currency}}</td>
+                        <td>{{order.Status}}</td>
+                        <td>
+                            <md-button ng-show="isAdmin" class="md-fab md-mini md-primary" style="margin:3px 3px" aria-label="Modify"
+                                       data-ng-disabled="order.Status!=='@JYXWeb.Controllers.GoodsController.ORDER_STATUS_SUBMITTED'"
+                                       data-ng-click="confirmOrder($event, $index)">
+                                结单
+                            </md-button>
+                            <md-button class="md-fab md-mini md-warn" style="margin:3px 3px" aria-label="Modify"
+                                       data-ng-disabled="order.Status!=='@JYXWeb.Controllers.GoodsController.ORDER_STATUS_SUBMITTED'"
+                                       data-ng-click="cancelOrder($event, $index)">
+                                取消
+                            </md-button>
+                            <md-button class="md-fab md-mini md-warn md-hue-2" style="margin:3px 3px" aria-label="Delete"
+                                       data-ng-disabled="!isAdmin&&order.Status!=='@JYXWeb.Controllers.GoodsController.ORDER_STATUS_SUBMITTED'"
+                                       data-ng-click="deleteOrder($event, $index)">
+                                删除
+                            </md-button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </md-dialog-content>
+        <md-dialog-actions>
+            <span flex></span>
+            <md-button ng-click="close()">关闭</md-button>
+        </md-dialog-actions>
+    </md-dialog>
+
+</script>

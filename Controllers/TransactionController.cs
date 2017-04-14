@@ -115,7 +115,11 @@ namespace JYXWeb.Controllers
         public const string TRANSACTION_TYPE_DEPOSIT_MANUAL = "手动充值";
         public const string TRANSACTION_TYPE_DEPOSIT_ALIPAY = "支付宝充值";
         public const string TRANSACTION_TYPE_EXPENSE_SHIPPING = "运费支出";
-        public const string TRANSACTION_TYPE_EXPENSE_GOODS = "商品支出";
+        public const string TRANSACTION_TYPE_EXPENSE_GOODS = "代购支出";
+        public const string TRANSACTION_TYPE_EXPENSE_PURCHASE = "代刷支出";
+        public const string TRANSACTION_TYPE_REFUND_SHIPPING = "运费支出";
+        public const string TRANSACTION_TYPE_REFUND_GOODS = "代购退款";
+        public const string TRANSACTION_TYPE_REFUND_PURCHASE = "代刷退款";
 
     }
 }

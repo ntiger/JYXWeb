@@ -1,14 +1,23 @@
-﻿@{
+﻿@using JYXWeb.Util;
+@{
     ViewBag.Title = "商品分享区";
+    var userCode = User.Identity.GetUserCode();
+    var isAdmin = AppUtil.IsAdmin(userCode).ToString().ToLower();
 }
-<div ng-init="init()">
+<div ng-init="isAdmin=@isAdmin;init()">
     <h1 class="text-center">
         商品分享区
-        <md-button class="md-fab md-warn"
+        <md-button ng-show="isAdmin" class="md-fab md-warn"
                    ng-click="goodsEntry={Category:category,GoodsItems:[{GoodsImages:[]}]};showUpload($event)"
-                   aria-label="Back to Top">
-            <md-tooltip md-direction="right">添加</md-tooltip>
+                   aria-label="Show upload">
+            <md-tooltip md-direction="right">添加新商品</md-tooltip>
             <md-icon class="material-icons">add</md-icon>
+        </md-button>
+        <md-button class="md-fab md-warn"
+                   ng-click="showOrders($event)"
+                   aria-label="Show orders">
+            <md-tooltip md-direction="right">消费记录</md-tooltip>
+            <md-icon class="material-icons">list</md-icon>
         </md-button>
     </h1>
     <h4 layout="row">
@@ -26,12 +35,16 @@
     </h4>
     <div class="row" style="">
         <div class="col-xs-6 col-md-3" ng-repeat="g in goods track by $index">
-            <a href="" ng-click="showDetail($event, g)">
+            <a href="" ng-click="showDetail($event, g)" >
                 <img ng-src="{{g.GoodsItems[0].GoodsImages[0].Image}}" 
                      style="width:100%;height:auto;display:block" class="md-card-image" alt="Washed Out">
             </a>
             <h3>{{g.Brand}} {{g.Name}}</h3>
-            <p>库存: {{g.GoodsItems|sumByKey:'Quantity'}}</p>
+            <p>
+                库存: 
+                <span ng-show="!isAdmin">{{g.GoodsItems|sumByKey:'Quantity'}}</span>
+                <a ng-show="isAdmin" href="" ng-click="getGoodsEntry(g, showUpload)">{{g.GoodsItems|sumByKey:'Quantity'}}</a>
+            </p>
         </div>
     </div>
 </div>
@@ -39,6 +52,7 @@
 @section Scripts {
     @Html.Partial("_UploadModal")
     @Html.Partial("_DetailModal")
+    @Html.Partial("_OrdersModal")
     <script src="/src/app/controllers/goodsCtrl.js"></script>
 }
 

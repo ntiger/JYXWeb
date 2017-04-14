@@ -13,13 +13,21 @@
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li>@Html.ActionLink("首页", "Index", "Home")</li>
-                <li class="dropdown-submenu">@Html.ActionLink("我要转运", "Index", "Package")
+                <li class="dropdown-submenu">
+                    <a href="#">我要转运</a>
                     <ul class="dropdown-menu">
-                        <li role="presentation">@Html.ActionLink("原装闪运", "New", "Package")</li>
-                        <li role="presentation">@Html.ActionLink("普通转运", "New", "Package", new { holdPackage = "true"}, null)</li>
+                        <li role="presentation">@Html.ActionLink("原装闪运", "Index", "Package", new { newPackage = true})</li>
+                        <li role="presentation">@Html.ActionLink("普通转运", "Index", "Package", new { newPackage = true, holdPackage = "true"}, null)</li>
                         <li role="presentation">@Html.ActionLink("包裹管理", "Index", "Package")</li>
                     </ul>
                 </li>
+                <li class="dropdown-submenu">
+                    <a href="#">代购助手</a>
+                <ul class="dropdown-menu">
+                    <li role="presentation">@Html.ActionLink("商品列表", "Index", "Goods")</li>
+                    <li role="presentation">@Html.ActionLink("代刷购物", "Index", "Purchase")</li>
+                </ul>
+            </li>
                 <li>@Html.ActionLink("渠道说明", "Service", "Home")</li>
                 <li>@Html.ActionLink("公司简介", "About", "Home")</li>
  @*               <li>@Html.ActionLink("联系我们", "Contact", "Home")</li>*@

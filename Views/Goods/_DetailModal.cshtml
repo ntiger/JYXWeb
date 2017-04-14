@@ -15,8 +15,8 @@
                     <img style="max-width:100%;height:auto;display:block;" data-ng-src="{{detailImage}}" />
                     <div layout="row">
                         <div ng-repeat="item in goodsEntry.GoodsItems">
-                            <div ng-repeat="image in item.GoodsImages">
-                                <a href="" ng-click="$parent.$parent.detailImage=image.Image">
+                            <div ng-repeat="image in item.GoodsImages" style="display:inline-block">
+                                <a href="" ng-click="selectGoodsItem(item);selectImage(image.Image);">
                                     <div style="height:50px;width:50px;border:1px solid #555;position:relative">
                                         <img style="max-height:100%;max-width:100%;width:auto;height:auto;position:absolute;top:0;bottom:0;left:0;right:0;margin:auto;"
                                              data-ng-src="{{image.Image}}" />
@@ -31,30 +31,31 @@
                     <h1>{{goodsEntry.Name}}</h1>
                     <p>{{goodsEntry.Description}}</p>
                     <hr />
-                    <div layout="column" data-ng-repeat="(key, value) in goodsEntry.ColorSizes">
+                    <div layout="column">
                         <div layout="row">
-                            {{key}}
+                            <div data-ng-repeat="colorSize in goodsEntry.ColorSizes">
+                                <md-button class="md-raised" ng-class="colorSize.Selected?'md-warn':''" ng-click="selectColor(colorSize.Color)">{{colorSize.Color}}</md-button>
+                            </div>
                         </div>
-                        <div layout="row">
-                            <div data-ng-repeat="v in value">
-                                <md-button ng-class="">{{v}}</md-button>
+                        <div layout="row" data-ng-repeat="colorSize in goodsEntry.ColorSizes" ng-show="colorSize.Selected">
+                            <div data-ng-repeat="size in colorSize.Sizes" ng-show="size.Size">
+                                <md-button class="md-raised" ng-class="size.Selected?'md-warn':''" ng-click="selectSize(colorSize.Color, size.Size)">{{size.Size}}</md-button>
                             </div>
                         </div>
                     </div>
-                    <div data-ng-repeat=""></div>
                     <div class="pull-right text-right">
-                        <p>库存量: {{goodsEntry.Quantity}}</p>
-                        <span style="font-size:25px">{{goodsEntry.Price|currency:undefined:0}}</span>
+                        <p>库存量: {{selectedItem.Quantity}}</p>
+                        <span style="font-size:25px">{{selectedItem.Price|currency:undefined:0}}</span>
                         <br />
                         <br />
                         <div layout="row" class="text-left">
                             <span flex="95"></span>
                             <md-input-container class="md-block hide-md-error-msg">
                                 <label>数量: </label>
-                                <input type="number" ng-model="quantity" ng-init="quantity=1" />
+                                <input type="number" ng-model="quantity" />
                             </md-input-container>
                         </div>
-                        <md-button class="md-raised md-warn" style="margin-top:0" data-ng-click="purchase()">
+                        <md-button class="md-raised md-warn" style="margin-top:0" data-ng-click="purchase($event)">
                             点击购买
                         </md-button>
                     </div>

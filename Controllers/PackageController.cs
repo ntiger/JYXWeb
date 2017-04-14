@@ -376,5 +376,6 @@ namespace JYXWeb.Controllers
         public const string PACKAGE_STATUS_CUSTOMS_CLEARANCE = "清关中";
         public const string PACKAGE_STATUS_DOMESTIC_TRANSPORTATION = "国内转运";
 
+        public const double PACKAGE_WEIGHT_ESTIMATE_DEFAULT = 2d;
     }
 }

@@ -80,6 +80,25 @@
         });
 
         sections.push({
+            id: 'package',
+            name: '代购助手',
+            type: 'toggle',
+            pages: [{
+                id: 'package-new',
+                name: '商品列表',
+                type: 'link',
+                url: '/Goods',
+                icon: 'fa fa-group'
+            }, {
+                id: 'package-new-hold',
+                name: '代刷购物',
+                url: '/Purchase',
+                type: 'link',
+                icon: 'fa fa-map-marker'
+            }]
+        });
+
+        sections.push({
             id: 'account',
             name: '个人中心',
             type: 'link',

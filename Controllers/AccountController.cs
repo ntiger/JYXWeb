@@ -428,6 +428,11 @@ namespace JYXWeb.Controllers
             return Json("Success");
         }
 
+        public ActionResult GetBalance()
+        {
+            return Json(User.Identity.GetBalance(), JsonRequestBehavior.AllowGet);
+        }
+
 
         #endregion
 

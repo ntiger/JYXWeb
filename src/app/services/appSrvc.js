@@ -134,15 +134,15 @@ angular.module('appSrvc', ['ngMaterial'])
         this.appConfirm = function (ev, title, textContent, yesText, noText, callback) {
             if (typeof yesText === 'undefined' || yesText === '') { okText = '确定'; }
             if (typeof noText === 'undefined' || noText === '') { okText = '取消'; }
-            var confirm = $mdDialog.confirm()
+            var confirmDialog = $mdDialog.confirm()
                   .title(title)
                   .textContent(textContent)
                   .ariaLabel('confirm dialog')
                   .targetEvent(ev)
                   .ok(yesText)
                   .cancel(noText);
-
-            $mdDialog.show(confirm).then(function () {
+            confirmDialog.skipHide = true;
+            $mdDialog.show(confirmDialog).then(function () {
                 if (callback) {
                     callback();
                 }
@@ -152,9 +152,8 @@ angular.module('appSrvc', ['ngMaterial'])
         };
 
         this.appAlert = function (ev, title, textContent, okText) {
-            if (typeof okText === 'undefined' || okText === '') { okText = '好';}
-            $mdDialog.show(
-              $mdDialog.alert()
+            if (typeof okText === 'undefined' || okText === '') { okText = '好'; }
+            var alertDialog = $mdDialog.alert()
                 .parent(angular.element(document.querySelector('#popupContainer')))
                 .clickOutsideToClose(true)
                 .title(title)
@@ -162,7 +161,8 @@ angular.module('appSrvc', ['ngMaterial'])
                 .ariaLabel('alert dialog')
                 .ok(okText)
                 .targetEvent(ev)
-            );
+            alertDialog.skipHide = true;
+            $mdDialog.show(alertDialog);
         };
 
         this.getBalance = function (callback) {

@@ -27,7 +27,7 @@ angularApp.controller('purchaseCtrl', ['$scope', '$http', '$filter', '$log', '$t
         $scope.getOrder = function (index, callback) {
             $http.post('/Purchase/GetOrder/' + $scope.orders[index].ID).then(function (res) {
                 $scope.order = res.data;
-                if (callback) { calback($scope.order );}
+                if (callback) { callback($scope.order); }
             });
         }
 
@@ -41,23 +41,17 @@ angularApp.controller('purchaseCtrl', ['$scope', '$http', '$filter', '$log', '$t
         
         $scope.confirmOrder = function (ev, index) {
             $scope.getOrder(index, function (order) {
-                order.Status = statusList[1];
-                $scope.updateOrder(order);
+                order.Status = $scope.statusList[1];
+                $scope.order = order;
+                $scope.updateOrder();
             });
         }
 
         $scope.cancelOrder = function (ev, index) {
             $scope.getOrder(index, function (order) {
-                order.Status = statusList[2];
-                $scope.updateOrder(order);
-            });
-        }
-
-        $scope.deleteOrder = function (ev, index) {
-            $appUtil.appConfirm(ev, '', '删除以后将会无法找回这条记录, 确认要删除吗?', '确认', '取消', function () {
-                $http.get('/Purchase/DeleteOrder/' + $scope.orders[index].ID).then(function (res) {
-                    $scope.getOrders();
-                });
+                order.Status = $scope.statusList[2];
+                $scope.order = order;
+                $scope.updateOrder();
             });
         }
 
@@ -75,6 +69,28 @@ angularApp.controller('purchaseCtrl', ['$scope', '$http', '$filter', '$log', '$t
             });
         };
 
+        $scope.updateOrder = function (ev) {
+            $appUtil.getBalance(function (balance) {
+                if (balance - $scope.quantity * $scope.selectedItem.Price < 0) {
+                    $appUtil.appAlert(ev, '', '您的余额不足，请到个人中心充值');
+                    return;
+                }
+                $scope.showLoading = true;
+                $http.post('/Purchase/UpdateOrder', { order: $scope.order }).then(function (res) {
+                    $scope.showLoading = false;
+                    $mdDialog.cancel();
+                    $scope.getOrders();
+                    if ($scope.order.Status === $scope.statusList[0]) {
+                        $appUtil.appConfirm(ev, '', '代刷订单已生成, 请问您要自动生成包裹运单吗?', '生成包裹', '取消', function () {
+                            $http.get('/Purchase/CreatePackage/' + res.data).then(function (res) {
+                                $appUtil.appAlert(ev, '', '包裹运单已生成，请到包裹管理页添加收件人/发件人信息，并且进行需要的分箱/合箱操作');
+                            });
+                        });
+                    }
+                });
+            });
+        }
+
         function DialogController($scope, $mdDialog, $appUtil) {
             $scope.close = function () {
                 $mdDialog.cancel();
@@ -88,20 +104,6 @@ angularApp.controller('purchaseCtrl', ['$scope', '$http', '$filter', '$log', '$t
                     $scope.order.PurchaseOrderImages.push({ Image: result });
                 });
             };
-
-            $scope.updateOrder = function (ev) {
-                $scope.showLoading = true;
-                $http.post('/Purchase/UpdateOrder', { order: $scope.order }).then(function (res) {
-                    $scope.showLoading = false;
-                    $mdDialog.cancel();
-                    $scope.getOrders();
-                    $appUtil.appConfirm(ev, '', '代刷订单已生成, 请问您要自动生成或更新包裹吗?', '生成包裹', '取消', function () {
-                        $http.get('/Purchase/CreatePackage/' + $scope.order.ID).then(function (res) {
-                            $appUtil.appAlert(ev, '', '包裹运单已生成，请到包裹管理页添加收件人/发件人信息，并且进行需要的分箱/合箱操作');
-                        });
-                    });
-                });
-            }
         }
 
         // SideNav
@@ -113,4 +115,5 @@ angularApp.controller('purchaseCtrl', ['$scope', '$http', '$filter', '$log', '$t
         vm.toggleOpen = function (section) {
             $menu.toggleSelectSection(section);
         }
+        $menu.toggleSelectSection($menu.sections[1]);
     }]);

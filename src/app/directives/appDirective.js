@@ -85,6 +85,8 @@
                 var expressionHandler = $parse(attrs.ngFileSelect);
                 el.bind("change", function (e) {
                     $scope.files = (e.srcElement || e.target).files;
+                    $scope.$parent.childFileSelectScope = $scope;
+                    console.log($scope)
                     expressionHandler($scope);
                     e.target.value = '';
                 });

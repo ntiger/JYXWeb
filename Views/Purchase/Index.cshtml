@@ -15,7 +15,7 @@
         <span flex="5"></span>
         <md-input-container class="md-block  hide-md-error-msg">
             <label>状态</label>
-            <md-select ng-model="orderStatus" data-ng-change="getPurchaseOrders()">
+            <md-select ng-model="orderStatus" data-ng-change="getPurchaseOrders()" aria-label="status">
                 <md-option ng-repeat="status in statusList track by $index" data-ng-value="status">
                     {{status}}
                 </md-option>
@@ -63,7 +63,7 @@
                             取消
                         </md-button>
                         <md-button class="md-fab md-mini md-warn md-hue-2" style="margin:3px 3px" aria-label="Delete"
-                                   data-ng-disabled="order.Status!=='@JYXWeb.Controllers.PurchaseController.PURCHASE_ORDER_STATUS_SUBMITTED'"
+                                   data-ng-disabled="!isAdmin&&order.Status!=='@JYXWeb.Controllers.PurchaseController.PURCHASE_ORDER_STATUS_SUBMITTED'"
                                    data-ng-click="deleteOrder($event, $index)">
                             删除
                         </md-button>

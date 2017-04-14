@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace JYXWeb.Controllers
 {
@@ -46,9 +47,10 @@ namespace JYXWeb.Controllers
 
         public ActionResult GetOrder(string id)
         {
+            var userCode = User.Identity.GetUserCode();
             using (var dataContext = new PackageDataContext())
             {
-                var order = dataContext.PurchaseOrders.Where(a => a.ID == id).SingleOrDefault();
+                var order = dataContext.PurchaseOrders.Where(a => a.ID == id && (AppUtil.IsAdmin(userCode) || id.Contains(userCode))).SingleOrDefault();
                 if (order != null)
                 {
                     var result = new
@@ -86,6 +88,7 @@ namespace JYXWeb.Controllers
                 }
                 order.PurchaseOrderImages[i].Image = header + AppUtil.ResizeImage(img, 800);
             }
+            var id = order.ID;
             using (var dataContext = new PackageDataContext())
             {
                 var existingRecord = dataContext.PurchaseOrders.Where(a => a.ID == order.ID).SingleOrDefault();
@@ -101,12 +104,16 @@ namespace JYXWeb.Controllers
                     existingRecord.PurchaseOrderImages = order.PurchaseOrderImages;
                     existingRecord.LastUpdateTime = DateTime.Now;
                     existingRecord.Status = order.Status;
-                    if(order.Status == PURCHASE_ORDER_STATUS_CANCELLED)
+                    if (order.Status == PURCHASE_ORDER_STATUS_CANCELLED)
                     {
                         dataContext.Products.DeleteAllOnSubmit(dataContext.Products.Where(a => a.Tracking == existingRecord.ID));
                         dataContext.SubmitChanges();
-                        dataContext.Packages.DeleteAllOnSubmit(dataContext.Packages.Where(a => a.UserCode==User.Identity.GetUserCode() && a.Products.Count == 0));
+                        dataContext.Packages.DeleteAllOnSubmit(dataContext.Packages.Where(a => a.UserCode == User.Identity.GetUserCode() && a.Products.Count == 0));
                         dataContext.SubmitChanges();
+                        if (existingRecord.Quantity != null && existingRecord.Price != null)
+                        {
+                            new TransactionController().SaveTransaction(id.Substring(0, 6), TransactionController.TRANSACTION_TYPE_REFUND_PURCHASE, existingRecord.Quantity.Value * existingRecord.Price.Value, "取消代刷订单：" + id);
+                        }
                     }
                 }
                 else
@@ -117,24 +124,36 @@ namespace JYXWeb.Controllers
                     order.CreateTime = DateTime.Now;
                     order.LastUpdateTime = DateTime.Now;
                     dataContext.PurchaseOrders.InsertOnSubmit(order);
+                    id = order.ID;
+
+                    if (order.Quantity != null && order.Price != null)
+                    {
+                        new TransactionController().SaveTransaction(id.Substring(0, 6), TransactionController.TRANSACTION_TYPE_REFUND_PURCHASE, -1 * order.Quantity.Value * order.Price.Value, "代刷订单：" + id);
+                    }
                 }
                 dataContext.SubmitChanges();
             }
 
-            return null;
+            return Json(id);
         }
 
         public ActionResult DeleteOrder(string id)
         {
+            var userCode = User.Identity.GetUserCode();
             using (var dataContext = new PackageDataContext())
             {
-                if (id != null && id.Contains(User.Identity.GetUserCode()))
+                if (id != null && id.Contains(userCode)|| AppUtil.IsAdmin(userCode))
                 {
-                    dataContext.PurchaseOrders.DeleteAllOnSubmit(dataContext.PurchaseOrders.Where(a => a.ID == id));
-                    dataContext.Products.DeleteAllOnSubmit(dataContext.Products.Where(a => a.Tracking == id));
-                    dataContext.SubmitChanges();
-                    dataContext.Packages.DeleteAllOnSubmit(dataContext.Packages.Where(a => a.UserCode == User.Identity.GetUserCode() && a.Products.Count == 0));
-                    dataContext.SubmitChanges();
+                    var purchaseOrder = dataContext.PurchaseOrders.Where(a => a.ID == id).SingleOrDefault();
+                    if (purchaseOrder != null) {
+                        
+
+                        dataContext.PurchaseOrders.DeleteOnSubmit(purchaseOrder);
+                        dataContext.Products.DeleteAllOnSubmit(dataContext.Products.Where(a => a.Tracking == id));
+                        dataContext.SubmitChanges();
+                        dataContext.Packages.DeleteAllOnSubmit(dataContext.Packages.Where(a => a.UserCode == userCode && a.Products.Count == 0));
+                        dataContext.SubmitChanges();
+                    }
                 }
             }
             return null;
@@ -149,8 +168,6 @@ namespace JYXWeb.Controllers
                     var order = dataContext.PurchaseOrders.Where(a => a.ID == id).SingleOrDefault();
                     if (order != null)
                     {
-                        var factory = DependencyResolver.Current.GetService<IControllerFactory>() ?? new DefaultControllerFactory();
-                        var packageController = factory.CreateController(this.ControllerContext.RequestContext, "Package") as PackageController;
 
                         dataContext.Products.DeleteAllOnSubmit(dataContext.Products.Where(a => a.Tracking == id));
                         dataContext.SubmitChanges();
@@ -161,6 +178,7 @@ namespace JYXWeb.Controllers
                         {
                             Status = PackageController.PACKAGE_STATUS_AWAIT,
                             SubStatus = PackageController.PACKAGE_STATUS_AWAIT,
+                            WeightEst = PackageController.PACKAGE_WEIGHT_ESTIMATE_DEFAULT,
                         };
                         package.Products.Add(new Product
                         {
@@ -170,9 +188,12 @@ namespace JYXWeb.Controllers
                             Price = order.Price,
                             Notes = order.Notes,
                         });
+                        var factory = DependencyResolver.Current.GetService<IControllerFactory>() ?? new DefaultControllerFactory();
+                        var packageController = factory.CreateController(this.ControllerContext.RequestContext, "Package") as PackageController;
+                        var route = new RouteData();
+                        var newContext = new ControllerContext(new HttpContextWrapper(System.Web.HttpContext.Current), route, packageController);
+                        packageController.ControllerContext = newContext;
                         packageController.UpdatePackage(package);
-
-
                     }
                 }
             }
