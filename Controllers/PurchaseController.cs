@@ -62,6 +62,7 @@ namespace JYXWeb.Controllers
                         order.Notes,
                         order.Color,
                         order.Size,
+                        order.PercentFee,
                         order.Status,
                         PurchaseOrderImages = order.PurchaseOrderImages.Select(b => new
                         {
@@ -101,6 +102,7 @@ namespace JYXWeb.Controllers
                     existingRecord.Size = order.Size;
                     existingRecord.Quantity = order.Quantity;
                     existingRecord.Price = order.Price;
+                    existingRecord.PercentFee = order.PercentFee;
                     existingRecord.PurchaseOrderImages = order.PurchaseOrderImages;
                     existingRecord.LastUpdateTime = DateTime.Now;
                     existingRecord.Status = order.Status;
@@ -128,7 +130,7 @@ namespace JYXWeb.Controllers
 
                     if (order.Quantity != null && order.Price != null)
                     {
-                        new TransactionController().SaveTransaction(id.Substring(0, 6), TransactionController.TRANSACTION_TYPE_REFUND_PURCHASE, -1 * order.Quantity.Value * order.Price.Value, "代刷订单：" + id);
+                        new TransactionController().SaveTransaction(id.Substring(0, 6), TransactionController.TRANSACTION_TYPE_REFUND_PURCHASE, -1 * order.Quantity.Value * order.Price.Value * (1 + order.PercentFee.Value), "代刷订单：" + id);
                     }
                 }
                 dataContext.SubmitChanges();

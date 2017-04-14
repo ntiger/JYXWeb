@@ -42,6 +42,11 @@ namespace JYXWeb.Controllers
                     a.Name,
                     a.Phone,
                     a.PostCode,
+                    a.IDCard,
+                    AddressIDCardImages = a.AddressIDCardImages.Select(b => new
+                    {
+                        b.Image
+                    }).ToList(),
                     a.IsDefault,
                 }).OrderBy(a => a.IsDefault).ToList();
                 return Json(addresses, JsonRequestBehavior.AllowGet);
@@ -50,6 +55,18 @@ namespace JYXWeb.Controllers
 
         public ActionResult UpdateAddress(Address address)
         {
+            for (var i = 0; i < address.AddressIDCardImages.Count; i++)
+            {
+                var img = address.AddressIDCardImages[i].Image;
+                var commaIndex = address.AddressIDCardImages[i].Image.IndexOf(",");
+                var header = "data:image/jpeg;base64,";
+                if (commaIndex > -1)
+                {
+                    header = img.Substring(0, commaIndex + 1);
+                    img = img.Substring(commaIndex + 1);
+                }
+                address.AddressIDCardImages[i].Image = header + AppUtil.ResizeImage(img, 800);
+            }
             using (var packageDataContext = new PackageDataContext())
             {
                 var existingAddress = packageDataContext.Addresses.Where(a => a.ID == address.ID).SingleOrDefault();
@@ -59,7 +76,11 @@ namespace JYXWeb.Controllers
                     existingAddress.District = address.District;
                     existingAddress.Phone = address.Phone;
                     existingAddress.PostCode = address.PostCode;
+                    existingAddress.IDCard = address.IDCard;
                     existingAddress.IsDefault = address.IsDefault;
+                    packageDataContext.AddressIDCardImages.DeleteAllOnSubmit(existingAddress.AddressIDCardImages);
+                    existingAddress.AddressIDCardImages.Clear();
+                    existingAddress.AddressIDCardImages.AddRange(address.AddressIDCardImages);
                 }
                 else
                 {

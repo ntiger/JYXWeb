@@ -7,8 +7,9 @@ angularApp.controller('goodsCtrl', ['$scope', '$http', '$filter', '$log', '$time
     function ($scope, $http, $filter, $log, $timeout, $appUtil, $mdDialog, $fileReader, $menu) {
         $scope.$appUtil = $appUtil;
         $scope.goods = [];
-        $scope.categories = ['包', '保健品', '化妆品', '衣服', '鞋子', '食品', '日用品'];
-        $scope.category = $scope.categories[0];
+        $scope.categories = ['所有商品', '包', '保健品', '化妆品', '衣服', '鞋子', '食品', '日用品'];
+        $scope.inputCategories = ['包', '保健品', '化妆品', '衣服', '鞋子', '食品', '日用品'];
+        $scope.category = '所有商品';
         $scope.statusList = ['已提交', '已结单', '已取消', '全部'];
         $scope.defaultStatus = $scope.statusList[0];
         $scope.orderStatus = $scope.statusList[3];
@@ -176,7 +177,7 @@ angularApp.controller('goodsCtrl', ['$scope', '$http', '$filter', '$log', '$time
                     return;
                 }
                 $appUtil.getBalance(function (balance) {
-                    if (balance - $scope.quantity * $scope.selectedItem.Price < 0) {
+                    if (!$scope.isAdmin && balance - $scope.quantity * $scope.selectedItem.Price < 0) {
                         $appUtil.appAlert(ev, '', '您的余额不足，请到个人中心充值');
                         return;
                     }

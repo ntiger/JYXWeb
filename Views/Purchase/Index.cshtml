@@ -8,7 +8,7 @@
 <div layout="column" ng-init="isAdmin=@isAdmin;init()">
     <div layout="row">
         <md-input-container class="md-block  hide-md-error-msg">
-            <md-button class="md-raised md-warn" style="margin-top:0;" ng-click="order={Price:0,Quantity:1,Status:defaultStatus};showPurchaseOrder($event)">
+            <md-button class="md-raised md-warn" style="margin-top:0;" ng-click="order={Price:0,Quantity:1,Status:defaultStatus,PercentFee:percentFees[0].value};showPurchaseOrder($event)">
                 <md-icon class="material-icons">add</md-icon> 添加新订单
             </md-button>
         </md-input-container>

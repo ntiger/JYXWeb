@@ -9,6 +9,8 @@ angularApp.controller('purchaseCtrl', ['$scope', '$http', '$filter', '$log', '$t
         $scope.statusList = ['已提交', '已购买', '已取消', '全部'];
         $scope.defaultStatus = $scope.statusList[0];
         $scope.orderStatus = $scope.statusList[3];
+        $scope.percentFees = [{ display: '代刷费 7%', value: 0.07 }, { display: '丝芙兰优惠 0%', value: 0 }]
+
 
         $scope.purchases = [];
 
@@ -71,7 +73,7 @@ angularApp.controller('purchaseCtrl', ['$scope', '$http', '$filter', '$log', '$t
 
         $scope.updateOrder = function (ev) {
             $appUtil.getBalance(function (balance) {
-                if (balance - $scope.quantity * $scope.selectedItem.Price < 0) {
+                if (!$scope.isAdmin && balance - $scope.order.Quantity * $scope.order.Price * (1 + $scope.order.PercentFee) < 0) {
                     $appUtil.appAlert(ev, '', '您的余额不足，请到个人中心充值');
                     return;
                 }

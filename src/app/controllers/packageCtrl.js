@@ -3,8 +3,8 @@ if (typeof angularApp === 'undefined') {
     angularApp = angular.module('packageApp', ['ngMaterial', 'ngMessages', 'material.svgAssetsCache', 'md.data.table',
         'appFltr', 'appFctry', 'appSrvc', 'appDirective']);
 }
-angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$timeout', '$appUtil', '$mdDialog', '$menu',
-    function ($scope, $http, $filter, $log, $timeout, $appUtil, $mdDialog, $menu) {
+angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$timeout', '$appUtil', '$mdDialog', '$fileReader', '$menu',
+    function ($scope, $http, $filter, $log, $timeout, $appUtil, $mdDialog, $fileReader, $menu) {
         $scope.$appUtil = $appUtil;
 
         $scope.startDate = new Date(new Date().getFullYear(), 0, 1);
@@ -335,6 +335,15 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 });
             }
         }
+
+        $scope.addImage = function () {
+            $fileReader.readAsDataUrl($scope.files[$scope.files.length - 1], $scope).then(function (result) {
+                if (typeof $scope.package.Address.AddressIDCardImages=== 'undefined') {
+                    $scope.package.Address.AddressIDCardImages = [];
+                }
+                $scope.package.Address.AddressIDCardImages.push({ Image: result });
+            });
+        };
 
         // End Address
 

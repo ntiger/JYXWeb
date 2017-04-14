@@ -14,8 +14,8 @@
                 <div layout="row">
                     <md-input-container flex>
                         <label>分类</label>
-                        <md-select ng-model="goodsEntry.Category" ng-change="category=goodsEntry.Category">
-                            <md-option ng-repeat="category in categories track by $index" data-ng-value="category"
+                        <md-select ng-model="goodsEntry.Category" ng-change="category=goodsEntry.Category" aria-label="category">
+                            <md-option ng-repeat="category in inputCategories track by $index" data-ng-value="category"
                                        md-on-close="search()">
                                 {{category}}
                             </md-option>

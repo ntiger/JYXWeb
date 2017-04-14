@@ -43,11 +43,29 @@
                         <input ng-model="package.Address.PostCode">
                     </md-input-container>
                 </div>
-                <md-input-container class="md-block" flex-gt-xs>
-                    <label>联系电话</label>
-                    <input ng-model="package.Address.Phone">
-                </md-input-container>
-                <div layout-gt-sm="row">
+                <div layout="row">
+                    <md-input-container class="md-block" flex-gt-xs>
+                        <label>联系电话</label>
+                        <input ng-model="package.Address.Phone">
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-xs>
+                        <label>身份证号</label>
+                        <input ng-model="package.Address.IDCard">
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-xs>
+                        <span class="btn btn-xs btn-primary fileinput-button">
+                            <span>上传身份证照片</span>
+                            <input type="file" name="files" aria-label="file" multiple ng-file-select="addImage()">
+                        </span>
+                    </md-input-container>
+                </div>
+                <div layout="row">
+                    <div style="height:100px" data-ng-repeat="img in package.Address.AddressIDCardImages track by $index" flex-gt-xs>
+                        <a href="" ng-click="package.Address.AddressIDCardImages.splice($index,1)">
+                            <md-icon class="material-icons" style="color:red;font-weight:bold;">clear</md-icon>
+                        </a>
+                        <img style="height:100%;width:auto;display:block;" data-ng-src="{{img.Image}}" />
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">

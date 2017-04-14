@@ -152,7 +152,7 @@
                             </md-button>
                         </td>
                         <td md-cell>
-                            <a href="" ng-click="showTransactions($event, user)">{{user.Balance}}</a>
+                            <a href="" ng-click="showTransactions($event, user)">{{user.Balance|currency}}</a>
                         </td>
                         <td md-cell>
                             <a href="" ng-click="showPendingDeposits($event, user)">{{user.PendingBalance}}</a>

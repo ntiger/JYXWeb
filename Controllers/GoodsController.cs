@@ -77,7 +77,7 @@ namespace JYXWeb.Controllers
         {
             using (var dataContext = new PackageDataContext())
             {
-                var goods = dataContext.Goods.Where(a => a.Category == category).ToList().Select(a => new
+                var goods = dataContext.Goods.Where(a => category == "所有商品" || a.Category == category).ToList().Select(a => new
                 {
                     a.ID,
                     a.Category,
@@ -94,7 +94,7 @@ namespace JYXWeb.Controllers
                             Image = c.Image,
                         }).Take(1).ToList(),
                     }).ToList(),
-                }).ToList();
+                }).OrderBy(a => a.Category).ToList();
                 var result = Json(goods);
                 result.MaxJsonLength = int.MaxValue;
                 return result;

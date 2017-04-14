@@ -62,6 +62,15 @@
                     </md-input-container>
                 </div>
                 <div layout="row">
+                    <md-input-container>
+                        <md-select ng-model="order.PercentFee" aria-label="fee">
+                            <md-option ng-repeat="fee in percentFees track by $index" data-ng-value="fee.value">
+                                {{fee.display}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                <div layout="row">
                     <div style="height:300px" data-ng-repeat="img in order.PurchaseOrderImages track by $index">
                         <a href="" ng-click="order.PurchaseOrderImages.splice($index,1)">
                             <md-icon class="material-icons" style="color:red;font-weight:bold;">clear</md-icon>
