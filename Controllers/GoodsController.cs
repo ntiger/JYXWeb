@@ -215,7 +215,7 @@ namespace JYXWeb.Controllers
                 {
                     var userCode = User.Identity.GetUserCode();
                     var lastID = dataContext.GoodsOrders.Where(a => a.ID.Contains(userCode)).Select(a => a.ID).OrderByDescending(a => a).FirstOrDefault();
-                    order.ID = userCode + (lastID == null ? 100000 : int.Parse(lastID.Replace(userCode, "")) + 1) + GOODS_ORDER_ID_TAIL;
+                    order.ID = userCode + (lastID == null ? 100000 : int.Parse(lastID.Replace(userCode, "").Replace(GOODS_ORDER_ID_TAIL, "")) + 1) + GOODS_ORDER_ID_TAIL;
                     order.CreateTime = DateTime.Now;
                     order.LastUpdateTime = DateTime.Now;
                     order.GoodsItem = dataContext.GoodsItems.Where(a => a.ID == order.GoodsItem.ID).SingleOrDefault();

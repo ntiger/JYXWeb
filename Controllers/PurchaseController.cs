@@ -122,7 +122,7 @@ namespace JYXWeb.Controllers
                 {
                     var userCode = User.Identity.GetUserCode();
                     var lastID = dataContext.PurchaseOrders.Where(a => a.ID.Contains(userCode)).Select(a => a.ID).OrderByDescending(a => a).FirstOrDefault();
-                    order.ID = userCode + (lastID == null ? 100000 : int.Parse(lastID.Replace(userCode, "")) + 1) + PURCHASE_ORDER_ID_TAIL;
+                    order.ID = userCode + (lastID == null ? 100000 : int.Parse(lastID.Replace(userCode, "").Replace(PURCHASE_ORDER_ID_TAIL, "")) + 1) + PURCHASE_ORDER_ID_TAIL;
                     order.CreateTime = DateTime.Now;
                     order.LastUpdateTime = DateTime.Now;
                     dataContext.PurchaseOrders.InsertOnSubmit(order);

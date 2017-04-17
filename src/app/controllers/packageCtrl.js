@@ -141,7 +141,6 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             $scope.showPackageModal();
         };
 
-
         $scope.showPackageModal = function () {
             $('#packageModal').modal({
                 backdrop: 'static',
@@ -150,6 +149,19 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             $('#packageModal').modal('show');
             $scope.getAddresses();
             $scope.getSenders();
+        }
+
+        $scope.updatePackageStatus = function () {
+            if ($scope.package.SubStatus === '已出库' &&
+                ($scope.package.Weight === null || $scope.package.Weight === '') &&
+                ($scope.package.Cost === null || $scope.package.Cost === '')) {
+                $scope.showWeightAndCostLoading = true;
+                $http.get('/Package/GetPackageWeightAndCost/' + $scope.package.ID).then(function (res) {
+                    $scope.showWeightAndCostLoading = false;
+                    $scope.package.Cost = res.data.Cost;
+                    $scope.package.Weight = res.data.Weight;
+                });
+            }
         }
 
         //#region split package
@@ -203,7 +215,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         //#endregion
 
         $scope.getProductCategories = function () {
-            $http.post('/Package/GetProductCategories').then(function (res) {
+            $http.get('/Package/GetProductCategories').then(function (res) {
                 $scope.categories = res.data;
             });
         }
@@ -429,7 +441,6 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             var src = "/Package/ExportPackages?ids=" + packageIDs;
             window.open(src, "", "", "");
         };
-
 
         $scope.getPackageOverview = function () {
             $http.get('/Package/GetPackageOverview').then(function (res) {

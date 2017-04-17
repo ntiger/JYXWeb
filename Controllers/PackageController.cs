@@ -118,6 +118,8 @@ namespace JYXWeb.Controllers
                         package.UserCode,
                         package.SubStatus,
                         package.WeightEst,
+                        package.Weight,
+                        package.Cost,
                         Sender = package.SenderID == null ? null :new {
                             package.Sender.ID,
                             package.Sender.Name,
@@ -178,9 +180,9 @@ namespace JYXWeb.Controllers
                 var existingPackage = packageDataConext.Packages.Where(a => a.ID == package.ID).SingleOrDefault();
                 if (existingPackage != null)
                 {
-                    // 出库扣款
+                    // 出库扣款 Start
                     if ((existingPackage.Status == PACKAGE_STATUS_AWAIT || existingPackage.Status == PACKAGE_STATUS_IN_WAREHOUSE) &&
-                        package.Status == PACKAGE_STATUS_OUT_OF_WAREHOUSE && AppUtil.IsAdmin(User.Identity.GetUserCode()))
+                        package.Status == PACKAGE_STATUS_OUT_OF_WAREHOUSE && AppUtil.IsAdmin(User.Identity.GetUserCode()) && existingPackage.Cost == null)
                     {
                         if (package.Weight == null)
                         {
@@ -196,11 +198,11 @@ namespace JYXWeb.Controllers
                             var assignedUnitPrice = channel.Pricings.Where(c => c.UserCode == package.UserCode).Select(c => c.Price).SingleOrDefault();
                             unitPrice = assignedUnitPrice ?? channel.DefaultPrice.Value;
                         }
-                        package.Cost = RoundPackageWeight(package.Weight.Value) * unitPrice;
+                        package.Cost = package.Cost ?? RoundPackageWeight(package.Weight.Value) * unitPrice;
                         new TransactionController().SaveTransaction(package.UserCode,
                             TransactionController.TRANSACTION_TYPE_EXPENSE_SHIPPING, package.Cost * -1 ?? 0, package.ID);
                     }
-                    // 出库扣款
+                    // 出库扣款 End
 
                     existingPackage.AddressID = package.AddressID;
                     existingPackage.SenderID = package.SenderID;
@@ -308,6 +310,32 @@ namespace JYXWeb.Controllers
             }
         }
 
+        [Authorize(Users = MvcApplication.ADMIN_USERS)]
+        public ActionResult GetPackageWeightAndCost(string id)
+        {
+            using (var packageDataConext = new PackageDataContext())
+            {
+                var existingPackage = packageDataConext.Packages.Where(a => a.ID == id).SingleOrDefault();
+                if (existingPackage != null)
+                {
+                    // 出库扣款 Start
+                    double? weight, tmCost;
+                    TMUtil.GetPackageWeightAndCost(id, out weight, out tmCost);
+                    weight = weight ?? existingPackage.WeightEst;
+                    var unitPrice = 0d;
+                    if (existingPackage.Products.Count > 0 && existingPackage.Products.Where(b => b.Channel != null).Count() > 0)
+                    {
+                        var channelNumber = existingPackage.Products.Max(c => c.Channel);
+                        var channel = packageDataConext.Channels.Where(a => a.ID == channelNumber).First();
+                        var assignedUnitPrice = channel.Pricings.Where(c => c.UserCode == existingPackage.UserCode).Select(c => c.Price).SingleOrDefault();
+                        unitPrice = assignedUnitPrice ?? channel.DefaultPrice.Value;
+                    }
+                    var cost = RoundPackageWeight(weight.Value) * unitPrice;
+                    return Json(new { Weight = weight, Cost = cost }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            return null;
+        }
 
         public string GeneratePackageCode()
         {
@@ -319,7 +347,6 @@ namespace JYXWeb.Controllers
             }
             return code;
         }
-
 
         public void CreateTMEntry()
         {

@@ -72,6 +72,18 @@ angularApp.controller('purchaseCtrl', ['$scope', '$http', '$filter', '$log', '$t
         };
 
         $scope.updateOrder = function (ev) {
+            if (typeof $scope.order.Link === 'undefined' || $scope.order.Link === '') {
+                alert('商品链接不能为空');
+                return;
+            }
+            if (typeof $scope.order.Name === 'undefined' || $scope.order.Name === '') {
+                alert('商品名称不能为空');
+                return;
+            }
+            if (typeof $scope.order.Price === 'undefined' || $scope.order.Price === '') {
+                alert('商品价格不能为空');
+                return;
+            }
             $appUtil.getBalance(function (balance) {
                 if (!$scope.isAdmin && balance - $scope.order.Quantity * $scope.order.Price * (1 + $scope.order.PercentFee) < 0) {
                     $appUtil.appAlert(ev, '', '您的余额不足，请到个人中心充值');

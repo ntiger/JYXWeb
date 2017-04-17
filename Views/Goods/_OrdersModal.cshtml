@@ -18,6 +18,7 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
+                        <th>订单号</th>
                         <th>时间</th>
                         <th>品牌</th>
                         <th>名称</th>
@@ -30,6 +31,7 @@
                 </thead>
                 <tbody>
                     <tr data-ng-repeat="order in orders">
+                        <td>{{order.ID}}</td>
                         <td>{{order.CreateTime | formatDateTime}}</td>
                         <td>{{order.Brand}}</td>
                         <td>{{order.Name}}</td>

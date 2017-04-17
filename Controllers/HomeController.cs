@@ -80,6 +80,11 @@ namespace JYXWeb.Controllers
             return View();
         }
 
+        public ActionResult TestYD()
+        {
+            return null;
+        }
+
         #endregion
     }
 }
