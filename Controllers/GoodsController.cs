@@ -281,6 +281,7 @@ namespace JYXWeb.Controllers
                             Tracking = order.ID,
                             Brand = order.GoodsItem.Good.Brand,
                             Name = order.GoodsItem.Good.Name,
+                            Channel = 9,
                             Quantity = order.Quantity,
                             Price = order.GoodsItem.Price,
                             Notes = "颜色：" + order.GoodsItem.Color + ",型号" + order.GoodsItem.Size,

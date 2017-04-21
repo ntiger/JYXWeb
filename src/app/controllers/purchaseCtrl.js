@@ -33,7 +33,7 @@ angularApp.controller('purchaseCtrl', ['$scope', '$http', '$filter', '$log', '$t
             });
         }
 
-        $scope.deleteOrder = function (index) {
+        $scope.deleteOrder = function (ev, index) {
             $appUtil.appConfirm(ev, '', '删除以后将会无法找回这条订单, 确认要删除吗?', '确认', '取消', function () {
                 $http.get('/Purchase/DeleteOrder/' + $scope.orders[index].ID).then(function (res) {
                     $scope.orders.splice(index, 1);
@@ -84,6 +84,7 @@ angularApp.controller('purchaseCtrl', ['$scope', '$http', '$filter', '$log', '$t
                 alert('商品价格不能为空');
                 return;
             }
+            $mdDialog.cancel();
             $appUtil.getBalance(function (balance) {
                 if (!$scope.isAdmin && balance - $scope.order.Quantity * $scope.order.Price * (1 + $scope.order.PercentFee) < 0) {
                     $appUtil.appAlert(ev, '', '您的余额不足，请到个人中心充值');

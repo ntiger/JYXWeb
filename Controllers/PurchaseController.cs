@@ -57,6 +57,7 @@ namespace JYXWeb.Controllers
                     {
                         order.ID,
                         order.Name,
+                        order.Link,
                         order.Quantity,
                         order.Price,
                         order.Notes,
@@ -186,6 +187,7 @@ namespace JYXWeb.Controllers
                         {
                             Tracking = order.ID,
                             Name = order.Name,
+                            Channel = 9,
                             Quantity = order.Quantity,
                             Price = order.Price,
                             Notes = order.Notes,

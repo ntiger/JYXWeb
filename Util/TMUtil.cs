@@ -323,9 +323,9 @@ namespace JYXWeb.Util
                 workBook.Close();
                 excel.Quit();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                
+                Console.Write(e.Message);
             }
             finally
             {
