@@ -5,6 +5,9 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
+                <md-input-container class="hide-md-error-msg pull-right no-margin" data-ng-show="isAdmin">
+                    <input ng-model="package.UserCode" aria-label="userCode" />
+                </md-input-container>
                 <h4 class="modal-title">{{package.ID===undefined?'添加新':'修改'}}包裹</h4>
             </div>
             <div class="modal-body">
