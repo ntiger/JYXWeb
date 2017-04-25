@@ -56,7 +56,6 @@
         <md-button class="md-raised md-warn" ng-click="addPackage($event)">新增包裹</md-button>
         <md-button class="md-raised md-warn" data-ng-disabled="selectedPackages.length<2" ng-click="combinePackages($event)">合箱</md-button>
         <md-button class="md-raised md-warn" data-ng-if="isAdmin" data-ng-disabled="selectedPackages.length<1" ng-click="export($event)">导出</md-button>
-        <md-button class="md-raised md-warn" data-ng-disabled="selectedPackages.length<1" ng-click="print($event)">打印</md-button>
     </md-input-container>
     <div layout="column">
         <md-table-container>

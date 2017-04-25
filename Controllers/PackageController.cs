@@ -2,9 +2,6 @@
 using JYXWeb.Models;
 using JYXWeb.Util;
 using Newtonsoft.Json;
-using PdfSharp.Drawing;
-using PdfSharp.Drawing.Layout;
-using PdfSharp.Pdf;
 using System;
 using System.Linq;
 using System.Web.Mvc;
@@ -338,102 +335,6 @@ namespace JYXWeb.Controllers
                 }
             }
             return null;
-        }
-
-        public ActionResult PrintPackages(string[] ids)
-        {
-            using (var dataContext = new PackageDataContext())
-            {
-                var packages = ids.Join(dataContext.Packages.Where(a => a.Address != null && a.Sender != null), a => a, b => b.ID, (a, b) => b).ToList();
-
-
-                // Create new document
-                PdfDocument document = new PdfDocument();
-
-                // Set font encoding to unicode always
-                var options = new XPdfFontOptions(PdfFontEncoding.Unicode, PdfFontEmbedding.Always);
-                // Then use the font with the most language support
-                var font = new XFont("Arial Unicode MS", 12, XFontStyle.Regular, options);
-
-                var fontHeight = font.Height;
-
-                PdfPage page = null;
-                XGraphics gfx = null;
-                foreach (var package in packages)
-                {
-                    var x = 50d;
-                    var y = 20d;
-                    var lineSpace = 5;
-                    var offset = 15;
-
-                    if (packages.IndexOf(package) % 2 == 0)
-                    {
-                        page = document.AddPage();
-                        gfx = XGraphics.FromPdfPage(page);
-                    }
-                    else
-                    {
-                        y = page.Height / 2 + 20;
-                    }
-
-                    var barcodeImg = AppUtil.GetBarcodeImage(package.ID);
-
-
-                    gfx.DrawImage(barcodeImg, x, y);
-                    y += barcodeImg.Height - offset;
-
-                    XTextFormatter tf = new XTextFormatter(gfx);
-                    tf.Alignment = XParagraphAlignment.Left;
-                    tf.DrawString(package.ID, new XFont("Arial Unicode MS", 9, XFontStyle.Regular, options), XBrushes.Black,
-                      new XRect(x, y, page.Width - 2 * x, fontHeight), XStringFormats.TopLeft);
-                    y += fontHeight + offset;
-
-
-                    tf.DrawString("发件人:", font, XBrushes.Black,
-                      new XRect(x, y, page.Width - 2 * x, fontHeight), XStringFormats.TopLeft);
-                    y += fontHeight + lineSpace;
-
-                    var sender = string.Join(" ", new string[] { package.Sender.Name, package.Sender.Address, package.Sender.Phone });
-                    tf.DrawString(sender, font, XBrushes.Black,
-                      new XRect(x, y, page.Width - 2 * x, fontHeight), XStringFormats.TopLeft);
-                    y += fontHeight + offset;
-
-                    tf.DrawString("收件人:", font, XBrushes.Black,
-                      new XRect(x, y, page.Width - 2 * x, fontHeight), XStringFormats.TopLeft);
-                    y += fontHeight + lineSpace;
-
-                    var recipient = string.Join(" ", new string[] {
-                        package.Address.Name, package.Address.Phone,
-                        package.Address.District1.District1.District1.Name,
-                        package.Address.District1.District1.Name,
-                        package.Address.District1.Name,
-                        package.Address.Street
-                    });
-                    tf.DrawString(recipient, font, XBrushes.Black,
-                      new XRect(x, y, page.Width - 2 * x, fontHeight), XStringFormats.TopLeft);
-                    y += fontHeight + offset;
-
-
-                    tf.DrawString("物品:", font, XBrushes.Black,
-                     new XRect(x, y, page.Width - 2 * x, fontHeight), XStringFormats.TopLeft);
-                    y += fontHeight + lineSpace;
-
-                    foreach (var product in package.Products)
-                    {
-                        var productStr = string.Join(" ", new string[] {
-                            product.Brand, product.Name, "*"+product.Quantity,
-                            string.Format("{0:C0}",product.Price),
-                        });
-                        tf.DrawString(productStr, font, XBrushes.Black,
-                          new XRect(x, y, page.Width - 2 * x, fontHeight), XStringFormats.TopLeft);
-                        y += fontHeight + 2;
-                    }
-                }
-                string filename = "package" + User.Identity.GetUserCode() + ".pdf";
-                // Save the document
-                document.Save(filename);
-                return File(System.IO.File.ReadAllBytes(filename), AppUtil.GetContentType(filename), "package.pdf");
-            }
         }
 
         public string GeneratePackageCode()

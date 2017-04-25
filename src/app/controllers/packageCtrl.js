@@ -290,32 +290,20 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             angular.forEach($scope[parentAttr], function (value, key) {
                 if (name === value.Name) { id = value.ID; }
             });
-            if (id === '' && targetAttr !== 'provinces') { return;}
             $http.get('/Address/GetDistricts/' + id).then(function (res) {
                 $scope[targetAttr] = [];
                 angular.forEach(res.data, function (value, key) {
                     $scope[targetAttr].push({ ID: value.ID, Name: value.Name });
-                    if (targetAttr === 'districts' && value.Name === '') {
-                        $scope.package.Address.District = value.ID;
-                    }
                 });
-                
             });
         }
 
-        $scope.getAddresses = function (id) {
+        $scope.getAddresses = function () {
             if (typeof $scope.addresses === 'undefined' || $scope.addressIDs.indexOf($scope.package.Address.ID) === -1) {
                 $http.post('/Address/GetAddresses/' + $scope.package.Address.ID).then(function (res) {
                     $scope.addresses = res.data;
                     if (typeof $scope.package.Address.ID === 'undefined' && $scope.addresses.length > 0) {
                         $scope.package.Address = $scope.addresses[0];
-                    }
-                    if (typeof id !== 'undefined') {
-                        angular.forEach($scope.addresses, function (value) {
-                            if (value.ID === id) {
-                                $scope.package.Address = value;
-                            }
-                        });
                     }
                     $scope.updateAddressString();
                 });
@@ -323,15 +311,8 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         }
 
         $scope.updateAddress = function () {
-            if (typeof $scope.package.Address.Phone === 'undefined' || $scope.package.Address.Phone === '') {
-                alert('请输入电话号码'); return false;
-            }
-            if (typeof $scope.package.Address.District === 'undefined' || $scope.package.Address.District === '') {
-                alert('请选择省份、城市和区县'); return false;
-            }
-            $('#addressModal').modal('hide');
             $http.post('/Address/UpdateAddress', { address: $scope.package.Address }).then(function (res) {
-                $scope.getAddresses(res.data);
+                $scope.getAddresses();
                 $scope.updateAddressString();
             });
         }
@@ -460,14 +441,6 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             var src = "/Package/ExportPackages?ids=" + packageIDs;
             window.open(src, "", "", "");
         };
-
-        $scope.print = function () {
-            var packageIDs = $scope.selectedPackages.map(function (pkg) { return pkg.ID }).join('&ids=');
-            var src = "/Package/PrintPackages?ids=" + packageIDs;
-            window.open(src, "", "", "");
-        };
-
-        
 
         $scope.getPackageOverview = function () {
             $http.get('/Package/GetPackageOverview').then(function (res) {

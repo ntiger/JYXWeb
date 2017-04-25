@@ -9,7 +9,7 @@ angularApp.controller('purchaseCtrl', ['$scope', '$http', '$filter', '$log', '$t
         $scope.statusList = ['已提交', '已购买', '已取消', '全部'];
         $scope.defaultStatus = $scope.statusList[0];
         $scope.orderStatus = $scope.statusList[3];
-        $scope.percentFees = [{ display: '代刷费 7%', value: 0.07 }, { display: '丝芙兰优惠 6%', value: 0.06 }]
+        $scope.percentFees = [{ display: '代刷费 7%', value: 0.07 }, { display: '丝芙兰优惠 0%', value: 0 }]
 
 
         $scope.purchases = [];

@@ -23,7 +23,7 @@
                     <md-input-container>
                         <label>请选择城市</label>
                         <md-select ng-model="package.Address.CityName" md-on-open="getDistricts('cities', 'provinces', package.Address.ProvinceName)" ng-change="package.Address.District=''">
-                            <md-option ng-repeat="(i, city) in cities track by $index" ng-value="city.Name" ng-selected="cities.length==1&&i==0">{{city.Name}}</md-option>
+                            <md-option ng-repeat="(i, city) in cities track by $index" ng-value="city.Name">{{city.Name}}</md-option>
                         </md-select>
                     </md-input-container>
                     <md-input-container>
@@ -45,7 +45,7 @@
                 </div>
                 <div layout="row">
                     <md-input-container class="md-block" flex-gt-xs>
-                        <label>联系电话 <span style="color:red">*</span></label>
+                        <label>联系电话</label>
                         <input ng-model="package.Address.Phone">
                     </md-input-container>
                     <md-input-container class="md-block" flex-gt-xs>
@@ -70,7 +70,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary" ng-click="updateAddress()">保存</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="updateAddress()">保存</button>
             </div>
         </div>
     </div>
