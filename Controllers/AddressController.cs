@@ -19,7 +19,7 @@ namespace JYXWeb.Controllers
                 {
                     a.ID,
                     a.Name
-                }).ToList();
+                }).OrderBy(a => a.Name).ToList();
                 return Json(districts, JsonRequestBehavior.AllowGet);
             }
         }
@@ -90,7 +90,7 @@ namespace JYXWeb.Controllers
 
                 packageDataContext.SubmitChanges();
             }
-            return null;
+            return Json(address.ID);
         }
 
         public ActionResult DeleteAddress(int id)

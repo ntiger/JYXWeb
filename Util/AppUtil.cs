@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Zen.Barcode;
 
 namespace JYXWeb.Util
 {
@@ -127,6 +128,14 @@ namespace JYXWeb.Util
             return base64String;
         }
 
+        public static Image GetBarcodeImage(string id)
+        {
+            var checksum = Code128Checksum.Instance;
+            var barcode = new Code128BarcodeDraw(checksum).Draw(id, 80, 3);
+            return barcode;
+        }
+
+
         #region External Request
 
         public static void SubmitUrlAsync(string url)
@@ -196,6 +205,8 @@ namespace JYXWeb.Util
             }
             return responsebody;
         }
+
+        
 
         #endregion
     }
