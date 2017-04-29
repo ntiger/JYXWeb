@@ -175,14 +175,14 @@ namespace JYXWeb.Util
             Task.Factory.StartNew(() => PostUrlPrivate(url, keyValuePairs));
         }
 
-        public static string PostUrl(string url, IDictionary<string, string> keyValuePairs)
+        public static object PostUrl(string url, IDictionary<string, string> keyValuePairs)
         {
             return PostUrlPrivate(url, keyValuePairs);
         }
 
-        private static string PostUrlPrivate(string url, IDictionary<string, string> keyValuePairs)
+        private static object PostUrlPrivate(string url, IDictionary<string, string> keyValuePairs)
         {
-            string responsebody;
+            object responsebody;
             using (var webClient = new WebClient())
             {
                 try
@@ -196,11 +196,12 @@ namespace JYXWeb.Util
                         }
                     }
                     byte[] responsebytes = webClient.UploadValues(url, "POST", reqparm);
-                    responsebody = Encoding.UTF8.GetString(responsebytes);
+                    responsebody = responsebytes;
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     responsebody = "Error";
+                    Console.WriteLine(e.Message);
                 }
             }
             return responsebody;

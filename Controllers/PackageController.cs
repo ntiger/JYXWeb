@@ -308,7 +308,7 @@ namespace JYXWeb.Controllers
             using (var packageDataConext = new PackageDataContext())
             {
                 var packages = ids.Join(packageDataConext.Packages.Where(a => a.Address != null && a.Sender != null), a => a, b => b.ID, (a, b) => b).ToArray();
-                var fileContent = TMUtil.ExportXLS(packages);
+                var fileContent = TMUtil.ExportXLSOpenXML(packages);
                 return File(fileContent, AppUtil.GetContentType("xxx.xls"), "packages.xls");
             }
         }
@@ -344,11 +344,24 @@ namespace JYXWeb.Controllers
         {
             using (var dataContext = new PackageDataContext())
             {
+                var paramDict = ids.Select((a, index) => new string[] { "ids[" + index + "]", a }).ToDictionary(a => a[0], a => a[1]);
+                var pdfContent = AppUtil.PostUrl("http://65.182.182.141:8888/Package/PrintPackagesPDF", paramDict);
+
+                string fileName = "package.pdf";
+                return File((byte[])pdfContent, AppUtil.GetContentType(fileName), fileName);
+            }
+        }
+
+        [AllowAnonymous]
+        public ActionResult PrintPackagesPDF(string[] ids)
+        {
+            using (var dataContext = new PackageDataContext())
+            {
                 var packages = ids.Join(dataContext.Packages.Where(a => a.Address != null && a.Sender != null), a => a, b => b.ID, (a, b) => b).ToList();
 
 
                 // Create new document
-                PdfDocument document = new PdfDocument();
+                var document = new PdfDocument();
 
                 // Set font encoding to unicode always
                 var options = new XPdfFontOptions(PdfFontEncoding.Unicode, PdfFontEmbedding.Always);
@@ -382,7 +395,7 @@ namespace JYXWeb.Controllers
                     gfx.DrawImage(barcodeImg, x, y);
                     y += barcodeImg.Height - offset;
 
-                    XTextFormatter tf = new XTextFormatter(gfx);
+                    var tf = new XTextFormatter(gfx);
                     tf.Alignment = XParagraphAlignment.Left;
                     tf.DrawString(package.ID, new XFont("Arial Unicode MS", 9, XFontStyle.Regular, options), XBrushes.Black,
                       new XRect(x, y, page.Width - 2 * x, fontHeight), XStringFormats.TopLeft);
@@ -435,6 +448,7 @@ namespace JYXWeb.Controllers
                 return File(System.IO.File.ReadAllBytes(filename), AppUtil.GetContentType(filename), "package.pdf");
             }
         }
+
 
         public string GeneratePackageCode()
         {
