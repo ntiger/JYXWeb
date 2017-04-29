@@ -92,7 +92,7 @@ namespace JYXWeb.Controllers
                         a.UserCode,
                         Weight = a.Weight == null ? a.WeightEst + " (预估)" : a.Weight + "",
                         Cost = string.Format("{0:c}", a.Cost != null ? a.Cost.Value :
-                                RoundPackageWeight(a.Weight ?? a.WeightEst.Value) *
+                                RoundPackageWeight(a.Weight ?? a.WeightEst ?? 2) *
                                 (a.Products.Count == 0 || a.Products.Where(b => b.Channel != null).Count() == 0 ? null :
                                 a.Products.Where(b => b.Channel == a.Products.Max(c => c.Channel)).First()
                                 .Channel1.Pricings.Where(c => c.UserCode == a.UserCode).Select(c => c.Price).SingleOrDefault() ??
@@ -213,7 +213,7 @@ namespace JYXWeb.Controllers
                     existingPackage.SubStatus = package.SubStatus;
                     existingPackage.Weight = package.Weight;
                     existingPackage.Cost = package.Cost;
-                    existingPackage.WeightEst = package.WeightEst;
+                    existingPackage.WeightEst = package.WeightEst ?? 2;
                     packageDataConext.Products.DeleteAllOnSubmit(existingPackage.Products);
                     existingPackage.Products.Clear();
                     existingPackage.Products.AddRange(package.Products);
@@ -233,6 +233,7 @@ namespace JYXWeb.Controllers
                     {
                         package.Address = packageDataConext.Addresses.Where(a => a.ID == package.Address.ID).SingleOrDefault();
                     }
+                    package.WeightEst = package.WeightEst ?? 2;
                     package.LastUpdateTime = DateTime.Now;
                     package.LastUpdateUser = User.Identity.Name;
                     packageDataConext.Packages.InsertOnSubmit(package);
