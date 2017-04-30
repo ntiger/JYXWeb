@@ -354,6 +354,8 @@ namespace JYXWeb.Util
             var row = 1;
             var col = 0;
             var dataRow = sheet.CreateRow(row);
+
+
             dataRow.CreateCell(col++).SetCellValue("序号");
             dataRow.CreateCell(col++).SetCellValue("客户编号");
             dataRow.CreateCell(col++).SetCellValue("天马单号");
@@ -364,9 +366,11 @@ namespace JYXWeb.Util
             dataRow.CreateCell(col++).SetCellValue("寄件人地址");
             dataRow.CreateCell(col++).SetCellValue("品牌");
             dataRow.CreateCell(col++).SetCellValue("中文品名");
+            dataRow.CreateCell(col++).SetCellValue("包装");
+            dataRow.CreateCell(col++).SetCellValue("数量");
             dataRow.CreateCell(col++).SetCellValue("单价(美金)");
             dataRow.CreateCell(col++).SetCellValue("重量(LBS)");
-            dataRow.CreateCell(col++).SetCellValue("实收运费(美金)");
+            dataRow.CreateCell(col++).SetCellValue("保留");
             dataRow.CreateCell(col++).SetCellValue("投保额");
             dataRow.CreateCell(col++).SetCellValue("保险费");
             dataRow.CreateCell(col++).SetCellValue("关税");
@@ -380,6 +384,7 @@ namespace JYXWeb.Util
             dataRow.CreateCell(col++).SetCellValue("收件人邮编");
             dataRow.CreateCell(col++).SetCellValue("收件人身份证号码");
             dataRow.CreateCell(col++).SetCellValue("用户备注");
+            dataRow.CreateCell(col++).SetCellValue("优惠码");
 
             row++;
             for (var i = 0; i < packages.Length; i++)
@@ -399,6 +404,7 @@ namespace JYXWeb.Util
 
                 dataRow.CreateCell(col++).SetCellValue(package.Products[0].Brand);
                 dataRow.CreateCell(col++).SetCellValue(package.Products[0].Name);
+                dataRow.CreateCell(col++).SetCellValue("");
                 dataRow.CreateCell(col++).SetCellValue(package.Products[0].Quantity == null ? "" : package.Products[0].Quantity.ToString());
                 dataRow.CreateCell(col++).SetCellValue(package.Products[0].Price == null ? "" : package.Products[0].Price.ToString());
 
@@ -419,6 +425,7 @@ namespace JYXWeb.Util
                     dataRow = sheet.CreateRow(row);
                     dataRow.CreateCell(col++).SetCellValue(product.Brand);
                     dataRow.CreateCell(col++).SetCellValue(product.Name);
+                    dataRow.CreateCell(col++).SetCellValue("");
                     dataRow.CreateCell(col++).SetCellValue(product.Quantity == null ? "" : product.Quantity.ToString());
                     dataRow.CreateCell(col++).SetCellValue(product.Price == null ? "" : product.Price.ToString());
                 }

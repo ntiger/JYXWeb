@@ -25,6 +25,12 @@ namespace JYXWeb.Util
             return (claim != null) ? claim.Value : string.Empty;
         }
 
+        public static string GetUserType(this IIdentity identity)
+        {
+            var claim = ((ClaimsIdentity)identity).FindFirst("UserType");
+            return (claim != null) ? claim.Value : string.Empty;
+        }
+
         public static double GetBalance(this IIdentity identity)
         {
             var userCode = identity.GetUserCode();

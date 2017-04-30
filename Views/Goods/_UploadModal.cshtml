@@ -51,6 +51,10 @@
                             <label>单价</label>
                             <input ng-model="item.Price" />
                         </md-input-container>
+                        <md-input-container flex>
+                            <label>底价</label>
+                            <input ng-model="item.DiscountPrice" />
+                        </md-input-container>
                         <md-icon flex class="material-icons md-warn" ng-click="goodsEntry.GoodsItems.splice($index,1)">delete</md-icon>
                         <md-icon flex class="material-icons md-warn fileinput-button">
                             add_a_photo
@@ -64,13 +68,14 @@
                         </div>
                     </div>
                 </div>
-                <div data-ng-show="showLoading">
-                    <img src="/Images/ajax-loader-small.gif" />
-                </div>
+                
             </md-content>
         </md-dialog-content>
         <md-dialog-actions>
             <span flex></span>
+            <div data-ng-show="showLoading">
+                <img src="/Images/ajax-loader-small.gif" />
+            </div>
             <md-button class="md-raised md-warn" ng-click="updateGoodsEntry()">提交</md-button>
             <md-button class="md-raised" ng-click="close()">取消</md-button>
         </md-dialog-actions>

@@ -6,6 +6,7 @@ if (typeof angularApp === 'undefined') {
 angularApp.controller('accountCtrl', function ($scope, $http, $filter, $log, $timeout, $appUtil, $mdDialog, $menu) {
     $scope.$appUtil = $appUtil;
     $scope.Math = Math;
+    $scope.userTypes = ['普通用户', '本地客户'];
 
     $scope.init = function () {
         $scope.getUsers();
@@ -14,6 +15,10 @@ angularApp.controller('accountCtrl', function ($scope, $http, $filter, $log, $ti
 
     $scope.saveName = function () {
         $http.post('/Account/SaveName', { firstName: $scope.firstName, lastName: $scope.lastName }).then(function (res) { });
+    }
+
+    $scope.updateUserType = function (user) {
+        $http.post('/Account/UpdateUserType/' + user.Id, { userType: user.UserType }).then(function (res) { });
     }
 
     $scope.updateUserMemo = function (user) {
@@ -147,6 +152,8 @@ angularApp.controller('accountCtrl', function ($scope, $http, $filter, $log, $ti
             });
         }
     }
+
+
 
     // SideNav
     var vm = this;

@@ -271,6 +271,7 @@ namespace JYXWeb.Controllers
                 newPackage.Status = "待入库";
                 newPackage.SubStatus = "待入库";
                 newPackage.LastUpdateTime = DateTime.Now;
+                newPackage.WeightEst = packages.Max(a => a.WeightEst ?? 2);
                 newPackage.ID = GeneratePackageCode();
                 newPackage.UserCode = User.Identity.GetUserCode();
                 packageDataConext.Packages.InsertOnSubmit(newPackage);
@@ -506,6 +507,14 @@ namespace JYXWeb.Controllers
                 }
                 packageDataContext.SubmitChanges();
             }
+        }
+
+
+        public ActionResult Intro()
+        {
+            ViewBag.angularAppName = "packageApp";
+            ViewBag.angularControllerName = "packageCtrl";
+            return View();
         }
 
 

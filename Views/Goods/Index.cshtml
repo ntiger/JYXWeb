@@ -43,7 +43,7 @@
             <p>
                 库存: 
                 <span ng-show="!isAdmin">{{g.GoodsItems|sumByKey:'Quantity'}}</span>
-                <a ng-show="isAdmin" href="" ng-click="getGoodsEntry(g, showUpload)">{{g.GoodsItems|sumByKey:'Quantity'}}</a>
+                <a ng-show="isAdmin" href="" ng-click="getGoodsEntry(g, showUpload, true)">{{g.GoodsItems|sumByKey:'Quantity'}}</a>
             </p>
         </div>
     </div>

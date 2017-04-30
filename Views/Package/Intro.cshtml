@@ -1,0 +1,37 @@
+﻿@{
+    ViewBag.Title = "转运课堂";
+}
+<div ng-cloak="">
+    <md-nav-bar md-selected-nav-item="currentNavItem" nav-bar-aria-label="navigation links" ng-init="currentNavItem='添加包裹'">
+        <md-nav-item md-nav-click="goto('add')" name="添加包裹" class="md-warn">
+            添加包裹
+        </md-nav-item>
+        <md-nav-item md-nav-click="goto('combine')" name="合箱操作">
+            合箱操作
+        </md-nav-item>
+        <md-nav-item md-nav-click="goto('split')" name="分箱操作">
+            分箱操作
+        </md-nav-item>
+        <md-nav-item md-nav-click="goto('track')" name="追踪包裹">
+            追踪包裹
+        </md-nav-item>
+    </md-nav-bar>
+    <div class="ext-content">
+        <div ng-show="currentNavItem==='添加包裹'">
+            @Html.Partial("_IntroAddPackage")
+        </div>
+        <div ng-show="currentNavItem==='合箱操作'">
+            @Html.Partial("_IntroCombinePackage")
+        </div>
+        <div ng-show="currentNavItem==='分箱操作'">
+            @Html.Partial("_IntroSplitPackage")
+        </div>
+        <div ng-show="currentNavItem==='追踪包裹'">
+            @Html.Partial("_IntroTrackPackage")
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/src/app/controllers/packageCtrl.js"></script>
+}

@@ -1,7 +1,21 @@
 ﻿/* Controller */
 if (typeof angularApp === 'undefined') {
     angularApp = angular.module('packageApp', ['ngMaterial', 'ngMessages', 'material.svgAssetsCache', 'md.data.table',
-        'appFltr', 'appFctry', 'appSrvc', 'appDirective']);
+        'appFltr', 'appFctry', 'appSrvc', 'appDirective']).config(['$httpProvider', function ($httpProvider) {
+            if (!$httpProvider.defaults.headers.get) {
+                $httpProvider.defaults.headers.get = {};
+            }
+            $httpProvider.defaults.headers.get['If-Modified-Since'] = 'Mon, 26 Jul 1997 05:00:00 GMT';
+            $httpProvider.defaults.headers.get['Cache-Control'] = 'no-cache';
+            $httpProvider.defaults.headers.get['Pragma'] = 'no-cache';
+
+            if (!$httpProvider.defaults.headers.post) {
+                $httpProvider.defaults.headers.post = {};
+            }
+            $httpProvider.defaults.headers.post['If-Modified-Since'] = 'Mon, 26 Jul 1997 05:00:00 GMT';
+            $httpProvider.defaults.headers.post['Cache-Control'] = 'no-cache';
+            $httpProvider.defaults.headers.post['Pragma'] = 'no-cache';
+        }]);
 }
 angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$timeout', '$appUtil', '$mdDialog', '$fileReader', '$menu',
     function ($scope, $http, $filter, $log, $timeout, $appUtil, $mdDialog, $fileReader, $menu) {
@@ -407,13 +421,14 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         $scope.updateSender = function () {
             $http.post('/Address/UpdateSender', { sender: $scope.package.Sender }).then(function (res) {
                 $scope.getSenders();
+                $scope.updateSenderString();
             });
         }
 
         $scope.updateSenderString = function () {
             $scope.senderIDs = [];
             angular.forEach($scope.senders, function (value, key) {
-                value.senderString = value.Name + ', ' + value.Address + ', ' + value.Phone
+                value.senderString = [value.Name, value.Address, value.Phone].join(' ');
                 $scope.senderIDs.push(value.ID);
             });
         }

@@ -342,6 +342,20 @@ namespace JYXWeb.Controllers
             return null;
         }
 
+        [HttpPost]
+        [Authorize(Users = MvcApplication.ADMIN_USERS)]
+        public async Task<ActionResult> UpdateUserType(string id, string userType)
+        {
+            var user = await UserManager.FindByIdAsync(id);
+            if (user != null)
+            {
+                user.UserType = userType;
+                await UserManager.UpdateAsync(user);
+            }
+            return null;
+        }
+
+
 
         [Authorize(Users = MvcApplication.ADMIN_USERS)]
         public ActionResult GetUsers()
@@ -355,6 +369,7 @@ namespace JYXWeb.Controllers
                     a.UserCode,
                     a.FirstName,
                     a.LastName,
+                    a.UserType,
                     a.Memo,
                     a.Id
                 }).ToList();
@@ -380,6 +395,7 @@ namespace JYXWeb.Controllers
                                   a.UserCode,
                                   a.FirstName,
                                   a.LastName,
+                                  a.UserType,
                                   a.Memo,
                                   a.Id,
                                   Balance = b == null ? 0 : b.Balance,
@@ -433,6 +449,9 @@ namespace JYXWeb.Controllers
             return Json(User.Identity.GetBalance(), JsonRequestBehavior.AllowGet);
         }
 
+        
+        public const string USER_TYPE_LOCAL = "本地客户";
+        public const string USER_TYPE_GENERAL = "普通用户";
 
         #endregion
 

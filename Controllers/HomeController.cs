@@ -33,6 +33,7 @@ namespace JYXWeb.Controllers
         {
             return View();
         }
+        
 
         #region News
 

@@ -18,14 +18,7 @@ namespace JYXWeb.Controllers
             ViewBag.angularControllerName = "goodsCtrl";
             return View();
         }
-
-        public ActionResult Upload()
-        {
-            ViewBag.angularAppName = "goodsApp";
-            ViewBag.angularControllerName = "goodsCtrl";
-            return View();
-        }
-
+        
         public ActionResult Update(Good goods)
         {
             for (var i = 0; i < goods.GoodsItems.Count; i++)
@@ -83,13 +76,13 @@ namespace JYXWeb.Controllers
                     a.Category,
                     a.Brand,
                     a.Name,
-                    GoodsItems = a.GoodsItems.Select(b => new
+                    GoodsItems = a.GoodsItems.ToList().Select(b => new
                     {
-                        b.Price,
+                        Price = b.Price,
                         b.Quantity,
                         b.Size,
                         b.Color,
-                        GoodsImages = b.GoodsImages.Select(c => new
+                        GoodsImages = b.GoodsImages.ToList().Select(c => new
                         {
                             Image = c.Image,
                         }).Take(1).ToList(),
@@ -101,8 +94,12 @@ namespace JYXWeb.Controllers
             }
         }
 
-        public ActionResult GetGoodsEntry(int id)
+        public ActionResult GetGoodsEntry(int id, bool upload = false)
         {
+            if (upload && !AppUtil.IsAdmin(User.Identity.GetUserCode()))
+            {
+                upload = false;
+            }
             using (var dataContext = new PackageDataContext())
             {
                 var goodsEntry = dataContext.Goods.Where(a => a.ID == id).SingleOrDefault();
@@ -122,7 +119,8 @@ namespace JYXWeb.Controllers
                         GoodsItems = goodsEntry.GoodsItems.Select(b => new
                         {
                             b.ID,
-                            b.Price,
+                            DiscountPrice = upload ? b.DiscountPrice : User.Identity.GetUserType() == AccountController.USER_TYPE_LOCAL ? b.DiscountPrice : b.Price,
+                            Price = upload ? b.Price : User.Identity.GetUserType() == AccountController.USER_TYPE_LOCAL ? b.DiscountPrice : b.Price,
                             b.Quantity,
                             b.Color,
                             b.Size,

@@ -69,14 +69,19 @@
                 url: '/Package?newPackage=true&holdPackage=true',
                 type: 'link',
                 icon: 'fa fa-map-marker'
-            },
-              {
-                  id: 'package-manage',
-                  name: '包裹管理',
-                  url: '/Package',
-                  type: 'link',
-                  icon: 'fa fa-plus'
-              }]
+            }, {
+                id: 'package-manage',
+                name: '包裹管理',
+                url: '/Package',
+                type: 'link',
+                icon: 'fa fa-plus'
+            }, {
+                id: 'introduction',
+                name: '转运课堂',
+                url: '/Package/Intro',
+                type: 'link',
+                icon: 'fa fa-plus'
+            }]
         });
 
         sections.push({

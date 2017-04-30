@@ -53,8 +53,10 @@ angularApp.controller('goodsCtrl', ['$scope', '$http', '$filter', '$log', '$time
             })
         };
         
-        $scope.getGoodsEntry = function (goodsEntry, callback) {
-            $http.post('/Goods/GetGoodsEntry/' + goodsEntry.ID).then(function (res) {
+        $scope.getGoodsEntry = function (goodsEntry, callback, upload) {
+            var uploadStr = '';
+            if (upload) { uploadStr = '?upload=true';}
+            $http.post('/Goods/GetGoodsEntry/' + goodsEntry.ID + uploadStr).then(function (res) {
                 $scope.goodsEntry = res.data;
                 if (callback) { callback();}
             });

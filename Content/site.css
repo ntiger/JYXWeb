@@ -218,3 +218,24 @@ md-input-container.hide-md-error-msg .md-errors-spacer:empty {
   cursor: pointer;
 }
 /****File Upload End****/
+
+
+
+md-nav-bar .md-nav-bar button span {
+    font-size: 24px;
+}
+
+md-nav-bar .md-nav-bar button.md-active span {
+    font-weight: bold;
+}
+
+md-nav-bar .md-nav-bar button.md-active {
+    border-color: #E95620;
+    color: #E95620;
+}
+
+   
+
+md-nav-bar md-nav-ink-bar {
+    background: #E95620 none repeat scroll 0 0;
+}

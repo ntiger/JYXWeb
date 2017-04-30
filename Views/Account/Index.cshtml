@@ -4,6 +4,7 @@
     var userCode = User.Identity.GetUserCode();
     var firstName = User.Identity.GetFirstName();
     var lastName = User.Identity.GetLastName();
+    var userType = User.Identity.GetUserType();
     var isAdmin = AppUtil.IsAdmin(userCode).ToString().ToLower();
 }
 
@@ -141,6 +142,7 @@
                         <th md-column md-order-by="UserName" class="text-center"><span>登录邮箱</span></th>
                         <th md-column md-order-by="LastName" class="text-center"><span>姓</span></th>
                         <th md-column md-order-by="FirstName" class="text-center"><span>名</span></th>
+                        <th md-column md-order-by="UserType" class="text-center"><span>用户类型</span></th>
                         <th md-column md-order-by="Memo" class="text-center"><span>备注</span></th>
                     </tr>
                 </thead>
@@ -161,6 +163,15 @@
                         <td md-cell>{{user.UserName}}</td>
                         <td md-cell>{{user.LastName}}</td>
                         <td md-cell>{{user.FirstName}}</td>
+                        <td md-cell>
+                            <md-input-container flex>
+                                <md-select ng-model="user.UserType" aria-label="userType"  data-ng-change="updateUserType(user)">
+                                    <md-option ng-repeat="type in userTypes track by $index" data-ng-value="type">
+                                        {{type}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                        </td>
                         <td md-cell>
                             <md-input-container class="hide-md-error-msg no-margin">
                                 <input ng-model="user.Memo" aria-label="memo" data-ng-change="updateUserMemo(user)" ng-model-options="{ updateOn: 'blur' }" />

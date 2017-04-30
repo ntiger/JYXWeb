@@ -74,6 +74,7 @@ namespace JYXWeb.Controllers
                 {
                     existingAddress.Name = address.Name;
                     existingAddress.District = address.District;
+                    existingAddress.Street = address.Street;
                     existingAddress.Phone = address.Phone;
                     existingAddress.PostCode = address.PostCode;
                     existingAddress.IDCard = address.IDCard;
