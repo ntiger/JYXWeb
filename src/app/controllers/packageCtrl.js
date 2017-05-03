@@ -76,7 +76,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             model.userName = $scope.userName;
             $http.post('/Package/SearchPackages', { criteriaStr: JSON.stringify(model) }).then(function (res) {
                 $scope.packages = res.data;
-                $scope.packagesOrder = 'ID';
+                $scope.packagesOrder = '-ID';
             });
         }
 

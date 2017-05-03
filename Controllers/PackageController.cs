@@ -99,8 +99,11 @@ namespace JYXWeb.Controllers
                                 a.Products.Where(b => b.Channel == a.Products.Max(c => c.Channel)).First().Channel1.DefaultPrice)) +
                                 (a.Weight == null ? " (预估)" : ""),
                         Disabled = a.SubStatus != "已入库" && a.SubStatus != "待入库",
-                    }).ToList();
-                return Json(packages);
+                        a.LastUpdateTime,
+                    }).OrderByDescending(a => a.LastUpdateTime).ToList();
+                var jsonResult = Json(packages);
+                jsonResult.MaxJsonLength = int.MaxValue;
+                return jsonResult;
             }
         }
 

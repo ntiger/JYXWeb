@@ -351,10 +351,15 @@ namespace JYXWeb.Util
                 sheet = templateWorkbook.CreateSheet("Sheet1");
             }
 
-            var row = 1;
+            var row = 0;
             var col = 0;
-            var dataRow = sheet.CreateRow(row);
 
+
+            var dataRow = sheet.CreateRow(row);
+            dataRow.CreateCell(col).SetCellValue("4.01");
+
+            row = 1;
+            dataRow = sheet.CreateRow(row);
 
             dataRow.CreateCell(col++).SetCellValue("序号");
             dataRow.CreateCell(col++).SetCellValue("客户编号");
@@ -366,6 +371,8 @@ namespace JYXWeb.Util
             dataRow.CreateCell(col++).SetCellValue("寄件人地址");
             dataRow.CreateCell(col++).SetCellValue("品牌");
             dataRow.CreateCell(col++).SetCellValue("中文品名");
+            dataRow.CreateCell(col++).SetCellValue("型号");
+            dataRow.CreateCell(col++).SetCellValue("容量");
             dataRow.CreateCell(col++).SetCellValue("包装");
             dataRow.CreateCell(col++).SetCellValue("数量");
             dataRow.CreateCell(col++).SetCellValue("单价(美金)");
@@ -405,6 +412,8 @@ namespace JYXWeb.Util
                 dataRow.CreateCell(col++).SetCellValue(package.Products[0].Brand);
                 dataRow.CreateCell(col++).SetCellValue(package.Products[0].Name);
                 dataRow.CreateCell(col++).SetCellValue("");
+                dataRow.CreateCell(col++).SetCellValue("");
+                dataRow.CreateCell(col++).SetCellValue("");
                 dataRow.CreateCell(col++).SetCellValue(package.Products[0].Quantity == null ? "" : package.Products[0].Quantity.ToString());
                 dataRow.CreateCell(col++).SetCellValue(package.Products[0].Price == null ? "" : package.Products[0].Price.ToString());
 
@@ -421,10 +430,12 @@ namespace JYXWeb.Util
                 foreach (var product in package.Products.Skip(1))
                 {
                     row++;
-                    col = 9;
+                    col = 8;
                     dataRow = sheet.CreateRow(row);
                     dataRow.CreateCell(col++).SetCellValue(product.Brand);
                     dataRow.CreateCell(col++).SetCellValue(product.Name);
+                    dataRow.CreateCell(col++).SetCellValue("");
+                    dataRow.CreateCell(col++).SetCellValue("");
                     dataRow.CreateCell(col++).SetCellValue("");
                     dataRow.CreateCell(col++).SetCellValue(product.Quantity == null ? "" : product.Quantity.ToString());
                     dataRow.CreateCell(col++).SetCellValue(product.Price == null ? "" : product.Price.ToString());
