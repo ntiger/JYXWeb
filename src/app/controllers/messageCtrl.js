@@ -7,7 +7,7 @@ angularApp.controller('messageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
     function ($scope, $http, $filter, $log, $timeout, $appUtil, $mdDialog, $menu) {
         $scope.$appUtil = $appUtil;
         $scope.messageCategories = ['系统问题', '清关问题', '包裹入库', '包裹出库', '充值问题', '其他问题'];
-        $scope.messageStatusList = ['待回复', '已回复', '已解决', '全部'];
+        $scope.messageStatusList = ['待回复', '已回复', '已解决', '新消息', '全部'];
         $scope.defaultStatus = $scope.messageStatusList[0];
         $scope.messageStatus = $scope.messageStatusList[3];
         
@@ -37,12 +37,15 @@ angularApp.controller('messageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         }
 
         $scope.closeMessage = function () {
-            $http.get('/Message/CloseMessage/' + $scope.message.ID).then(function (res) {
-                $scope.message.Status = '已解决';
-                angular.forEach($scope.messages, function (value) {
-                    if (value.ID === $scope.message.ID) {
-                        value.Status = '已解决'
-                    }
+            $appUtil.appConfirm(ev, '', '您的问题已经解决了？如果没有解决请写明原因，我们会尽快答复。', '是的', '还没', function () {
+                $http.get('/Message/CloseMessage/' + $scope.message.ID).then(function (res) {
+                    $scope.message.Status = '已解决';
+                    angular.forEach($scope.messages, function (value) {
+                        if (value.ID === $scope.message.ID) {
+                            value.Status = '已解决'
+                        }
+                    });
+                    $('#messageModal').model('hide');
                 });
             });
         }

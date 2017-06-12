@@ -131,33 +131,47 @@ namespace JYXWeb.Util
         public static Image GetBarcodeImage(string id)
         {
             var checksum = Code128Checksum.Instance;
-            var barcode = new Code128BarcodeDraw(checksum).Draw(id, 80, 3);
+            var barcode = new Code128BarcodeDraw(checksum).Draw(id, 50, 2);
             return barcode;
         }
 
 
         #region External Request
 
-        public static void SubmitUrlAsync(string url)
+        public static void SubmitUrlAsync(string url, Dictionary<string, string> headerParams = null)
         {
-            Task.Factory.StartNew(() => SubmitUrlPrivate(url));
+            Task.Factory.StartNew(() => SubmitUrlPrivate(url, headerParams));
         }
 
-        public static string SubmitUrl(string url)
+        public static string SubmitUrl(string url, Dictionary<string, string> headerParams = null)
         {
-            return SubmitUrlPrivate(url);
+            return SubmitUrlPrivate(url, headerParams);
         }
 
-        private static string SubmitUrlPrivate(string url)
+        private static string SubmitUrlPrivate(string url, Dictionary<string, string> headerParams)
         {
             string responsebody;
             using (var webClient = new WebClient())
             {
+                if (headerParams != null)
+                {
+                    foreach (var keyValue in headerParams)
+                    {
+                        webClient.Headers.Add(keyValue.Key, keyValue.Value);
+                    }
+                }
                 try
                 {
                     using (var stream = webClient.OpenRead(url))
                     {
-                        responsebody = new StreamReader(stream).ReadToEnd();
+                        if (webClient.ResponseHeaders["Content-Type"] != null && webClient.ResponseHeaders["Content-Type"].ToUpper().Contains("GB2312"))
+                        {
+                            responsebody = new StreamReader(stream, Encoding.GetEncoding("GB2312")).ReadToEnd();
+                        }
+                        else
+                        {
+                            responsebody = new StreamReader(stream).ReadToEnd();
+                        }
                     }
                 }
                 catch (Exception)

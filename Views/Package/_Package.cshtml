@@ -58,7 +58,9 @@
     <md-input-container md-no-float class="md-block hide-md-error-msg">
         <label>请选择收货地址</label>
         <md-select ng-model="package.Address" ng-model-options="{trackBy: '$value.ID'}">
-            <md-option ng-repeat="address in addresses track by $index" data-ng-value="address" md-on-close="updateAddressString()">
+            <md-option ng-repeat="address in addresses track by $index" data-ng-value="address" 
+                       ng-hide="address.DoNotDisplay&&address.ID!=package.Address.ID"
+                       md-on-close="updateAddressString()">
                 {{address.addressString}}
             </md-option>
         </md-select>

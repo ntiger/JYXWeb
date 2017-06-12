@@ -67,7 +67,7 @@ namespace JYXWeb.Util
         public static IList<string[]> GetTrackingInfo(string id)
         {
             var trackingInfo = new List<string[]>();
-            var trackingRawHtml = AppUtil.SubmitUrl(TRACKING_URL + id);
+            var trackingRawHtml = AppUtil.SubmitUrl(TRACKING_URL + id, new Dictionary<string, string> { { "Referer", "http://www.expresstochina.com/UserCenter/YunDanList.aspx" } });
             var doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(trackingRawHtml);
 

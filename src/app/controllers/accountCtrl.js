@@ -52,7 +52,7 @@ angularApp.controller('accountCtrl', function ($scope, $http, $filter, $log, $ti
 
     $scope.query = {
         order: 'UserCode',
-        limit: 10,
+        limit: 20,
         page: 1
     };
 

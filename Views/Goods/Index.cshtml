@@ -36,14 +36,14 @@
     <div class="row" style="">
         <div class="col-xs-6 col-md-3" ng-repeat="g in goods track by $index">
             <a href="" ng-click="showDetail($event, g)" >
-                <img ng-src="{{g.GoodsItems[0].GoodsImages[0].Image}}" 
+                <img ng-src="{{g.Image}}" 
                      style="width:100%;height:auto;display:block" class="md-card-image" alt="Washed Out">
             </a>
             <h3>{{g.Brand}} {{g.Name}}</h3>
             <p>
                 库存: 
-                <span ng-show="!isAdmin">{{g.GoodsItems|sumByKey:'Quantity'}}</span>
-                <a ng-show="isAdmin" href="" ng-click="getGoodsEntry(g, showUpload, true)">{{g.GoodsItems|sumByKey:'Quantity'}}</a>
+                <span ng-show="!isAdmin">{{g.Quantity}}</span>
+                <a ng-show="isAdmin" href="" ng-click="getGoodsEntry(g, showUpload, true)">{{g.Quantity}}</a>
             </p>
         </div>
     </div>

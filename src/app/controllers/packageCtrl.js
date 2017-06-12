@@ -74,7 +74,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             model.tracking = $scope.tracking;
             model.userCode = $scope.userCode;
             model.userName = $scope.userName;
-            $http.post('/Package/SearchPackages', { criteriaStr: JSON.stringify(model) }).then(function (res) {
+            $http.post('/Package/SearchPackages?nocache=' + new Date().getTime(), { criteriaStr: JSON.stringify(model) }).then(function (res) {
                 $scope.packages = res.data;
                 $scope.packagesOrder = '-ID';
             });
@@ -125,6 +125,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         }
     
         $scope.trackPackage = function (code) {
+            $scope.trackingPackage = code;
             $http.get('/Package/Tracking/' + code).then(function (res) {
                 $scope.trackings = res.data;
                 $('#trackingModal').modal('show');
@@ -251,7 +252,9 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 pkg = $scope.package;
 
                 angular.forEach(pkg.Products, function (value, key) {
-                    value.Tracking = pkg.Tracking;
+                    if (typeof value.Tracking === 'undefined' || value.Tracking === null) {
+                        value.Tracking = pkg.Tracking;
+                    }
                     value.OrderNumber = pkg.OrderNumber;
                     value.Notes = pkg.Notes;
                 });
@@ -287,7 +290,6 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         }
 
         // Address
-
         $scope.showAddressManager = function (newAddress) {
             $('#addressModal').modal({
                 backdrop: 'static',
@@ -322,7 +324,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 $http.post('/Address/GetAddresses/' + $scope.package.Address.ID).then(function (res) {
                     $scope.addresses = res.data;
                     if (typeof $scope.package.Address.ID === 'undefined' && $scope.addresses.length > 0) {
-                        $scope.package.Address = $scope.addresses[0];
+                        $scope.package.Address = {};
                     }
                     if (typeof id !== 'undefined') {
                         angular.forEach($scope.addresses, function (value) {
@@ -331,6 +333,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                             }
                         });
                     }
+
                     $scope.updateAddressString();
                 });
             }
@@ -394,7 +397,6 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
 
 
         // Sender
-
         $scope.showSenderManager = function (newSender) {
             $('#senderModal').modal({
                 backdrop: 'static',

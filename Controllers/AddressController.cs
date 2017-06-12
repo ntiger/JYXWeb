@@ -43,6 +43,7 @@ namespace JYXWeb.Controllers
                     a.Phone,
                     a.PostCode,
                     a.IDCard,
+                    a.DoNotDisplay,
                     AddressIDCardImages = a.AddressIDCardImages.Select(b => new
                     {
                         b.Image
@@ -78,6 +79,7 @@ namespace JYXWeb.Controllers
                     existingAddress.Phone = address.Phone;
                     existingAddress.PostCode = address.PostCode;
                     existingAddress.IDCard = address.IDCard;
+                    existingAddress.DoNotDisplay = address.DoNotDisplay;
                     existingAddress.IsDefault = address.IsDefault;
                     packageDataContext.AddressIDCardImages.DeleteAllOnSubmit(existingAddress.AddressIDCardImages);
                     existingAddress.AddressIDCardImages.Clear();

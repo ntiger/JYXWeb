@@ -79,11 +79,11 @@ namespace JYXWeb.Controllers
                     a.LastUpdateTime >= startDate && a.LastUpdateTime <= endDate &&
                     (packageCode == "" || packageCode == a.ID) &&
                     (status == null || status == "全部" || (!isAdmin && status == a.Status || isAdmin && status == a.SubStatus)) &&
-                    (receiver == "" || receiver == a.Address.Name) &&
+                    (receiver == "" || a.Address!=null && receiver == a.Address.Name) &&
                     (tracking == "" || a.Products.Where(b => b.Tracking == tracking).Count() > 0)).Select(a => new
                     {
                         a.ID,
-                        Tracking = String.Join(";", a.Products.Select(b => b.Tracking).Distinct()),
+                        Tracking = String.Join("; ", a.Products.Select(b => b.Tracking).Distinct()),
                         Receiver = a.Address == null ? "" : a.Address.Name,
                         AddressID = a.AddressID == null ? "" : a.AddressID.ToString(),
                         ProductNames = String.Join(", ", a.Products.Select(b => b.Name + " * " + b.Quantity)),
@@ -117,9 +117,9 @@ namespace JYXWeb.Controllers
                     var newObj = new
                     {
                         package.ID,
-                        OrderNumber = string.Join(";", package.Products.Select(a => a.OrderNumber).Distinct()),
-                        Tracking = string.Join(";", package.Products.Select(a => a.Tracking).Distinct()),
-                        Notes = string.Join(";", package.Products.Select(a => a.Notes).Distinct()),
+                        OrderNumber = string.Join("; ", package.Products.Select(a => a.OrderNumber).Distinct()),
+                        Tracking = string.Join("; ", package.Products.Select(a => a.Tracking).Distinct()),
+                        Notes = string.Join("; ", package.Products.Select(a => a.Notes).Distinct()),
                         package.Status,
                         package.UserCode,
                         package.SubStatus,
@@ -171,7 +171,7 @@ namespace JYXWeb.Controllers
             using (var packageDataConext = new PackageDataContext())
             {
                 var packages = packageDataConext.Packages.Where(a => a.UserCode == User.Identity.GetUserCode()).ToList();
-                if (packages.Select(a => String.Join(";", a.Products.Select(b => b.Tracking).Distinct())).Contains(id))
+                if (packages.Select(a => String.Join("; ", a.Products.Select(b => b.Tracking).Distinct())).Contains(id))
                 {
                     return Json("exist", JsonRequestBehavior.AllowGet);
                 }
@@ -201,11 +201,11 @@ namespace JYXWeb.Controllers
                         {
                             var channelNumber = package.Products.Max(c => c.Channel);
                             var channel = packageDataConext.Channels.Where(a => a.ID == channelNumber).First();
-                            var assignedUnitPrice = channel.Pricings.Where(c => c.UserCode == package.UserCode).Select(c => c.Price).SingleOrDefault();
+                            var assignedUnitPrice = channel.Pricings.Where(c => c.UserCode == package.UserCode.Trim().ToUpper()).Select(c => c.Price).SingleOrDefault();
                             unitPrice = assignedUnitPrice ?? channel.DefaultPrice.Value;
                         }
                         package.Cost = package.Cost ?? RoundPackageWeight(package.Weight.Value) * unitPrice;
-                        new TransactionController().SaveTransaction(package.UserCode,
+                        new TransactionController().SaveTransaction(package.UserCode.Trim().ToUpper(),
                             TransactionController.TRANSACTION_TYPE_EXPENSE_SHIPPING, package.Cost * -1 ?? 0, package.ID);
                     }
                     // 出库扣款 End
@@ -228,6 +228,7 @@ namespace JYXWeb.Controllers
                 {
                     package.ID = GeneratePackageCode();
                     package.UserCode = package.UserCode ?? User.Identity.GetUserCode();
+                    package.UserCode = package.UserCode.Trim().ToUpper();
                     if (package.Sender != null)
                     {
                         package.Sender = packageDataConext.Senders.Where(a => a.ID == package.Sender.ID).SingleOrDefault();
@@ -276,7 +277,7 @@ namespace JYXWeb.Controllers
                 newPackage.LastUpdateTime = DateTime.Now;
                 newPackage.WeightEst = packages.Max(a => a.WeightEst ?? 2);
                 newPackage.ID = GeneratePackageCode();
-                newPackage.UserCode = User.Identity.GetUserCode();
+                newPackage.UserCode = packages[0].UserCode;
                 packageDataConext.Packages.InsertOnSubmit(newPackage);
                 packageDataConext.Packages.DeleteAllOnSubmit(packages);
                 packageDataConext.SubmitChanges();
@@ -305,6 +306,14 @@ namespace JYXWeb.Controllers
         [AllowAnonymous]
         public ActionResult Tracking(string id)
         {
+            using (var dataContext = new PackageDataContext())
+            {
+                var package = dataContext.Packages.Where(a => a.ID == id).SingleOrDefault();
+                if (package.Products.Where(a => a.OrderNumber != null && a.OrderNumber.IndexOf("HM") == 0).Count() > 0)
+                {
+                    return Json(HMUtil.GetTrackingInfo(package.Products.Where(a => a.OrderNumber.IndexOf("HM") == 0).Select(a => a.OrderNumber).FirstOrDefault()), JsonRequestBehavior.AllowGet);
+                }
+            }
             return Json(TMUtil.GetTrackingInfo(id), JsonRequestBehavior.AllowGet);
         }
 
@@ -398,7 +407,7 @@ namespace JYXWeb.Controllers
 
 
                     gfx.DrawImage(barcodeImg, x, y);
-                    y += barcodeImg.Height - offset;
+                    y += barcodeImg.Height - 10;
 
                     var tf = new XTextFormatter(gfx);
                     tf.Alignment = XParagraphAlignment.Left;
@@ -489,6 +498,7 @@ namespace JYXWeb.Controllers
 
         public double RoundPackageWeight(double weight)
         {
+            if (weight < 2) { return 2; }
             return Math.Floor(weight) + (weight - Math.Floor(weight) > 0.1 ? 1 : 0);
         }
 

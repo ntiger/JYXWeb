@@ -70,23 +70,14 @@ namespace JYXWeb.Controllers
         {
             using (var dataContext = new PackageDataContext())
             {
-                var goods = dataContext.Goods.Where(a => category == "所有商品" || a.Category == category).ToList().Select(a => new
+                var goods = dataContext.Goods.Where(a => category == "所有商品" || a.Category == category).Select(a => new
                 {
                     a.ID,
                     a.Category,
                     a.Brand,
                     a.Name,
-                    GoodsItems = a.GoodsItems.ToList().Select(b => new
-                    {
-                        Price = b.Price,
-                        b.Quantity,
-                        b.Size,
-                        b.Color,
-                        GoodsImages = b.GoodsImages.ToList().Select(c => new
-                        {
-                            Image = c.Image,
-                        }).Take(1).ToList(),
-                    }).ToList(),
+                    Quantity = a.GoodsItems.Sum(b => b.Quantity),
+                    Image = a.GoodsItems.First().GoodsImages.First().Image,
                 }).OrderBy(a => a.Category).ToList();
                 var result = Json(goods);
                 result.MaxJsonLength = int.MaxValue;
