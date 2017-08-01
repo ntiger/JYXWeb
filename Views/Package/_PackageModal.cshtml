@@ -6,9 +6,30 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <md-input-container class="hide-md-error-msg pull-right no-margin" data-ng-show="isAdmin">
-                    <input ng-model="package.UserCode" aria-label="userCode" />
+                    <input ng-model="package.UserCode" aria-label="userCode" placeholder="用户编码" />
                 </md-input-container>
-                <h4 class="modal-title">{{package.ID===undefined?'添加新':'修改'}}包裹</h4>
+                <md-input-container class="hide-md-error-msg pull-right no-margin" data-ng-show="isAdmin">
+                    <input ng-model="package.ID" aria-label="id" placeholder="单号" />
+                </md-input-container>
+                <md-input-container class="hide-md-error-msg pull-right no-margin" data-ng-show="isAdmin">
+                    <input ng-model="package.IDOther" aria-label="idOther" placeholder="隐藏单号" />
+                </md-input-container>
+                
+                
+                <h4 class="modal-title">
+                    <span class="pull-left">
+                        {{package.ID===undefined?'添加新':'修改'}}包裹
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span>
+                </h4>
+                <md-input-container class="md-block no-margin pull-left">
+                    <label>选择渠道</label>
+                    <md-select ng-model="package.Channel">
+                        <md-option ng-repeat="channel in channelList track by $index" data-ng-value="channel">
+                            {{channel}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
             </div>
             <div class="modal-body">
                 @Html.Partial("_Package")

@@ -1,9 +1,9 @@
 ﻿<div layout-gt-sm="row" style="max-width:1200px">
-    <md-input-container class="md-block" flex>
+    <md-input-container class="md-block" flex ng-hide="local">
         <label>包裹追踪号 (Tracking #)</label>
         <input ng-model="package.Tracking">
     </md-input-container>
-    <md-input-container class="md-block" flex>
+    <md-input-container class="md-block" flex ng-hide="local">
         <label>订单号 (Order #, 可不填)</label>
         <input ng-model="package.OrderNumber">
     </md-input-container>

@@ -20,7 +20,10 @@ namespace JYXWeb.Util
 
         public const string KEY = "xiaoyangAPi";
         public const string PASS = "fOFCxjKnEtCrw4TPB7v0kATE5b3Iiy9j";
-        
+
+        public const string TRACKING_URL = "http://www.takeex.com/track.html";
+        public const string TRACKING_HEADER_REFERER = "http://www.takeex.com/";
+
         #endregion
 
         public string YDRequest(string jsonString)
@@ -56,6 +59,22 @@ namespace JYXWeb.Util
                 }
                 return sb.ToString();
             }
+        }
+
+        public static IList<string[]> GetTrackingInfo(string id)
+        {
+            var trackingInfo = new List<string[]>();
+            var paramsDict = new Dictionary<string, string>() { { "data", id }, };
+            var trackingRawHtmlBytes = AppUtil.PostUrl(TRACKING_URL, paramsDict,
+                new Dictionary<string, string> { { "Referer", TRACKING_HEADER_REFERER } });
+            var responseJsonString = Encoding.UTF8.GetString(trackingRawHtmlBytes);
+            dynamic trackingJson = new System.Web.Script.Serialization.JavaScriptSerializer().Deserialize<object>(responseJsonString);
+            foreach (var data in trackingJson["data"][0])
+            {
+                trackingInfo.Insert(trackingInfo.Count > 0 ? 1 : 0, new string[] { data["date"].Replace("速佳快递", "美天优递"), data["info"].Replace("速佳", "").Replace("韵达", "") });
+            }
+
+            return trackingInfo;
         }
     }
 

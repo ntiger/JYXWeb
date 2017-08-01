@@ -213,5 +213,5 @@ angularApp.controller('goodsCtrl', ['$scope', '$http', '$filter', '$log', '$time
         vm.toggleOpen = function (section) {
             $menu.toggleSelectSection(section);
         }
-        $menu.toggleSelectSection($menu.sections[1]);
+        $menu.openedSection = $menu.sections[2];
     }]);

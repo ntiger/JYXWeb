@@ -117,6 +117,7 @@ namespace JYXWeb.Controllers
                     var newObj = new
                     {
                         package.ID,
+                        OriginalID = package.ID,
                         OrderNumber = string.Join("; ", package.Products.Select(a => a.OrderNumber).Distinct()),
                         Tracking = string.Join("; ", package.Products.Select(a => a.Tracking).Distinct()),
                         Notes = string.Join("; ", package.Products.Select(a => a.Notes).Distinct()),
@@ -126,6 +127,8 @@ namespace JYXWeb.Controllers
                         package.WeightEst,
                         package.Weight,
                         package.Cost,
+                        package.IDOther,
+                        package.Channel,
                         Sender = package.SenderID == null ? null :new {
                             package.Sender.ID,
                             package.Sender.Name,
@@ -140,6 +143,7 @@ namespace JYXWeb.Controllers
                             CityName = package.Address.District1.District1.Name,
                             City = package.Address.District1.District1.ID,
                             DistrictName = package.Address.District1.Name,
+                            package.Address.IDCard,
                             package.Address.District,
                             package.Address.Street,
                             package.Address.Name,
@@ -179,6 +183,19 @@ namespace JYXWeb.Controllers
             return Json("not exist", JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult CheckPackageID(string id)
+        {
+            using (var packageDataConext = new PackageDataContext())
+            {
+                var packages = packageDataConext.Packages.Where(a => a.ID == id).ToList();
+                if (packages.Count > 0)
+                {
+                    return Json("exist", JsonRequestBehavior.AllowGet);
+                }
+            }
+            return Json("not exist", JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult UpdatePackage(Package package)
         {
             using (var packageDataConext = new PackageDataContext())
@@ -210,6 +227,7 @@ namespace JYXWeb.Controllers
                     }
                     // 出库扣款 End
 
+                    existingPackage.Channel = package.Channel;
                     existingPackage.AddressID = package.AddressID;
                     existingPackage.SenderID = package.SenderID;
                     existingPackage.Status = package.Status;
@@ -220,13 +238,17 @@ namespace JYXWeb.Controllers
                     packageDataConext.Products.DeleteAllOnSubmit(existingPackage.Products);
                     existingPackage.Products.Clear();
                     existingPackage.Products.AddRange(package.Products);
+                    existingPackage.IDOther = package.IDOther;
                     existingPackage.LastUpdateTime = DateTime.Now;
                     existingPackage.LastUpdateUser = User.Identity.Name;
                     packageDataConext.SubmitChanges();
                 }
                 else
                 {
-                    package.ID = GeneratePackageCode();
+                    if (package.ID == null || package.ID == "")
+                    {
+                        package.ID = GeneratePackageCode();
+                    }
                     package.UserCode = package.UserCode ?? User.Identity.GetUserCode();
                     package.UserCode = package.UserCode.Trim().ToUpper();
                     if (package.Sender != null)
@@ -309,9 +331,20 @@ namespace JYXWeb.Controllers
             using (var dataContext = new PackageDataContext())
             {
                 var package = dataContext.Packages.Where(a => a.ID == id).SingleOrDefault();
-                if (package.Products.Where(a => a.OrderNumber != null && a.OrderNumber.IndexOf("HM") == 0).Count() > 0)
+                if (package != null)
                 {
-                    return Json(HMUtil.GetTrackingInfo(package.Products.Where(a => a.OrderNumber.IndexOf("HM") == 0).Select(a => a.OrderNumber).FirstOrDefault()), JsonRequestBehavior.AllowGet);
+                    if (package.IDOther != null && package.IDOther.IndexOf("FH") == 0)
+                    {
+                        return Json(MFUtil.GetTrackingInfo(package.IDOther), JsonRequestBehavior.AllowGet);
+                    }
+                    if (package.ID.IndexOf("MT") == 0)
+                    {
+                        return Json(YDUtil.GetTrackingInfo(id), JsonRequestBehavior.AllowGet);
+                    }
+                    if (package.Products.Where(a => a.OrderNumber != null && a.OrderNumber.IndexOf("HM") == 0).Count() > 0)
+                    {
+                        return Json(HMUtil.GetTrackingInfo(package.Products.Where(a => a.OrderNumber.IndexOf("HM") == 0).Select(a => a.OrderNumber).FirstOrDefault()), JsonRequestBehavior.AllowGet);
+                    }
                 }
             }
             return Json(TMUtil.GetTrackingInfo(id), JsonRequestBehavior.AllowGet);
@@ -362,7 +395,7 @@ namespace JYXWeb.Controllers
                 var pdfContent = AppUtil.PostUrl("http://65.182.182.141:8888/Package/PrintPackagesPDF", paramDict);
 
                 string fileName = "package.pdf";
-                return File((byte[])pdfContent, AppUtil.GetContentType(fileName), fileName);
+                return File(pdfContent, AppUtil.GetContentType(fileName), fileName);
             }
         }
 
@@ -469,7 +502,7 @@ namespace JYXWeb.Controllers
             var code = "";
             using (var packageDataContext = new PackageDataContext())
             {
-                var maxCode = packageDataContext.Packages.Select(a => a.ID).Max(a => a);
+                var maxCode = packageDataContext.Packages.Select(a => a.ID).Where(a => a.Contains("TM")).Max(a => a);
                 code = "TM" + (long.Parse(maxCode.Replace("TM", "")) + 1);
             }
             return code;

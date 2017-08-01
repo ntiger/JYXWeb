@@ -25,6 +25,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         $scope.endDate = new Date();
         $scope.statusList = ['全部', '待入库', '已入库', '已出库', '空运中', '清关中', '国内转运', '待退货', '已退货', '问题件'];
         $scope.statusListAdmin = ['全部', '待入库', '确认发货(未到货)', '已入库', '未预报', '确认发货(已到货)', '已出库', '空运中', '清关中', '国内转运', '待退货', '已退货', '问题件'];
+        $scope.channelList = ['身份证渠道', '无身份证渠道', '混装渠道'];
         $scope.statusDict = {};
         for (var i = 0; i < $scope.statusListAdmin.length; i++) {
             $scope.statusDict[$scope.statusListAdmin[i]] = $scope.statusListAdmin[i];
@@ -74,6 +75,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             model.tracking = $scope.tracking;
             model.userCode = $scope.userCode;
             model.userName = $scope.userName;
+            $scope.selectedPackages = [];
             $http.post('/Package/SearchPackages?nocache=' + new Date().getTime(), { criteriaStr: JSON.stringify(model) }).then(function (res) {
                 $scope.packages = res.data;
                 $scope.packagesOrder = '-ID';
@@ -265,12 +267,21 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 pkg.OrderNumber = pkg.Products.map(function (product) { return product.OrderNumber; }).filter(function (value, index, self) { return self.indexOf(value) === index; }).join(';');
                 pkg.Notes = pkg.Products.map(function (product) { return product.Notes; }).filter(function (value, index, self) { return self.indexOf(value) === index; }).join(';');
             }
-            if (typeof pkg.Tracking === 'undefined' || pkg.Tracking === '') {
+
+            if (typeof pkg.Channel === 'undefined' || pkg.Channel === '') {
+                alert('请选择渠道');
+                return;
+            }
+            if (pkg.Channel === $scope.channelList[0] && !$appUtil.checkIDCard(pkg.Address.IDCard)) {
+                alert('收货地址身份证输入有误，请检查');
+                return;
+            }
+            if (!$scope.local && (typeof pkg.Tracking === 'undefined' || pkg.Tracking === '')) {
                 alert('请输入包裹追踪号再保存.')
                 return;
             }
 
-            if (typeof pkg.ID === 'undefined') {
+            if (typeof pkg.ID === 'undefined' || pkg.ID === '') {
                 $http.post('/Package/CheckTracking/' + pkg.Tracking).then(function (res) {
                     if (res.data === 'exist') { $appUtil.appAlert(null, '', '此包裹追踪号已存在，请输入其他追踪号'); return; }
                     $('#packageModal').modal('hide');
@@ -281,10 +292,13 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 });
             }
             else {
-                $('#packageModal').modal('hide');
-                pkg.Status = $scope.statusDict[pkg.SubStatus];
-                $http.post('/Package/UpdatePackage', { package: pkg }).then(function (res) {
-                    $scope.refreshPackages();
+                $http.post('/Package/CheckPackageID/' + pkg.ID).then(function (res) {
+                    if (res.data === 'exist' && pkg.ID !== pkg.OriginalID) { $appUtil.appAlert(null, '', '此单号已存在，请输入其他单号'); return; }
+                    $('#packageModal').modal('hide');
+                    pkg.Status = $scope.statusDict[pkg.SubStatus];
+                    $http.post('/Package/UpdatePackage', { package: pkg }).then(function (res) {
+                        $scope.refreshPackages();
+                    });
                 });
             }
         }

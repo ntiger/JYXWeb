@@ -55,6 +55,13 @@
         var sections = [];
         sections.push({
             id: 'package',
+            name: '在线制单',
+            type: 'link',
+            url: '/Package?newPackage=true&local=true',
+            icon: 'fa fa-group',
+        });
+        sections.push({
+            id: 'package',
             name: '我要转运',
             type: 'toggle',
             pages: [{
@@ -128,7 +135,7 @@
 
         return self = {
             sections: sections,
-            openedSection: sections[0],
+            openedSection: sections[1],
             toggleSelectSection: function (section) {
                 self.openedSection = (self.openedSection === section ? null : section);
             },

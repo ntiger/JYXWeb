@@ -184,21 +184,28 @@ namespace JYXWeb.Util
         }
 
 
-        public static void PostUrlAsync(string url, IDictionary<string, string> keyValuePairs)
+        public static void PostUrlAsync(string url, IDictionary<string, string> keyValuePairs, Dictionary<string, string> headerParams = null)
         {
-            Task.Factory.StartNew(() => PostUrlPrivate(url, keyValuePairs));
+            Task.Factory.StartNew(() => PostUrlPrivate(url, keyValuePairs,headerParams));
         }
 
-        public static object PostUrl(string url, IDictionary<string, string> keyValuePairs)
+        public static byte[] PostUrl(string url, IDictionary<string, string> keyValuePairs, Dictionary<string, string> headerParams = null)
         {
-            return PostUrlPrivate(url, keyValuePairs);
+            return PostUrlPrivate(url, keyValuePairs, headerParams);
         }
 
-        private static object PostUrlPrivate(string url, IDictionary<string, string> keyValuePairs)
+        private static byte[] PostUrlPrivate(string url, IDictionary<string, string> keyValuePairs, Dictionary<string, string> headerParams = null)
         {
-            object responsebody;
+            byte[] responsebody;
             using (var webClient = new WebClient())
             {
+                if (headerParams != null)
+                {
+                    foreach (var keyValue in headerParams)
+                    {
+                        webClient.Headers.Add(keyValue.Key, keyValue.Value);
+                    }
+                }
                 try
                 {
                     System.Collections.Specialized.NameValueCollection reqparm = new System.Collections.Specialized.NameValueCollection();
@@ -214,7 +221,7 @@ namespace JYXWeb.Util
                 }
                 catch (Exception e)
                 {
-                    responsebody = "Error";
+                    responsebody = Encoding.UTF8.GetBytes("Error");
                     Console.WriteLine(e.Message);
                 }
             }

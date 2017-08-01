@@ -4,10 +4,11 @@
     var userCode = User.Identity.GetUserCode();
     var isAdmin = AppUtil.IsAdmin(userCode).ToString().ToLower();
     var newPackage = Request.Params["newPackage"] ?? "false";
+    var local = Request.Params["local"] ?? "false";
     var holdPackage = Request.Params["holdPackage"] ?? "true";
     var status = Request.Params["status"] ?? "全部";
 }
-<div data-ng-init="isAdmin=@isAdmin;userCode='@userCode';newPackage=@newPackage;holdPackage=@holdPackage;status='@status';init(newPackage?addPackage:'');" ng-cloak layout="column">
+<div data-ng-init="isAdmin=@isAdmin;userCode='@userCode';newPackage=@newPackage;holdPackage=@holdPackage;local=@local;status='@status';init(newPackage?addPackage:'');" ng-cloak layout="column">
     <div layout-gt-sm="row">
         <md-input-container class="md-block hide-md-error-msg">
             <md-datepicker ng-model="startDate" md-placeholder="Enter start date"></md-datepicker>
@@ -135,5 +136,5 @@
     @Html.Partial("_AddressModal")
     @Html.Partial("_SenderModal")
     @Html.Partial("_TrackingModal")
-    <script src="~/src/app/controllers/packageCtrl.js?0.1.3"></script>
+    <script src="~/src/app/controllers/packageCtrl.js?0.1.6"></script>
 }

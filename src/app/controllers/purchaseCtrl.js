@@ -130,5 +130,5 @@ angularApp.controller('purchaseCtrl', ['$scope', '$http', '$filter', '$log', '$t
         vm.toggleOpen = function (section) {
             $menu.toggleSelectSection(section);
         }
-        $menu.toggleSelectSection($menu.sections[1]);
+        $menu.openedSection = $menu.sections[2];
     }]);

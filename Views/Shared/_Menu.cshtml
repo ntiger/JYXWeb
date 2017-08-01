@@ -1,4 +1,5 @@
-﻿<div class="navbar navbar-default navbar-fixed-top">
+﻿@using JYXWeb.Util
+<div class="navbar navbar-default navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -22,13 +23,16 @@
                         <li role="presentation">@Html.ActionLink("转运课堂", "Intro", "Package")</li>
                     </ul>
                 </li>
+                @if (User != null && User.Identity.Name != ""&&User.Identity.GetUserType()== "本地客户")
+                {
                 <li class="dropdown-submenu">
                     <a href="#">代购助手</a>
-                <ul class="dropdown-menu">
-                    <li role="presentation">@Html.ActionLink("商品列表", "Index", "Goods")</li>
-                    <li role="presentation">@Html.ActionLink("代刷购物", "Index", "Purchase")</li>
-                </ul>
-            </li>
+                    <ul class="dropdown-menu">
+                        <li role="presentation">@Html.ActionLink("商品列表", "Index", "Goods")</li>
+                        <li role="presentation">@Html.ActionLink("代刷购物", "Index", "Purchase")</li>
+                    </ul>
+                </li>
+                }
                 <li>@Html.ActionLink("渠道说明", "Service", "Home")</li>
                 <li>@Html.ActionLink("公司简介", "About", "Home")</li>
  @*               <li>@Html.ActionLink("联系我们", "Contact", "Home")</li>*@
