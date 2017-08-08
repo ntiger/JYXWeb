@@ -239,3 +239,7 @@ md-nav-bar .md-nav-bar button.md-active {
 md-nav-bar md-nav-ink-bar {
     background: #E95620 none repeat scroll 0 0;
 }
+
+.fileinput-button .md-errors-spacer{
+    display:none;
+}

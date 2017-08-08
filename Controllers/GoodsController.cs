@@ -196,7 +196,7 @@ namespace JYXWeb.Controllers
                         existingRecord.GoodsItem.Quantity += existingRecord.Quantity;
                         if (existingRecord.GoodsItem.Price != null && order.Quantity != null)
                         {
-                            new TransactionController().SaveTransaction(order.ID.Substring(0, 6), TransactionController.TRANSACTION_TYPE_REFUND_GOODS, existingRecord.GoodsItem.Price.Value * order.Quantity.Value, "取消代购订单:" + existingRecord.ID);
+                            new TransactionController().SaveTransaction(order.ID.Substring(0, User.Identity.GetUserCode().Length), TransactionController.TRANSACTION_TYPE_REFUND_GOODS, existingRecord.GoodsItem.Price.Value * order.Quantity.Value, "取消代购订单:" + existingRecord.ID);
                         }
                     }
                 }
@@ -212,7 +212,7 @@ namespace JYXWeb.Controllers
                     order.GoodsItem.Quantity -= order.Quantity;
                     if (order.GoodsItem.Price != null && order.Quantity != null)
                     {
-                        new TransactionController().SaveTransaction(order.ID.Substring(0, 6), TransactionController.TRANSACTION_TYPE_EXPENSE_GOODS, -1 * order.GoodsItem.Price.Value * order.Quantity.Value, "代购订单:" + order.ID);
+                        new TransactionController().SaveTransaction(order.ID.Substring(0, userCode.Length), TransactionController.TRANSACTION_TYPE_EXPENSE_GOODS, -1 * order.GoodsItem.Price.Value * order.Quantity.Value, "代购订单:" + order.ID);
                     }
                 }
                 dataContext.SubmitChanges();

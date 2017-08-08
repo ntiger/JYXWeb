@@ -56,8 +56,16 @@
     <md-input-container class="md-block">
         <md-button class="md-raised md-warn" ng-click="addPackage($event)">新增包裹</md-button>
         <md-button class="md-raised md-warn" data-ng-disabled="selectedPackages.length<2" ng-click="combinePackages($event)">合箱</md-button>
-        <md-button class="md-raised md-warn" data-ng-if="isAdmin" data-ng-disabled="selectedPackages.length<1" ng-click="export($event)">导出</md-button>
         <md-button class="md-raised md-warn" data-ng-disabled="selectedPackages.length<1" ng-click="print($event)">打印</md-button>
+        <md-button class="md-raised md-warn" data-ng-if="isAdmin" data-ng-disabled="selectedPackages.length<1" ng-click="export($event)">导出</md-button>
+        <md-input-container data-ng-show="isAdmin">
+            <label>导出模板</label>
+            <md-select ng-model="exportTemplate">
+                <md-option ng-repeat="t in exportTemplates track by $index" data-ng-value="t">
+                    {{t}}
+                </md-option>
+            </md-select>
+        </md-input-container>
     </md-input-container>
     <div layout="column">
         <md-table-container>

@@ -14,7 +14,7 @@ namespace JYXWeb.Util
 {
     public class AppUtil
     {
-        public static string GenerateUserCode(int size = 6)
+        public static string GenerateUserCode(int size = 5)
         {
             string input = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             Random random = new Random();
@@ -25,7 +25,7 @@ namespace JYXWeb.Util
 
         public static bool IsAdmin(string userCode)
         {
-            if (userCode == "AAAAAA" || userCode == "BBBBBB")
+            if (userCode == "AAAAA" || userCode == "BBBBB")
             {
                 return true;
             }
@@ -131,7 +131,7 @@ namespace JYXWeb.Util
         public static Image GetBarcodeImage(string id)
         {
             var checksum = Code128Checksum.Instance;
-            var barcode = new Code128BarcodeDraw(checksum).Draw(id, 50, 2);
+            var barcode = new Code128BarcodeDraw(checksum).Draw(id, 40, 2);
             return barcode;
         }
 

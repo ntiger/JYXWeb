@@ -20,13 +20,17 @@ if (typeof angularApp === 'undefined') {
 angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$timeout', '$appUtil', '$mdDialog', '$fileReader', '$menu',
     function ($scope, $http, $filter, $log, $timeout, $appUtil, $mdDialog, $fileReader, $menu) {
         $scope.$appUtil = $appUtil;
-
-        $scope.startDate = new Date(new Date().getFullYear(), 0, 1);
+        var d = new Date();
+        d.setMonth(d.getMonth() - 2);
+        $scope.startDate = new Date(d.getFullYear(), d.getMonth(), 1);
         $scope.endDate = new Date();
         $scope.statusList = ['全部', '待入库', '已入库', '已出库', '空运中', '清关中', '国内转运', '待退货', '已退货', '问题件'];
         $scope.statusListAdmin = ['全部', '待入库', '确认发货(未到货)', '已入库', '未预报', '确认发货(已到货)', '已出库', '空运中', '清关中', '国内转运', '待退货', '已退货', '问题件'];
         $scope.channelList = ['身份证渠道', '无身份证渠道', '混装渠道'];
         $scope.statusDict = {};
+        $scope.exportTemplates = ['默认格式', '实重收费格式', '混装格式'];
+        $scope.exportTemplate = $scope.exportTemplates[0];
+
         for (var i = 0; i < $scope.statusListAdmin.length; i++) {
             $scope.statusDict[$scope.statusListAdmin[i]] = $scope.statusListAdmin[i];
             if ($scope.statusListAdmin[i] === '确认发货(未到货)') {
@@ -488,7 +492,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
 
         $scope.export = function () {
             var packageIDs = $scope.selectedPackages.map(function (pkg) { return pkg.ID }).join('&ids=');
-            var src = "/Package/ExportPackages?ids=" + packageIDs;
+            var src = "/Package/ExportPackages?ids=" + packageIDs + '&template=' +$scope.exportTemplate;
             window.open(src, "", "", "");
         };
 

@@ -115,7 +115,7 @@ namespace JYXWeb.Controllers
                         dataContext.SubmitChanges();
                         if (existingRecord.Quantity != null && existingRecord.Price != null)
                         {
-                            new TransactionController().SaveTransaction(id.Substring(0, 6), TransactionController.TRANSACTION_TYPE_REFUND_PURCHASE, existingRecord.Quantity.Value * existingRecord.Price.Value, "取消代刷订单：" + id);
+                            new TransactionController().SaveTransaction(id.Substring(0, User.Identity.GetUserCode().Length), TransactionController.TRANSACTION_TYPE_REFUND_PURCHASE, existingRecord.Quantity.Value * existingRecord.Price.Value, "取消代刷订单：" + id);
                         }
                     }
                 }
@@ -131,7 +131,7 @@ namespace JYXWeb.Controllers
 
                     if (order.Quantity != null && order.Price != null)
                     {
-                        new TransactionController().SaveTransaction(id.Substring(0, 6), TransactionController.TRANSACTION_TYPE_REFUND_PURCHASE, -1 * order.Quantity.Value * order.Price.Value * (1 + order.PercentFee.Value), "代刷订单：" + id);
+                        new TransactionController().SaveTransaction(id.Substring(0, userCode.Length), TransactionController.TRANSACTION_TYPE_REFUND_PURCHASE, -1 * order.Quantity.Value * order.Price.Value * (1 + order.PercentFee.Value), "代刷订单：" + id);
                     }
                 }
                 dataContext.SubmitChanges();

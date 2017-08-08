@@ -1,6 +1,9 @@
 ﻿@using Microsoft.AspNet.Identity;
 @using JYXWeb.Util;
 
+<md-button aria-label="" href="/Address/UploadIDCard">
+    上传身份证
+</md-button>
 @if (Request.IsAuthenticated)
 {
     var username = User.Identity.GetUserName().Split('@')[0];

@@ -9,6 +9,8 @@ using System.Text;
 using Microsoft.Office.Interop.Excel;
 using System.Web;
 using System.Security.Cryptography;
+using NPOI.HSSF.UserModel;
+using System.IO;
 
 namespace JYXWeb.Util
 {
@@ -76,6 +78,81 @@ namespace JYXWeb.Util
 
             return trackingInfo;
         }
+
+        public static byte[] ExportXLSOpenXML(Package[] packages)
+        {
+            // Creating the workbook...
+            var templateWorkbook = new HSSFWorkbook();
+
+            // Getting the worksheet by its name...
+            var sheet = templateWorkbook.GetSheet("Sheet1");
+            if (sheet == null)
+            {
+                sheet = templateWorkbook.CreateSheet("Sheet1");
+            }
+
+            var row = 0;
+            var col = 0;
+
+                                            
+            var dataRow = sheet.CreateRow(row);
+            dataRow.CreateCell(col++).SetCellValue("速佳单号");
+            dataRow.CreateCell(col++).SetCellValue("所属店");
+            dataRow.CreateCell(col++).SetCellValue("寄件人姓名");
+            dataRow.CreateCell(col++).SetCellValue("寄件人电话");
+            dataRow.CreateCell(col++).SetCellValue("收件人姓名");
+            dataRow.CreateCell(col++).SetCellValue("收件人电话");
+            dataRow.CreateCell(col++).SetCellValue("收件人地址");
+            dataRow.CreateCell(col++).SetCellValue("导入重量(LB)");
+            dataRow.CreateCell(col++).SetCellValue("导入日期");
+            dataRow.CreateCell(col++).SetCellValue("预选渠道");
+            dataRow.CreateCell(col++).SetCellValue("申报价值");
+            dataRow.CreateCell(col++).SetCellValue("保险");
+            for(var i = 0; i < 10; i++)
+            {
+                dataRow.CreateCell(col++).SetCellValue("内件" + (i + 1) + "品牌");
+                dataRow.CreateCell(col++).SetCellValue("内件" + (i + 1) + "品名");
+                dataRow.CreateCell(col++).SetCellValue("内件" + (i + 1) + "数量");
+            }
+            
+            row++;
+            for (var i = 0; i < packages.Length; i++)
+            {
+                col = 0;
+                var package = packages[i];
+                dataRow = sheet.CreateRow(row);
+                dataRow.CreateCell(col++).SetCellValue(package.ID);
+                dataRow.CreateCell(col++).SetCellValue("小杨");
+                dataRow.CreateCell(col++).SetCellValue(package.Sender.Name);
+                dataRow.CreateCell(col++).SetCellValue(package.Sender.Phone);
+                dataRow.CreateCell(col++).SetCellValue(package.Address.Name);
+                dataRow.CreateCell(col++).SetCellValue(package.Address.Phone);
+                dataRow.CreateCell(col++).SetCellValue(package.Address.District1.District1.District1.Name +
+                    package.Address.District1.District1.Name + package.Address.District1.Name + package.Address.Street);
+                dataRow.CreateCell(col++).SetCellValue(package.Weight ?? package.WeightEst ?? 2);
+                dataRow.CreateCell(col++).SetCellValue("");
+                dataRow.CreateCell(col++).SetCellValue("混装");
+                dataRow.CreateCell(col++).SetCellValue(package.Products.Select(a => a.Price == null ? 0 : a.Price.Value).Sum().ToString());
+                dataRow.CreateCell(col++).SetCellValue("");
+                foreach (var product in package.Products.Skip(1))
+                {
+                    dataRow.CreateCell(col++).SetCellValue(product.Brand);
+                    dataRow.CreateCell(col++).SetCellValue(product.Name);
+                    dataRow.CreateCell(col++).SetCellValue(product.Quantity == null ? "" : product.Quantity.ToString());
+                }
+
+                row++;
+            }
+
+            var ms = new MemoryStream();
+
+            // Writing the workbook content to the FileStream...
+            templateWorkbook.Write(ms);
+
+            // Sending the server processed data back to the user computer...
+            return ms.ToArray();
+        }
+
     }
 
 }

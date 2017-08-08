@@ -335,7 +335,7 @@ namespace JYXWeb.Controllers
                 {
                     if (package.IDOther != null && package.IDOther.IndexOf("FH") == 0)
                     {
-                        return Json(MFUtil.GetTrackingInfo(package.IDOther), JsonRequestBehavior.AllowGet);
+                        return Json(MFUtil.GetTrackingInfo(package.IDOther, package.ID), JsonRequestBehavior.AllowGet);
                     }
                     if (package.ID.IndexOf("MT") == 0)
                     {
@@ -350,12 +350,25 @@ namespace JYXWeb.Controllers
             return Json(TMUtil.GetTrackingInfo(id), JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult ExportPackages(string[] ids)
+        public ActionResult ExportPackages(string[] ids, string template)
         {
             using (var packageDataConext = new PackageDataContext())
             {
                 var packages = ids.Join(packageDataConext.Packages.Where(a => a.Address != null && a.Sender != null), a => a, b => b.ID, (a, b) => b).ToArray();
-                var fileContent = TMUtil.ExportXLSOpenXML(packages);
+                byte[] fileContent;
+                if (template == "实重收费格式")
+                {
+                    fileContent = MFUtil.ExportXLSOpenXML(packages);
+                    return File(fileContent, AppUtil.GetContentType("xxx.xlsx"), "packages.xlsx");
+                }
+                else if (template == "混装格式")
+                {
+                    fileContent = YDUtil.ExportXLSOpenXML(packages);
+                }
+                else
+                {
+                    fileContent = TMUtil.ExportXLSOpenXML(packages);
+                }
                 return File(fileContent, AppUtil.GetContentType("xxx.xls"), "packages.xls");
             }
         }
@@ -449,11 +462,17 @@ namespace JYXWeb.Controllers
                     y += fontHeight + offset;
 
 
+                    var channel = package.Channel;
+                    tf.DrawString(channel, font, XBrushes.Black,
+                      new XRect(x, y, page.Width - 2 * x, fontHeight), XStringFormats.TopLeft);
+                    y += fontHeight + offset;
+
+
                     tf.DrawString("发件人:", font, XBrushes.Black,
                       new XRect(x, y, page.Width - 2 * x, fontHeight), XStringFormats.TopLeft);
                     y += fontHeight + lineSpace;
 
-                    var sender = string.Join(" ", new string[] { package.Sender.Name, package.Sender.Address, package.Sender.Phone });
+                    var sender = string.Join(" ", new string[] { package.Sender.Name });
                     tf.DrawString(sender, font, XBrushes.Black,
                       new XRect(x, y, page.Width - 2 * x, fontHeight), XStringFormats.TopLeft);
                     y += fontHeight + offset;
@@ -481,8 +500,7 @@ namespace JYXWeb.Controllers
                     foreach (var product in package.Products)
                     {
                         var productStr = string.Join(" ", new string[] {
-                            product.Brand, product.Name, "*"+product.Quantity,
-                            string.Format("{0:C0}",product.Price),
+                            product.Brand, product.Name, "*" + product.Quantity,
                         });
                         tf.DrawString(productStr, font, XBrushes.Black,
                           new XRect(x, y, page.Width - 2 * x, fontHeight), XStringFormats.TopLeft);
@@ -497,13 +515,16 @@ namespace JYXWeb.Controllers
         }
 
 
-        public string GeneratePackageCode()
+        public string GeneratePackageCode(string usercode = null)
         {
+            usercode = usercode ?? User.Identity.GetUserCode();
             var code = "";
             using (var packageDataContext = new PackageDataContext())
             {
-                var maxCode = packageDataContext.Packages.Select(a => a.ID).Where(a => a.Contains("TM")).Max(a => a);
-                code = "TM" + (long.Parse(maxCode.Replace("TM", "")) + 1);
+                var codeBase = "MT" + DateTime.Today.Year.ToString().Substring(2) + usercode;
+                var existingCodes = packageDataContext.Packages.Select(a => a.ID).Where(a => a.Contains(codeBase)).ToArray();
+                var maxCode = existingCodes.Length == 0 ? codeBase + "10000" : existingCodes.Max(a => a);
+                code = codeBase + (long.Parse(maxCode.Replace(codeBase, "")) + 1);
             }
             return code;
         }

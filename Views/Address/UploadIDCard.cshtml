@@ -1,0 +1,86 @@
+﻿@{
+    ViewBag.Title = "上传身份证";
+}
+<h2>@ViewBag.Title</h2>
+<div class="container">
+    <md-input-container class="md-block" flex-gt-xs>
+        <label>运单号 <span style="color:red">*</span></label>
+        <input ng-model="packageID">
+    </md-input-container>
+    <md-input-container class="md-block" flex-gt-xs>
+        <label>身份证号 <span style="color:red">*</span></label>
+        <input ng-model="IDCard">
+    </md-input-container>
+    <md-input-container class="md-block" flex-gt-xs>
+        <span class="btn btn-xs btn-primary fileinput-button">
+            <span>上传身份证照片正面</span>
+            <input type="file" name="files" aria-label="file" multiple ng-file-select="addImage(0)">
+        </span>
+    </md-input-container>
+    <md-input-container class="md-block" flex-gt-xs>
+        <span class="btn btn-xs btn-primary fileinput-button">
+            <span>上传身份证照片反面</span>
+            <input type="file" name="files" aria-label="file" multiple ng-file-select="addImage(1)">
+        </span>
+    </md-input-container>
+    <div layout="row">
+        <div style="height:100px" data-ng-repeat="img in IDCardImages track by $index" flex-gt-xs>
+            <a href="" ng-click="IDCardImages.splice($index,1)">
+                <md-icon class="material-icons" style="color:red;font-weight:bold;">clear</md-icon>
+            </a>
+            <img style="height:100%;width:auto;display:block;" data-ng-src="{{img}}" />
+        </div>
+    </div>
+    <br />
+    <button type="button" class="btn btn-sm btn-primary" ng-click="updateIDCard()">提交</button>
+
+</div>
+
+@section Scripts {
+<script>
+    if (typeof angularApp === 'undefined') {
+        angularApp = angular.module('addressApp', ['ngMaterial', 'ngMessages', 'material.svgAssetsCache', 'md.data.table',
+            'appFltr', 'appFctry', 'appSrvc', 'appDirective']);
+    }
+    angularApp.controller('addressCtrl', ['$scope', '$http', '$filter', '$log', '$timeout', '$appUtil', '$mdDialog', '$fileReader', '$menu',
+        function ($scope, $http, $filter, $log, $timeout, $appUtil, $mdDialog, $fileReader, $menu) {
+            $scope.$appUtil = $appUtil;
+
+            $scope.addImage = function (index) {
+                $fileReader.readAsDataUrl($scope.files[$scope.files.length - 1], $scope).then(function (result) {
+                    if (typeof $scope.IDCardImages === 'undefined') {
+                        $scope.IDCardImages = [];
+                    }
+                    $scope.IDCardImages[index] = result;
+                });
+            };
+
+            $scope.updateIDCard = function () {
+                if (typeof $scope.packageID === 'undefined' || $scope.packageID === '') {
+                    $appUtil.appAlert(null, '', '请输入运单号'); return;
+                }
+                if (typeof $scope.IDCard === 'undefined' || $scope.IDCard === '') {
+                    $appUtil.appAlert(null, '', '请输入身份证号'); return;
+                }
+                if (!$appUtil.checkIDCard(pkg.Address.IDCard)) {
+                    $appUtil.appAlert(null, '', '身份证号输入有误，请检查'); return;
+                }
+                $http.get('/Address/CheckIDCard/' + $scope.packageID).then(function (res) {
+                    var IDCardTail = res.data;
+                    if (IDCardTail === '' || confirm('运单身份证已存在（尾号：' + IDCardTail + '），是否覆盖？')) {
+                        var model = {
+                            IDCard: $scope.IDCard,
+                            IDCardImages: $scope.IDCardImages,
+                            packageID: $scope.packageID,
+                        };
+                        $http.post('/Address/UpdateIDCard', model).then(function (res) {
+                            alert(res.data);
+                        });
+                    }
+                });
+            }
+            
+
+        }]);
+</script>
+}

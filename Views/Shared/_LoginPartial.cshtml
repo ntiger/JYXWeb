@@ -14,6 +14,7 @@
     @Html.AntiForgeryToken()
 
     <ul class="nav navbar-nav navbar-right">
+        <li><a href="/Address/UploadIDCard">上传身份证</a></li>
         <li>
             @Html.ActionLink(username + " 欢迎你", "Index", "Account", routeValues: null, htmlAttributes: new { title = "个人中心" })
         </li>
@@ -24,6 +25,7 @@
 else
 {
     <ul class="nav navbar-nav navbar-right">
+        <li><a href="/Address/UploadIDCard">上传身份证</a></li>
         <li>@Html.ActionLink("注册", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
         <li>@Html.ActionLink("登录", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
     </ul>

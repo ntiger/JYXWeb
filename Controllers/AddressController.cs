@@ -24,7 +24,6 @@ namespace JYXWeb.Controllers
             }
         }
 
-
         public ActionResult GetAddresses(int? id)
         {
             using (var packageDataContext = new PackageDataContext())
@@ -59,7 +58,7 @@ namespace JYXWeb.Controllers
             for (var i = 0; i < address.AddressIDCardImages.Count; i++)
             {
                 var img = address.AddressIDCardImages[i].Image;
-                var commaIndex = address.AddressIDCardImages[i].Image.IndexOf(",");
+                var commaIndex = img.IndexOf(",");
                 var header = "data:image/jpeg;base64,";
                 if (commaIndex > -1)
                 {
@@ -187,5 +186,71 @@ namespace JYXWeb.Controllers
                 return Json(returnStr, JsonRequestBehavior.AllowGet);
             }
         }
+
+
+        [AllowAnonymous]
+        public ActionResult UploadIDCard()
+        {
+            ViewBag.angularAppName = "addressApp";
+            ViewBag.angularControllerName = "addressCtrl";
+            return View();
+        }
+
+        [AllowAnonymous]
+        public ActionResult CheckIDCard(string id)
+        {
+            using (var dataContext = new PackageDataContext())
+            {
+                var IDCard = "";
+                var package = dataContext.Packages.Where(a => a.ID == id).SingleOrDefault();
+                if (package != null && package.Address != null && package.Address.IDCard != null)
+                {
+                    IDCard = package.Address.IDCard.Trim();
+                    if (IDCard.Length > 3)
+                    {
+                        IDCard = IDCard.Substring(IDCard.Length - 3);
+                    }
+                }
+                return Json(IDCard, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+        [AllowAnonymous]
+        public ActionResult UpdateIDCard(string packageID, string IDCard, string[] IDCardImages)
+        {
+            using (var dataContext = new PackageDataContext())
+            {
+                var package = dataContext.Packages.Where(a => a.ID == packageID).SingleOrDefault();
+                if (package != null)
+                {
+                    package.Address.IDCard = IDCard;
+                    package.Address.AddressIDCardImages.Clear();
+                    for (var i = 0; IDCardImages != null && i < IDCardImages.Length; i++)
+                    {
+                        var commaIndex = IDCardImages[i].IndexOf(",");
+                        var header = "data:image/jpeg;base64,";
+                        if (commaIndex > -1)
+                        {
+                            header = IDCardImages[i].Substring(0, commaIndex + 1);
+                            IDCardImages[i] = IDCardImages[i].Substring(commaIndex + 1);
+                        }
+                        package.Address.AddressIDCardImages.Add(new AddressIDCardImage
+                        {
+                            Image = header + AppUtil.ResizeImage(IDCardImages[i], 800),
+                        });
+                    }
+                    dataContext.SubmitChanges();
+                }
+                else
+                {
+                    return Json("此运单不存在");
+                }
+            }
+
+            return Json("上传成功");
+        }
+
+
     }
 }
