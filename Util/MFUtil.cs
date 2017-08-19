@@ -46,6 +46,29 @@ namespace JYXWeb.Util
                 trackingInfo.Add(new string[] { package.LastUpdateTime.HasValue ? package.LastUpdateTime.Value.AddHours(-4).ToString("yyyy-MM-dd HH:mm") : "", "运单创建, 等待处理" });
                 trackingInfo.Add(new string[] { package.LastUpdateTime.HasValue ? package.LastUpdateTime.Value.ToString("yyyy-MM-dd HH:mm") : "", "已出库, 送往集散中心" });
             }
+            for (var i = 0; i < nodes.Count; i++)
+            {
+                if (nodes[i].ChildNodes["p"].InnerText.Contains("东部仓到签"))
+                {
+                    trackingInfo.Add(new string[] { nodes[i].ChildNodes["span"].InnerText, "集散中心揽收" });
+                }
+                if (nodes[i].ChildNodes["p"].InnerText.Contains("航班已起飞"))
+                {
+                    trackingInfo.Add(new string[] { nodes[i].ChildNodes["span"].InnerText, "航班已起飞" });
+                }
+                if (nodes[i].ChildNodes["dd"].InnerText.Contains("清关中"))
+                {
+                    trackingInfo.Add(new string[] { nodes[i].ChildNodes["span"].InnerText, "清关中" });
+                }
+                if (nodes[i].ChildNodes["p"].InnerText.Contains("清关已完成"))
+                {
+                    trackingInfo.Add(new string[] { nodes[i].ChildNodes["span"].InnerText, "清关已完成" });
+                }
+                if (nodes[i].ChildNodes["p"].InnerText.Contains("口岸转运确认"))
+                {
+                    trackingInfo.Add(new string[] { nodes[i].ChildNodes["span"].InnerText, nodes[i].ChildNodes["dd"].InnerText.Replace("快递机构", "已转运") });
+                }
+            }
             return trackingInfo;
         }
 
@@ -137,6 +160,7 @@ namespace JYXWeb.Util
             // Sending the server processed data back to the user computer...
             return ms.ToArray();
         }
+        
     }
 
 }

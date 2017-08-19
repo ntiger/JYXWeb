@@ -22,24 +22,25 @@
 
     <md-input-container class="md-block" flex data-ng-show="isAdmin">
         <label>包裹状态</label>
-        <md-select ng-model="package.SubStatus" data-ng-change="updatePackageStatus()">
+        <md-select ng-model="package.SubStatus">
             <md-option ng-repeat="status in statusList track by $index" data-ng-value="status">
                 {{status}}
             </md-option>
         </md-select>
     </md-input-container>
+    
+    <md-input-container class="md-block" flex="5" data-ng-show="isAdmin">
+        <label>重量</label>
+        <input ng-model="package.Weight" ng-change="getPackageCost($event)" ng-model-options="{ updateOn: 'blur'}">
+    </md-input-container>
     <div flex="5" ng-show="showWeightAndCostLoading">
         <img src="/Images/ajax-loader-small.gif" />
     </div>
     <md-input-container class="md-block" flex="5" data-ng-show="isAdmin">
-        <label>重量</label>
-        <input ng-model="package.Weight">
-    </md-input-container>
-    <md-input-container class="md-block" flex="5" data-ng-show="isAdmin">
         <label>价格</label>
         <input ng-model="package.Cost">
     </md-input-container>
-    
+   
 </div>
 <div layout="row">
     <md-input-container md-no-float class="md-block hide-md-error-msg">

@@ -80,9 +80,18 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             model.userCode = $scope.userCode;
             model.userName = $scope.userName;
             $scope.selectedPackages = [];
-            $http.post('/Package/SearchPackages?nocache=' + new Date().getTime(), { criteriaStr: JSON.stringify(model) }).then(function (res) {
+
+            var req = {
+                method: 'POST',
+                url: '/Package/SearchPackages?nocache=' + new Date().getTime(),
+                headers: {
+                    'Cache-Control': 'no-cache'
+                },
+                data: { criteriaStr: JSON.stringify(model) }
+            }
+            $http(req).then(function (res) {
                 $scope.packages = res.data;
-                $scope.packagesOrder = '-ID';
+                $scope.packagesOrder = '-LastUpdateTime';
             });
         }
 
@@ -172,17 +181,12 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             $scope.getSenders();
         }
 
-        $scope.updatePackageStatus = function () {
-            if ($scope.package.SubStatus === '已出库' &&
-                ($scope.package.Weight === null || $scope.package.Weight === '') &&
-                ($scope.package.Cost === null || $scope.package.Cost === '')) {
-                $scope.showWeightAndCostLoading = true;
-                $http.get('/Package/GetPackageWeightAndCost/' + $scope.package.ID).then(function (res) {
-                    $scope.showWeightAndCostLoading = false;
-                    $scope.package.Cost = res.data.Cost;
-                    $scope.package.Weight = res.data.Weight;
-                });
-            }
+        $scope.getPackageCost = function () {
+            $scope.showWeightAndCostLoading = true;
+            $http.get('/Package/GetPackageCost/' + $scope.package.ID + '?weight=' + $scope.package.Weight).then(function (res) {
+                $scope.showWeightAndCostLoading = false;
+                $scope.package.Cost = res.data;
+            });
         }
 
         //#region split package
@@ -277,8 +281,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 return;
             }
             if (pkg.Channel === $scope.channelList[0] && !$appUtil.checkIDCard(pkg.Address.IDCard)) {
-                alert('收货地址身份证输入有误，请检查');
-                return;
+                alert('身份证号码与标准格式不符，请检查');
             }
             if (!$scope.local && (typeof pkg.Tracking === 'undefined' || pkg.Tracking === '')) {
                 alert('请输入包裹追踪号再保存.')
@@ -324,8 +327,8 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             angular.forEach($scope[parentAttr], function (value, key) {
                 if (name === value.Name) { id = value.ID; }
             });
-            if (id === '' && targetAttr !== 'provinces') { return;}
-            $http.get('/Address/GetDistricts/' + id).then(function (res) {
+            if (id === '' && targetAttr !== 'provinces') { return; }
+            $http.get('/Address/GetDistricts/' + id + '?nocache=' + new Date().getTime()).then(function (res) {
                 $scope[targetAttr] = [];
                 angular.forEach(res.data, function (value, key) {
                     $scope[targetAttr].push({ ID: value.ID, Name: value.Name });
@@ -333,7 +336,6 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                         $scope.package.Address.District = value.ID;
                     }
                 });
-                
             });
         }
 
