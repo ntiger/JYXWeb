@@ -509,7 +509,7 @@ namespace JYXWeb.Controllers
                     y += fontHeight + offset;
 
 
-                    var channel = package.Channel;
+                    var channel = package.Channel + "       客户编号：20HGT";
                     tf.DrawString(channel, font, XBrushes.Black,
                       new XRect(x, y, page.Width - 2 * x, fontHeight), XStringFormats.TopLeft);
                     y += fontHeight + offset;

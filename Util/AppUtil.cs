@@ -135,7 +135,7 @@ namespace JYXWeb.Util
         public static Image GetBarcodeImage(string id)
         {
             var checksum = Code128Checksum.Instance;
-            var barcode = new Code128BarcodeDraw(checksum).Draw(id, 40, 2);
+            var barcode = new Code128BarcodeDraw(checksum).Draw(id, 30, 1);
             return barcode;
         }
 
