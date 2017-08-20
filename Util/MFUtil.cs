@@ -39,12 +39,12 @@ namespace JYXWeb.Util
             var package = new PackageDataContext().Packages.Where(a => a.ID == packageID).FirstOrDefault();
             if (package.Status == PackageController.PACKAGE_STATUS_AWAIT)
             {
-                trackingInfo.Add(new string[] { package.LastUpdateTime.HasValue ? package.LastUpdateTime.Value.ToString("yyyy-MM-dd HH:mm") : "", "运单创建, 等待处理" });
+                trackingInfo.Add(new string[] { package.CreateTime.HasValue ? package.CreateTime.Value.ToString("yyyy-MM-dd HH:mm") : "", "运单创建, 等待处理" });
             }
             if(package.Status == PackageController.PACKAGE_STATUS_OUT_OF_WAREHOUSE)
             {
-                trackingInfo.Add(new string[] { package.LastUpdateTime.HasValue ? package.LastUpdateTime.Value.AddHours(-4).ToString("yyyy-MM-dd HH:mm") : "", "运单创建, 等待处理" });
-                trackingInfo.Add(new string[] { package.LastUpdateTime.HasValue ? package.LastUpdateTime.Value.ToString("yyyy-MM-dd HH:mm") : "", "已出库, 送往集散中心" });
+                trackingInfo.Add(new string[] { package.CreateTime.HasValue ? package.CreateTime.Value.AddHours(-4).ToString("yyyy-MM-dd HH:mm") : "", "运单创建, 等待处理" });
+                trackingInfo.Add(new string[] { package.CreateTime.HasValue ? package.CreateTime.Value.ToString("yyyy-MM-dd HH:mm") : "", "已出库, 送往集散中心" });
             }
             for (var i = 0; i < nodes.Count; i++)
             {

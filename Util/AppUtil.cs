@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.OleDb;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -41,6 +43,8 @@ namespace JYXWeb.Util
                 contentType = registryKey.GetValue("Content Type").ToString();
             return contentType;
         }
+
+        #region Image Handling
 
         public static string GetThumbnail(string sourceImageBase64, int? outputWidth, bool keepOriginalRatio = true)
         {
@@ -135,6 +139,7 @@ namespace JYXWeb.Util
             return barcode;
         }
 
+        #endregion
 
         #region External Request
 
@@ -186,7 +191,7 @@ namespace JYXWeb.Util
 
         public static void PostUrlAsync(string url, IDictionary<string, string> keyValuePairs, Dictionary<string, string> headerParams = null)
         {
-            Task.Factory.StartNew(() => PostUrlPrivate(url, keyValuePairs,headerParams));
+            Task.Factory.StartNew(() => PostUrlPrivate(url, keyValuePairs, headerParams));
         }
 
         public static byte[] PostUrl(string url, IDictionary<string, string> keyValuePairs, Dictionary<string, string> headerParams = null)
@@ -228,7 +233,72 @@ namespace JYXWeb.Util
             return responsebody;
         }
 
-        
+
+
+        #endregion
+
+
+        #region File Handling
+
+        public static DataTable ConvertCSVtoDataTable(string strFilePath)
+        {
+            var dt = new DataTable();
+            using (var sr = new StreamReader(strFilePath))
+            {
+                var headers = sr.ReadLine().Split(',');
+                foreach (var header in headers)
+                {
+                    dt.Columns.Add(header);
+                }
+
+                while (!sr.EndOfStream)
+                {
+                    var rows = sr.ReadLine().Split(',');
+                    if (rows.Length > 1)
+                    {
+                        var dr = dt.NewRow();
+                        for (int i = 0; i < headers.Length; i++)
+                        {
+                            dr[i] = rows[i].Trim();
+                        }
+                        dt.Rows.Add(dr);
+                    }
+                }
+
+            }
+
+
+            return dt;
+        }
+
+        public static DataTable ConvertXSLXtoDataTable(string strFilePath, string connString)
+        {
+            var oledbConn = new OleDbConnection(connString);
+            var dt = new DataTable();
+            try
+            {
+                oledbConn.Open();
+                var dbSchema = oledbConn.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
+                var sheet1 = dbSchema.Rows[0].Field<string>("TABLE_NAME");
+                using (var cmd = new OleDbCommand("SELECT * FROM ["+ sheet1 + "]", oledbConn))
+                {
+                    var oleda = new OleDbDataAdapter();
+                    oleda.SelectCommand = cmd;
+                    DataSet ds = new DataSet();
+                    oleda.Fill(ds);
+                    dt = ds.Tables[0];
+                }
+            }
+            catch(Exception e)
+            {
+                Console.Write(e.Message);
+            }
+            finally
+            {
+                oledbConn.Close();
+            }
+            return dt;
+        }
 
         #endregion
     }

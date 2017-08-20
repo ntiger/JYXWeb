@@ -9,13 +9,17 @@ using System.Web.Routing;
 
 namespace JYXWeb.Controllers
 {
-    [Authorize]
     public class GoodsController : Controller
     {
         public ActionResult Index()
         {
             ViewBag.angularAppName = "goodsApp";
             ViewBag.angularControllerName = "goodsCtrl";
+            return View();
+        }
+
+        public ActionResult Item()
+        {
             return View();
         }
         
@@ -79,7 +83,7 @@ namespace JYXWeb.Controllers
                     Quantity = a.GoodsItems.Sum(b => b.Quantity),
                     Image = a.GoodsItems.First().GoodsImages.First().Image,
                 }).OrderBy(a => a.Category).ToList();
-                var result = Json(goods);
+                var result = Json(goods, JsonRequestBehavior.AllowGet);
                 result.MaxJsonLength = int.MaxValue;
                 return result;
             }

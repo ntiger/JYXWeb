@@ -6,6 +6,8 @@ using PdfSharp.Drawing;
 using PdfSharp.Drawing.Layout;
 using PdfSharp.Pdf;
 using System;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -48,7 +50,6 @@ namespace JYXWeb.Controllers
             DateTime endDate = criteria.endDate;
             string status = criteria.status;
             string receiver = criteria.receiver;
-            string tracking = criteria.tracking;
             string packageCode = criteria.packageCode;
             string userName = criteria.userName;
             string userCode = criteria.userCode;
@@ -61,26 +62,14 @@ namespace JYXWeb.Controllers
                 return null;
             }
 
-            var userCodes = new string[] { userCode };
-            if (userCode == "")
-            {
-                var userNames = new ApplicationDbContext().Users.Select(a => new
-                {
-                    Name = (a.FirstName == null ? "" : a.FirstName.ToLower()) + " " + (a.LastName == null ? "" : a.LastName.ToLower()),
-                    UserCode = a.UserCode,
-                }).ToArray();
-                userCodes = userNames.Where(a => userName == null || userName == "" || a.Name.Contains(userName)).Select(a => a.UserCode).ToArray();
-            }
-
             using (var dataContext = new PackageDataContext())
             {
-                var jointPackages = userCodes.Join(dataContext.Packages, a => a, b => b.UserCode, (a, b) => b);
-                var packages = jointPackages.Where(a =>
-                    a.LastUpdateTime >= startDate && a.LastUpdateTime <= endDate &&
+                var packages = dataContext.Packages.Where(a =>
+                    (userCode == null || userCode == "" || a.UserCode == userCode) &&
+                    a.LastUpdateTime.Value.Date >= startDate && a.LastUpdateTime.Value.Date <= endDate &&
                     (packageCode == "" || packageCode == a.ID) &&
                     (status == null || status == "全部" || (!isAdmin && status == a.Status || isAdmin && status == a.SubStatus)) &&
-                    (receiver == "" || a.Address!=null && receiver == a.Address.Name) &&
-                    (tracking == "" || a.Products.Where(b => b.Tracking == tracking).Count() > 0)).Select(a => new
+                    (receiver == "" || a.Address != null && receiver == a.Address.Name)).ToList().Select(a => new
                     {
                         a.ID,
                         Tracking = String.Join("; ", a.Products.Select(b => b.Tracking).Distinct()),
@@ -259,6 +248,7 @@ namespace JYXWeb.Controllers
                     }
                     package.WeightEst = package.WeightEst ?? 2;
                     package.LastUpdateTime = DateTime.Now;
+                    package.CreateTime = DateTime.Now;
                     package.LastUpdateUser = User.Identity.Name;
                     packageDataConext.Packages.InsertOnSubmit(package);
                     packageDataConext.SubmitChanges();
@@ -371,6 +361,68 @@ namespace JYXWeb.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult UploadMFID()
+        {
+            var requestFile = Request.Files["file"];
+            var fileName = "mf.xls";
+            if (requestFile.ContentLength > 0)
+            {
+                string extension = System.IO.Path.GetExtension(requestFile.FileName).Trim().ToLower();
+                string connString = "";
+                string[] validFileTypes = { ".xls", ".xlsx", ".csv" };
+                
+                string path = string.Format("{0}/{1}", Server.MapPath("~/Content/Uploads"), fileName);
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(Server.MapPath("~/Content/Uploads"));
+                }
+                if (validFileTypes.Contains(extension))
+                {
+                    if (System.IO.File.Exists(path))
+                    {
+                        System.IO.File.Delete(path);
+                    }
+                    requestFile.SaveAs(path);
+                    DataTable dataTable;
+                    if (extension == ".csv")
+                    {
+                        dataTable = AppUtil.ConvertCSVtoDataTable(path);
+                    }
+                    //Connection String to Excel Workbook  
+                    else if (extension == ".xls")
+                    {
+                        connString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + path + ";Extended Properties=\"Excel 8.0;HDR=Yes;IMEX=2\"";
+                        dataTable = AppUtil.ConvertXSLXtoDataTable(path, connString);
+                    }
+                    else
+                    {
+                        connString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + path + ";Extended Properties=\"Excel 12.0;HDR=Yes;IMEX=2\"";
+                        dataTable = AppUtil.ConvertXSLXtoDataTable(path, connString);
+                    }
+
+                    using (var dataContext = new PackageDataContext())
+                    {
+                        for (var i = 0; i < dataTable.Rows.Count; i++)
+                        {
+                            var id = dataTable.Rows[i][1];
+                            var idOther = dataTable.Rows[i][19];
+                            if (id != null && id.ToString() != "")
+                            {
+                                var package = dataContext.Packages.Where(a => a.ID == id.ToString()).SingleOrDefault();
+                                if (package != null && idOther != null && idOther.ToString() != "")
+                                {
+                                    package.IDOther = idOther.ToString();
+                                    dataContext.SubmitChanges();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return Json("匹配成功");
+        }
+
         [Authorize(Users = MvcApplication.ADMIN_USERS)]
         public ActionResult GetPackageCost(string id, double weight = 2)
         {
@@ -389,7 +441,7 @@ namespace JYXWeb.Controllers
                         unitPrice = assignedUnitPrice ?? channel.DefaultPrice.Value;
                     }
                     var cost = weight * unitPrice;
-                    return Json(cost, JsonRequestBehavior.AllowGet);
+                    return Json(Math.Round(cost * 100000) / 100000, JsonRequestBehavior.AllowGet);
                 }
             }
             return null;

@@ -193,5 +193,6 @@ angular.module('appSrvc', ['ngMaterial'])
             if (residue !== ID.substr(17, 1)) return false;
 
             return true;
-        }
+        };
+
     }]);

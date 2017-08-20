@@ -66,7 +66,12 @@
                 </md-option>
             </md-select>
         </md-input-container>
-    </md-input-container>
+        <md-input-container flex-gt-xs data-ng-if="isAdmin">
+            <span class="btn btn-xs btn-primary fileinput-button">
+                <span>匹配单号</span>
+                <input type="file" name="files" aria-label="file" multiple ng-file-select="uploadMFID()">
+            </span>
+        </md-input-container>
     <div layout="column">
         <md-table-container>
             <table class="table-striped" md-table md-row-select="options.rowSelection" multiple="{{options.multiSelect}}"
@@ -144,5 +149,5 @@
     @Html.Partial("_AddressModal")
     @Html.Partial("_SenderModal")
     @Html.Partial("_TrackingModal")
-    <script src="~/src/app/controllers/packageCtrl.js?0.1.6"></script>
+    <script src="~/src/app/controllers/packageCtrl.js?0.1.10"></script>
 }

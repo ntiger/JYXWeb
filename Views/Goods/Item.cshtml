@@ -1,0 +1,56 @@
+﻿@using JYXWeb.Util;
+@{
+    ViewBag.Title = "";
+    var userCode = User.Identity.GetUserCode();
+    var isAdmin = AppUtil.IsAdmin(userCode).ToString().ToLower();
+}
+
+<div ng-init="isAdmin=@isAdmin;init();">
+    <h1 class="text-center">
+        商品分享区
+        <md-button ng-show="isAdmin" class="md-fab md-warn"
+                   ng-click="goodsEntry={Category:category,GoodsItems:[{GoodsImages:[]}]};showUpload($event)"
+                   aria-label="Show upload">
+            <md-tooltip md-direction="right">添加新商品</md-tooltip>
+            <md-icon class="material-icons">add</md-icon>
+        </md-button>
+        <md-button class="md-fab md-warn"
+                   ng-click="showOrders($event)"
+                   aria-label="Show orders">
+            <md-tooltip md-direction="right">消费记录</md-tooltip>
+            <md-icon class="material-icons">list</md-icon>
+        </md-button>
+    </h1>
+    <h4 layout="row">
+        <span flex></span>
+        <md-input-container flex md-no-float class="md-block hide-md-error-msg">
+            <label>分类</label>
+            <md-select ng-model="category" ng-change="search()">
+                <md-option ng-repeat="category in categories track by $index" data-ng-value="category"
+                           md-on-close="search()">
+                    {{category}}
+                </md-option>
+            </md-select>
+        </md-input-container>
+        <span flex></span>
+    </h4>
+    <div class="row" style="">
+        <div class="col-xs-6 col-md-3" ng-repeat="g in goods track by $index">
+            <a href="" ng-click="showDetail($event, g)" >
+                <img ng-src="{{g.Image}}" 
+                     style="width:100%;height:auto;display:block" class="md-card-image" alt="Washed Out">
+            </a>
+            <h3>{{g.Brand}} {{g.Name}}</h3>
+            <p>
+                库存: 
+                <span ng-show="!isAdmin">{{g.Quantity}}</span>
+                <a ng-show="isAdmin" href="" ng-click="getGoodsEntry(g, showUpload, true)">{{g.Quantity}}</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/src/app/controllers/goodsCtrl.js"></script>
+}
+

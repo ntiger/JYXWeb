@@ -64,9 +64,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             if (callback) {
                 callback();
             }
-            if ($scope.status !== '全部') {
-                $scope.searchPackages();
-            }
+            $scope.searchPackages();
         }
 
         $scope.searchPackages = function () {
@@ -96,12 +94,12 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         }
 
         $scope.refreshPackages = function () {
-            $scope.startDate = new Date(new Date().getFullYear(), 0, 1);
-            $scope.endDate = new Date();
-            $scope.status = $scope.statusList[0];
-            $scope.receiver = '';
-            $scope.packageCode = '';
-            $scope.tracking = '';
+            //$scope.startDate = new Date(new Date().getFullYear(), 0, 1);
+            //$scope.endDate = new Date();
+            //$scope.status = $scope.statusList[0];
+            //$scope.receiver = '';
+            //$scope.packageCode = '';
+            //$scope.tracking = '';
             $scope.searchPackages();
         }
 
@@ -283,10 +281,10 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
             if (pkg.Channel === $scope.channelList[0] && !$appUtil.checkIDCard(pkg.Address.IDCard)) {
                 alert('身份证号码与标准格式不符，请检查');
             }
-            if (!$scope.local && (typeof pkg.Tracking === 'undefined' || pkg.Tracking === '')) {
-                alert('请输入包裹追踪号再保存.')
-                return;
-            }
+            //if (!$scope.local && (typeof pkg.Tracking === 'undefined' || pkg.Tracking === '')) {
+            //    alert('请输入包裹追踪号再保存.')
+            //    return;
+            //}
 
             if (typeof pkg.ID === 'undefined' || pkg.ID === '') {
                 $http.post('/Package/CheckTracking/' + pkg.Tracking).then(function (res) {
@@ -376,10 +374,13 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         $scope.updateAddressString = function () {
             $scope.addressIDs = [];
             angular.forEach($scope.addresses, function (value, key) {
-                value.addressString = value.ProvinceName + ' ' + value.CityName + ' ' + value.DistrictName + ' ' +
-                value.Street + ' ' + value.Name + ' ' + value.Phone;
+                value.addressString = value.Name + ' ' + value.ProvinceName + ' ' + value.CityName + ' ' + value.DistrictName + ' ' +
+                    value.Street + ' ' + value.Phone;
                 $scope.addressIDs.push(value.ID);
             });
+
+            $scope.addresses.sort((a, b) => a.Name.localeCompare(b.Name, 'zh-CN'));
+
             $scope.provinces = [];
             $scope.provinces.push({ ID: $scope.package.Address.Province, Name: $scope.package.Address.ProvinceName });
 
@@ -524,6 +525,28 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 });
             });
         };
+
+        $scope.uploadMFID = function () {
+            var formData = new FormData();
+            formData.append('file', $scope.childFileSelectScope.files[$scope.childFileSelectScope.files.length - 1]);
+            $('body').addClass('loading');
+            var request = {
+                method: 'POST',
+                url: '/Package/UploadMFID/',
+                data: formData,
+                headers: {
+                    'Content-Type': undefined
+                }
+            };
+            $http(request).then(function (res) {
+                $('body').removeClass('loading');
+                alert(res.data);
+            }, function () {
+                $('body').removeClass('loading');
+                alert('匹配失败，联系你老公');
+            });
+        }
+
 
         // SideNav
         var vm = this;
