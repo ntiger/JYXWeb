@@ -75,7 +75,21 @@ namespace JYXWeb.Util
             {
                 trackingInfo.Insert(trackingInfo.Count > 0 ? 1 : 0, new string[] { data["date"].Replace("速佳快递", "美天优递"), data["info"].Replace("速佳", "").Replace("韵达", "") });
             }
-
+            if (trackingInfo.Count == 1 && trackingInfo[0][1].Contains("不存在"))
+            {
+                trackingInfo.Clear();
+                var package = new PackageDataContext().Packages.Where(a => a.ID == id).FirstOrDefault();
+                trackingInfo.Add(new string[] { package.CreateTime.HasValue ? package.CreateTime.Value.AddHours(-4).ToString("yyyy-MM-dd HH:mm") : "", "运单创建, 等待处理" });
+                trackingInfo.Add(new string[] { package.CreateTime.HasValue ? package.CreateTime.Value.ToString("yyyy-MM-dd HH:mm") : "", "已出库, 送往集散中心" });
+                if (DateTime.Now > package.CreateTime.Value.AddDays(6).AddMinutes(1190))
+                {
+                    trackingInfo.Add(new string[] { package.CreateTime.HasValue ? package.CreateTime.Value.AddDays(6).AddMinutes(1190).ToString("yyyy-MM-dd HH:mm") : "", "送机场, 飞行中" });
+                }
+                if (DateTime.Now > package.CreateTime.Value.AddDays(9).AddMinutes(122))
+                {
+                    trackingInfo.Add(new string[] { package.CreateTime.HasValue ? package.CreateTime.Value.AddDays(9).AddMinutes(122).ToString("yyyy-MM-dd HH:mm") : "", "清关中" });
+                }
+            }
             return trackingInfo;
         }
 

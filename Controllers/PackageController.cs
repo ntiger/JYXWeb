@@ -325,6 +325,10 @@ namespace JYXWeb.Controllers
                     {
                         return Json(MFUtil.GetTrackingInfo(package.IDOther, package.ID), JsonRequestBehavior.AllowGet);
                     }
+                    if (package.ID.IndexOf("ZTM") == 0)
+                    {
+                        return Json(ZLUtil.GetTrackingInfo(id), JsonRequestBehavior.AllowGet);
+                    }
                     if (package.ID.IndexOf("MT") == 0)
                     {
                         return Json(YDUtil.GetTrackingInfo(id), JsonRequestBehavior.AllowGet);

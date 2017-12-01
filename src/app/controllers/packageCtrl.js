@@ -48,6 +48,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
         $scope.tracking = '';
         $scope.addressIDs = [];
         $scope.senderIDs = [];
+        $scope.selected = [];
 
         $scope.selectedPackages = [];
         $scope.options = {
@@ -279,7 +280,7 @@ angularApp.controller('packageCtrl', ['$scope', '$http', '$filter', '$log', '$ti
                 return;
             }
             if (pkg.Channel === $scope.channelList[0] && !$appUtil.checkIDCard(pkg.Address.IDCard)) {
-                alert('身份证号码与标准格式不符，请检查');
+                //alert('身份证号码与标准格式不符，请检查');
             }
             //if (!$scope.local && (typeof pkg.Tracking === 'undefined' || pkg.Tracking === '')) {
             //    alert('请输入包裹追踪号再保存.')

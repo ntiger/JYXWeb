@@ -42,7 +42,7 @@ namespace JYXWeb.Controllers
                     a.Phone,
                     a.PostCode,
                     a.IDCard,
-                    a.DoNotDisplay,
+                    DoNotDisplay = a.DoNotDisplay ?? false,
                     AddressIDCardImages = a.AddressIDCardImages.Select(b => new
                     {
                         b.Image
@@ -86,6 +86,7 @@ namespace JYXWeb.Controllers
                 }
                 else
                 {
+                    address.Name = address.Name ?? "";
                     address.UserCode = User.Identity.GetUserCode();
                     packageDataContext.Addresses.InsertOnSubmit(address);
                 }
